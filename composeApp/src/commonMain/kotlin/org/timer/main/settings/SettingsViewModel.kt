@@ -1,12 +1,8 @@
 package org.timer.main.settings
 
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import org.timer.main.data.SettingsGateway
-import org.timer.main.data.TimeSettings
+import androidx.lifecycle.*
+import kotlinx.coroutines.flow.*
+import org.timer.main.data.*
 
 class SettingsViewModel : ViewModel() {
     private val _viewState = MutableStateFlow(SettingsViewState())

@@ -1,37 +1,26 @@
 package org.timer.main.timer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.diamondedge.logging.logging
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import androidx.lifecycle.compose.*
+import androidx.lifecycle.viewmodel.compose.*
+import com.diamondedge.logging.*
 
 @ExperimentalMaterial3Api
 @Composable
 fun TimerScreen(
-    modifier: Modifier,
-    viewState: TimerViewState,
-    viewModel: TimerViewModel,
+    modifier: Modifier = Modifier,
+    viewModel: TimerViewModel = viewModel { TimerViewModel() },
 ) {
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
     Column(modifier) {
         Row(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
             Text(
@@ -64,7 +53,6 @@ fun TimerScreen(
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 SecondaryTabRow(
-                    //  containerColor = MaterialTheme.colorScheme.primaryContainer,
                     selectedTabIndex = viewState.selectedTabIndex
                 ) {
                     titles.forEachIndexed { index, title ->

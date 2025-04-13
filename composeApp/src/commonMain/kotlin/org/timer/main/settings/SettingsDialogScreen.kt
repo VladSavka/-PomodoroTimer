@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.timer.main.*
 
 @Composable
 fun SettingsDialogScreen(
@@ -29,7 +30,7 @@ fun SettingsDialogScreen(
     isDialogVisible: (Boolean) -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-
+    
     SingleChoiceDialog(
         title = "Settings",
         radioOptions = listOf(
@@ -58,20 +59,10 @@ fun SingleChoiceDialog(
     val (selectedItemIndex, setSelectedItemIndex) = remember {
         mutableStateOf(indexOfDefault)
     }
-    AlertDialog(
-        title = { Text(text = title) },
-        text = {
+    if (remeberWindowInfo().isMobileDevice()){
+        Column {
+            Text(text = title)
             RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
-        },
-        onDismissRequest = {
-            isDialogVisible(false)
-        },
-        dismissButton = {
-            TextButton(onClick = { isDialogVisible(false) }) {
-                Text(text = "Dismiss")
-            }
-        },
-        confirmButton = {
             TextButton(enabled = viewState.isConfirmEnabled, onClick = {
                 isDialogVisible(false)
                 onItemSelected(selectedItemIndex)
@@ -79,7 +70,31 @@ fun SingleChoiceDialog(
                 Text(text = "Confirm")
             }
         }
-    )
+    } else {
+        AlertDialog(
+            title = { Text(text = title) },
+            text = {
+                RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
+            },
+            onDismissRequest = {
+                isDialogVisible(false)
+            },
+            dismissButton = {
+                TextButton(onClick = { isDialogVisible(false) }) {
+                    Text(text = "Dismiss")
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = viewState.isConfirmEnabled, onClick = {
+                    isDialogVisible(false)
+                    onItemSelected(selectedItemIndex)
+                }) {
+                    Text(text = "Confirm")
+                }
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -101,7 +116,7 @@ fun RadioItem(
                 RadioButtonWithText(index, selectedItemIndex, setIndexOfSelected, text)
             }
             if (index == items.size - 1) {
-                Row {
+                Column {
                     Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
                         OutlinedTextField(
                             value = viewState.focusMinutes,

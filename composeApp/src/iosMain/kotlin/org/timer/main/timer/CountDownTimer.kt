@@ -2,15 +2,17 @@ package org.timer.main.timer
 
 actual class CountDownTimer actual constructor(
     totalMillis: Long,
-    onTick: (Long) -> Unit,
-    onFinish: () -> Unit
+    actual val onTick: (Long) -> Unit,
+    actual val onFinish: () -> Unit,
+    actual val isRunning: (Boolean) -> Unit
 ) {
-    actual var millisInFuture: Long = 0
-        get() = TODO("Not yet implemented")
-    actual val onTick: (Long) -> Unit
-        get() = TODO("Not yet implemented")
-    actual val onFinish: () -> Unit
-        get() = TODO("Not yet implemented")
+    actual var totalMillis: Long
+        get() = 1
+        set(value) {}
+
+    actual var currentMillis: Long
+        get() = 1
+        set(value) {}
 
     actual fun startTimer() {
     }
@@ -18,5 +20,11 @@ actual class CountDownTimer actual constructor(
     actual fun pauseTimer() {
     }
 
-    actual var currentMillis: Long = 0
+    actual fun resetTimer() {
+    }
+
+    actual fun isFinished(): Boolean {
+        TODO("Not yet implemented")
+    }
+
 }

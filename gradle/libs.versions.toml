@@ -21,6 +21,7 @@ kotlinxDatetime = "0.6.2"
 lifecycleViewmodelCompose = "2.8.2"
 logging = "2.0.3"
 mediaplayerKmp = "2.0.9"
+precompose = "1.5.11"
 
 [libraries]
 astroplayer-core = { module = "com.example.astroplayer:astroplayer-core", version.ref = "astroplayerCore" }
@@ -42,6 +43,9 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 logging = { module = "com.diamondedge:logging", version.ref = "logging" }
 mediaplayer-kmp = { module = "io.github.khubaibkhan4:mediaplayer-kmp", version.ref = "mediaplayerKmp" }
+precompose = { module = "moe.tlaster:precompose", version.ref = "precompose" }
+precompose-koin = { module = "moe.tlaster:precompose-koin", version.ref = "precompose" }
+precompose-viewmodel = { module = "moe.tlaster:precompose-viewmodel", version.ref = "precompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

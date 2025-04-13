@@ -20,5 +20,12 @@ actual class CountDownTimer actual constructor(
     actual fun pauseTimer() {
     }
 
+    actual fun resetTimer() {
+    }
+
+    actual fun isFinished(): Boolean {
+        TODO("Not yet implemented")
+    }
+
 
 }

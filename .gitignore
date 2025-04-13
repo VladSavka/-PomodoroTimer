@@ -77,3 +77,5 @@ build/
 
 # Local configuration file
 local.properties
+*.klib
+*.salive

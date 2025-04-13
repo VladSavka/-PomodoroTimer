@@ -1,0 +1,242 @@
+package org.timer.main.timer
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.diamondedge.logging.logging
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
+import org.timer.main.data.SettingsGateway
+import org.timer.main.data.WorkoutVideosGateway
+
+private const val ITERATIONS_IN_ONE_CYCLE = 4
+
+class TimerViewModel : ViewModel() {
+    private val _viewState = MutableStateFlow(TimerViewState())
+    val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
+
+    private val alarmPlayer = AlarmPlayer()
+    private lateinit var pomodoroTimer: CountDownTimer
+    private lateinit var shortBreakTimer: CountDownTimer
+    private lateinit var longBreakTimer: CountDownTimer
+
+
+    init {
+        viewModelScope.launch {
+            initTimers()
+        }
+
+        SettingsGateway.getTimeSettings()
+            .onEach { resetTimers() }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun initTimers() {
+        val settings = SettingsGateway.getTimeSettings().first()
+        pomodoroTimer = CountDownTimer(
+            settings.pomodoroTime,
+            onTick = ::onPomodoroTick,
+            onFinish = ::onPomodoroFinish,
+            isRunning = { isRunning -> _viewState.update { it.copy(isPomodoroTimerRunning = isRunning) } }
+
+        )
+        shortBreakTimer = CountDownTimer(
+            settings.shortBreakTime,
+            onTick = ::onShortBreakTick,
+            onFinish = ::onShortBreakFinish,
+            isRunning = { isRunning -> _viewState.update { it.copy(isShortBreakRunning = isRunning) } }
+        )
+        longBreakTimer = CountDownTimer(
+            settings.longBreakTime,
+            onTick = ::onLongBreakTick,
+            onFinish = ::onLongBreakFinish,
+            isRunning = { isRunning -> _viewState.update { it.copy(isLongBreakTimerRunning = isRunning) } }
+        )
+
+        _viewState.update {
+            it.copy(
+                pomodoroTime = settings.pomodoroTime.formatToMMSS(),
+                shortBreakTime = settings.shortBreakTime.formatToMMSS(),
+                longBreakTime = settings.longBreakTime.formatToMMSS(),
+            )
+        }
+    }
+
+    private fun startShortBreak()  {
+        pomodoroTimer.resetTimer()
+        longBreakTimer.resetTimer()
+        shortBreakTimer.startTimer()
+        _viewState.update {
+            it.copy(
+                selectedTabIndex = 1,
+                videoLink = WorkoutVideosGateway.getYoutubeVideos().random()
+            )
+        }
+    }
+
+    private fun onShortBreakFinish() {
+        alarmPlayer.play(onEnded = ::startNextPomodoroIteration)
+    }
+
+    private fun onLongBreakFinish() {
+        alarmPlayer.play(onEnded = ::startNextPomodoroIteration)
+    }
+
+    private fun startNextPomodoroIteration() = viewModelScope.launch {
+        pomodoroTimer.resetTimer()
+        longBreakTimer.resetTimer()
+        shortBreakTimer.resetTimer()
+        pomodoroTimer.startTimer()
+        var kittyDoroNumber = viewState.value.kittyDoroNumber
+        kittyDoroNumber++
+        _viewState.update {
+            it.copy(
+                selectedTabIndex = 0,
+                videoLink = null,
+                kittyDoroNumber = kittyDoroNumber
+            )
+        }
+    }
+
+    var timerJob: Job? = null
+
+    private fun onPomodoroFinish()  {
+        log.debug { "onFinish" }
+        timerJob = viewModelScope.launch {
+            alarmPlayer.play(onEnded = {
+                if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
+                    startLongBreak()
+                } else {
+                    startShortBreak()
+                }
+            })
+        }
+    }
+
+    private fun startLongBreak()  {
+        shortBreakTimer.resetTimer()
+        pomodoroTimer.resetTimer()
+        longBreakTimer.startTimer()
+        _viewState.update {
+            it.copy(
+                selectedTabIndex = 2,
+                videoLink = WorkoutVideosGateway.getYoutubeVideos().random()
+            )
+        }
+    }
+
+    private fun onPomodoroTick(millis: Long) {
+        _viewState.update { it.copy(pomodoroTime = millis.formatToMMSS()) }
+    }
+
+    private fun onShortBreakTick(millis: Long) {
+        _viewState.update { it.copy(shortBreakTime = millis.formatToMMSS()) }
+    }
+
+    private fun onLongBreakTick(millis: Long) {
+        _viewState.update { it.copy(longBreakTime = millis.formatToMMSS()) }
+    }
+
+    fun onPomodoroStartClick() {
+        shortBreakTimer.resetTimer()
+        longBreakTimer.resetTimer()
+        pomodoroTimer.startTimer()
+    }
+
+    fun onShortBreakStartClick() {
+        pomodoroTimer.resetTimer()
+        longBreakTimer.resetTimer()
+        shortBreakTimer.startTimer()
+        if (_viewState.value.videoLink == null) {
+            _viewState.update { it.copy(videoLink = WorkoutVideosGateway.getYoutubeVideos().random()) }
+        }
+    }
+
+    fun onLongBreakStartClick() {
+        pomodoroTimer.resetTimer()
+        shortBreakTimer.resetTimer()
+        longBreakTimer.startTimer()
+        if (_viewState.value.videoLink == null) {
+            _viewState.update { it.copy(videoLink = WorkoutVideosGateway.getYoutubeVideos().random()) }
+        }
+    }
+
+    fun onResetClick() {
+        resetTimers()
+    }
+
+    private fun resetTimers() = viewModelScope.launch {
+        timerJob?.cancel()
+        alarmPlayer.cancel()
+        pomodoroTimer.pauseTimer()
+        shortBreakTimer.pauseTimer()
+        longBreakTimer.pauseTimer()
+        initTimers()
+        _viewState.update {
+            it.copy(
+                kittyDoroNumber = 1,
+                videoLink = null
+            )
+        }
+    }
+
+    fun onPomodoroPauseClick() {
+        if (pomodoroTimer.isFinished()) {
+            return
+        }
+        pomodoroTimer.pauseTimer()
+    }
+
+    fun onShortBreakPauseClick() {
+        if (shortBreakTimer.isFinished()) {
+            return
+        }
+        shortBreakTimer.pauseTimer()
+    }
+
+    fun onLongBreakPauseClick() {
+        if (longBreakTimer.isFinished()) {
+            return
+        }
+        longBreakTimer.pauseTimer()
+    }
+
+
+    private fun Long.formatToMMSS(): String {
+        val time = LocalTime.fromMillisecondOfDay(this.toInt())
+        return if (time.hour >= 1) {
+            time.format(LocalTime.Format {
+                hour()
+                char(':')
+                minute()
+                char(':')
+                second()
+            })
+        } else {
+            time.format(LocalTime.Format {
+                minute()
+                char(':')
+                second()
+            })
+        }
+    }
+
+    fun onPageChanged(currentPage: Int) {
+        log.debug { "onPageChanged " + currentPage }
+
+        _viewState.update { it.copy(selectedTabIndex = currentPage) }
+    }
+
+    companion object {
+        val log = logging()
+    }
+}

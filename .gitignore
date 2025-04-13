@@ -1,5 +1,18 @@
 # Android Studio
-/*/build/
+/*/build/bin/
+/*/build/classes/
+/*/build/compileSync/
+/*/build/compose/
+/*/build/generated/
+/*/build/intermediates/
+/*/build/kotlin/
+/*/build/kotlin-multiplatform-resources/
+/*/build/kotlin-webpack/
+/*/build/outputs/
+/*/build/processedResources/
+/*/build/tmp/
+/*/build/xcode-frameworks/
+
 /*/local.properties
 /*/out
 /*/*/build
@@ -73,7 +86,8 @@ gen/
 # Gradle files
 .gradle
 .gradle/
-build/
+/build/
+
 
 # Local configuration file
 local.properties

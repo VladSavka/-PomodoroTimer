@@ -1,4 +1,5 @@
 [versions]
+adaptiveNavigation = "1.2.0-alpha03"
 agp = "8.5.2"
 android-compileSdk = "34"
 android-minSdk = "24"
@@ -21,9 +22,11 @@ kotlinxDatetime = "0.6.2"
 lifecycleViewmodelCompose = "2.8.2"
 logging = "2.0.3"
 mediaplayerKmp = "2.0.9"
+navigationCompose = "2.8.0-alpha10"
 precompose = "1.5.11"
 
 [libraries]
+androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptiveNavigation" }
 astroplayer-core = { module = "com.example.astroplayer:astroplayer-core", version.ref = "astroplayerCore" }
 compose-multiplatform-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayer" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -43,6 +46,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 logging = { module = "com.diamondedge:logging", version.ref = "logging" }
 mediaplayer-kmp = { module = "io.github.khubaibkhan4:mediaplayer-kmp", version.ref = "mediaplayerKmp" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 precompose = { module = "moe.tlaster:precompose", version.ref = "precompose" }
 precompose-koin = { module = "moe.tlaster:precompose-koin", version.ref = "precompose" }
 precompose-viewmodel = { module = "moe.tlaster:precompose-viewmodel", version.ref = "precompose" }

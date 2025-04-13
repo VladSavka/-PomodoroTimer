@@ -1,7 +1,7 @@
 package org.timer.main.video
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 
 @Composable
 expect fun VideoPlayer(modifier: Modifier, url: String)

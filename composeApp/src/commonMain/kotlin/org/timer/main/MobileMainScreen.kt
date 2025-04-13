@@ -7,8 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.vector.*
-import moe.tlaster.precompose.navigation.*
-import moe.tlaster.precompose.navigation.transition.*
+import androidx.navigation.*
+import androidx.navigation.compose.*
 import org.timer.main.settings.*
 import org.timer.main.tasks.*
 import org.timer.main.timer.*
@@ -16,24 +16,23 @@ import org.timer.main.timer.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileMainScreen() {
-    val navController = Navigator()
+    val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(
-                navigator = navController,
-                navTransition = NavTransition(),
-                initialRoute = MainRouts.Home.destanation,
+                navController = navController,
+                startDestination = MainRouts.Home.destanation,
             ) {
-                scene(MainRouts.Home.destanation, navTransition = NavTransition()) {
+                composable(MainRouts.Home.destanation) {
                     TimerScreen()
                 }
-                scene(MainRouts.Profile.destanation, navTransition = NavTransition()) {
+                composable(MainRouts.Profile.destanation) {
                     TasksScreen()
                 }
-                scene(MainRouts.Settings.destanation, navTransition = NavTransition()) {
-                   SettingsDialogScreen(isDialogVisible = {})
+                composable(MainRouts.Settings.destanation) {
+                    SettingsDialogScreen(isDialogVisible = {})
                 }
             }
         }
@@ -41,14 +40,14 @@ fun MobileMainScreen() {
 }
 
 @Composable
-fun BottomBar(navController: Navigator) {
+fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         MainRouts.Home,
         MainRouts.Profile,
         MainRouts.Settings,
     )
-    val currentEntry by navController.currentEntry.collectAsState(null)
-    val currentDestination = currentEntry?.route?.route ?: ""
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = backStackEntry?.destination?.route ?: ""
 
     val bottomBarDestination = screens.any { it.destanation == currentDestination }
     if (bottomBarDestination) {
@@ -68,7 +67,7 @@ fun BottomBar(navController: Navigator) {
 fun RowScope.AddItem(
     screen: MainRouts,
     currentDestination: String,
-    navController: Navigator
+    navController: NavHostController
 ) {
     NavigationBarItem(
         icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
@@ -78,11 +77,7 @@ fun RowScope.AddItem(
             if (currentDestination == screen.destanation) {
                 return@NavigationBarItem
             }
-            navController.navigate(
-                screen.destanation, NavOptions(
-                    launchSingleTop = true,
-                )
-            )
+            navController.navigate(screen.destanation, navOptions { launchSingleTop = true })
         }
     )
 }

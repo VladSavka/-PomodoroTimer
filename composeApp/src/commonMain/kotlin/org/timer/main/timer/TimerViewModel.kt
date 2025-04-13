@@ -1,22 +1,12 @@
 package org.timer.main.timer
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.diamondedge.logging.logging
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.format
-import kotlinx.datetime.format.char
-import org.timer.main.data.SettingsGateway
-import org.timer.main.data.WorkoutVideosGateway
+import androidx.lifecycle.*
+import com.diamondedge.logging.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.datetime.*
+import kotlinx.datetime.format.*
+import org.timer.main.data.*
 
 private const val ITERATIONS_IN_ONE_CYCLE = 4
 

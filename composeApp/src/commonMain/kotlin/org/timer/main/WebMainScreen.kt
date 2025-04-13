@@ -30,7 +30,7 @@ fun WebMainScreen(
                     modifier = Modifier
                         .fillMaxHeight(0.5f)
                         .fillMaxWidth(),
-                  viewModel,
+                    viewModel,
                 )
                 TasksScreen(
                     modifier = Modifier

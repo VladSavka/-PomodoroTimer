@@ -1,27 +1,15 @@
 package org.timer.main.settings
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.unit.*
+import androidx.lifecycle.compose.*
+import androidx.lifecycle.viewmodel.compose.*
 import org.timer.main.*
 
 @Composable
@@ -30,7 +18,7 @@ fun SettingsDialogScreen(
     isDialogVisible: (Boolean) -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-    
+
     SingleChoiceDialog(
         title = "Settings",
         radioOptions = listOf(
@@ -59,7 +47,7 @@ fun SingleChoiceDialog(
     val (selectedItemIndex, setSelectedItemIndex) = remember {
         mutableStateOf(indexOfDefault)
     }
-    if (remeberWindowInfo().isMobileDevice()){
+    if (remeberWindowInfo().isMobileDevice()) {
         Column {
             Text(text = title)
             RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
@@ -74,7 +62,13 @@ fun SingleChoiceDialog(
         AlertDialog(
             title = { Text(text = title) },
             text = {
-                RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
+                RadioItem(
+                    radioOptions,
+                    selectedItemIndex,
+                    setSelectedItemIndex,
+                    viewModel,
+                    viewState
+                )
             },
             onDismissRequest = {
                 isDialogVisible(false)

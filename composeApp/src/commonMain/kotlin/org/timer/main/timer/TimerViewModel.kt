@@ -71,7 +71,7 @@ class TimerViewModel : ViewModel() {
         }
     }
 
-    private fun startShortBreak()  {
+    private fun startShortBreak() {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         shortBreakTimer.startTimer()
@@ -109,7 +109,7 @@ class TimerViewModel : ViewModel() {
 
     var timerJob: Job? = null
 
-    private fun onPomodoroFinish()  {
+    private fun onPomodoroFinish() {
         log.debug { "onFinish" }
         timerJob = viewModelScope.launch {
             alarmPlayer.play(onEnded = {
@@ -122,7 +122,7 @@ class TimerViewModel : ViewModel() {
         }
     }
 
-    private fun startLongBreak()  {
+    private fun startLongBreak() {
         shortBreakTimer.resetTimer()
         pomodoroTimer.resetTimer()
         longBreakTimer.startTimer()
@@ -157,7 +157,11 @@ class TimerViewModel : ViewModel() {
         longBreakTimer.resetTimer()
         shortBreakTimer.startTimer()
         if (_viewState.value.videoLink == null) {
-            _viewState.update { it.copy(videoLink = WorkoutVideosGateway.getYoutubeVideos().random()) }
+            _viewState.update {
+                it.copy(
+                    videoLink = WorkoutVideosGateway.getYoutubeVideos().random()
+                )
+            }
         }
     }
 
@@ -166,7 +170,11 @@ class TimerViewModel : ViewModel() {
         shortBreakTimer.resetTimer()
         longBreakTimer.startTimer()
         if (_viewState.value.videoLink == null) {
-            _viewState.update { it.copy(videoLink = WorkoutVideosGateway.getYoutubeVideos().random()) }
+            _viewState.update {
+                it.copy(
+                    videoLink = WorkoutVideosGateway.getYoutubeVideos().random()
+                )
+            }
         }
     }
 

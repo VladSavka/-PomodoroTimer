@@ -124,7 +124,9 @@ fun RadioItem(
                         OutlinedTextField(
                             value = viewState.shortBreakMinutes,
                             onValueChange = {
-                                if (it.isEmpty() || it.isDigits()) viewModel.updateShortBreakMinutes(it)
+                                if (it.isEmpty() || it.isDigits()) viewModel.updateShortBreakMinutes(
+                                    it
+                                )
                             },
                             label = { Text("Short break") },
                             singleLine = true,

@@ -64,7 +64,7 @@ fun TimerScreen(
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 SecondaryTabRow(
-                  //  containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    //  containerColor = MaterialTheme.colorScheme.primaryContainer,
                     selectedTabIndex = viewState.selectedTabIndex
                 ) {
                     titles.forEachIndexed { index, title ->

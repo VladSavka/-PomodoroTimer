@@ -9,7 +9,7 @@ data class TimerViewState(
     private val isLongBreakTimerRunning: Boolean = false,
     val kittyDoroNumber: Int = 1,
     val videoLink: String? = null,
-    val selectedTabIndex: Int= 0
+    val selectedTabIndex: Int = 0
 ) {
     val isPomodoroStartVisible: Boolean
         get() = !isPomodoroTimerRunning

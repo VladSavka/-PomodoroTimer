@@ -47,9 +47,10 @@ fun MainScreen(
                             .fillMaxWidth(),
                         viewState, viewModel,
                     )
-                    TasksScreen(modifier = Modifier
-                        .fillMaxHeight(1f)
-                        .fillMaxWidth()
+                    TasksScreen(
+                        modifier = Modifier
+                            .fillMaxHeight(1f)
+                            .fillMaxWidth()
                     )
                 }
             }

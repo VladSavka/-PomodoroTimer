@@ -5,12 +5,12 @@ expect class CountDownTimer(
     onTick: (Long) -> Unit,
     onFinish: () -> Unit,
     isRunning: (Boolean) -> Unit,
-    ) {
+) {
     var totalMillis: Long
     val onTick: (Long) -> Unit
     val onFinish: () -> Unit
     val isRunning: (Boolean) -> Unit
-    var currentMillis : Long
+    var currentMillis: Long
 
     fun startTimer()
     fun pauseTimer()

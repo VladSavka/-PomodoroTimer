@@ -93,3 +93,4 @@ gen/
 local.properties
 *.klib
 *.salive
+.idea

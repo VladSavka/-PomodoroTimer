@@ -14,7 +14,6 @@ import org.timer.main.MainScreen
 @Preview
 fun App() {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
-      //  MaterialTheme {
         MainScreen()
     }
 }

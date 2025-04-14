@@ -16,7 +16,6 @@ fun MainScreen(
     Box(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
-        logging().debug { "windowInfo.size.width ${windowInfo.size.width}" }
         if (windowInfo.isMobileDevice()) {
             MobileMainScreen()
         } else {

@@ -16,6 +16,7 @@ astroplayerCore = "0.1.0"
 compose-multiplatform = "1.7.0"
 composeMultiplatformMediaPlayer = "1.0.33"
 junit = "4.13.2"
+koinCore = "4.0.3"
 kotlin = "2.1.0"
 kotlinWasmHtmlInterop = "1.0.1"
 kotlinxDatetime = "0.6.2"
@@ -29,6 +30,12 @@ precompose = "1.5.11"
 androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptiveNavigation" }
 astroplayer-core = { module = "com.example.astroplayer:astroplayer-core", version.ref = "astroplayerCore" }
 compose-multiplatform-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayer" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCore" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koinCore" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinCore" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koinCore" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

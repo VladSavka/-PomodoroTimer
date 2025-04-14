@@ -125,6 +125,7 @@ class TimerViewModel : ViewModel() {
     }
 
     private fun onPomodoroTick(millis: Long) {
+        log.debug { "onPomodoroTick " + millis.formatToMMSS() }
         _viewState.update { it.copy(pomodoroTime = millis.formatToMMSS()) }
     }
 

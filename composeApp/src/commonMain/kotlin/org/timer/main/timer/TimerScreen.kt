@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import androidx.lifecycle.viewmodel.compose.*
-import com.diamondedge.logging.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -36,8 +35,7 @@ fun TimerScreen(
         val pagerState = rememberPagerState(pageCount = { titles.size })
 
         LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.settledPage }.collect { page ->
-                logging().debug { "Page changed to $page" }
+            snapshotFlow { pagerState.currentPage }.collect { page ->
                 viewModel.onPageChanged(page)
             }
         }
@@ -73,11 +71,11 @@ fun TimerScreen(
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxWidth()
-                ) {
+                ) { page ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        when (viewState.selectedTabIndex) {
+                        when (page) {
                             0 -> KittidoroContent(viewState, viewModel)
                             1 -> ShortBreakContent(viewState, viewModel)
                             2 -> LongBreakContent(viewState, viewModel)

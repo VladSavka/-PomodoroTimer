@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.vector.*
 import androidx.navigation.*
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import org.timer.main.settings.*
 import org.timer.main.tasks.*
@@ -77,7 +78,13 @@ fun RowScope.AddItem(
             if (currentDestination == screen.destanation) {
                 return@NavigationBarItem
             }
-            navController.navigate(screen.destanation, navOptions { launchSingleTop = true })
+            navController.navigate(screen.destanation,  {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            })
         }
     )
 }

@@ -12,12 +12,25 @@ import org.timer.main.*
 @Composable
 @Preview
 fun App() {
-//    KoinApplication(application = {
-//        modules(appModule())
-//    }) {
-        MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
-            MainScreen()
+    if (isWeb()) {
+        KoinApplication(application = {
+            modules(appModule(), platformSpecificModule())
+        }) {
+            MainContent()
         }
- //   }
+    } else {
+        KoinContext {
+            MainContent()
+        }
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainContent() {
+    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
+        MainScreen()
+    }
 }
 

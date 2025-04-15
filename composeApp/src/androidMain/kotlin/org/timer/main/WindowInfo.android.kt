@@ -13,3 +13,5 @@ actual fun remeberWindowInfo(): WindowInfo {
 
     return remember { WindowInfo(Size(width.value, height.value)) }
 }
+
+actual fun isWeb() = false

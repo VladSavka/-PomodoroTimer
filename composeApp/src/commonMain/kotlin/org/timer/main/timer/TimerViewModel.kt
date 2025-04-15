@@ -10,11 +10,12 @@ import org.timer.main.data.*
 
 private const val ITERATIONS_IN_ONE_CYCLE = 4
 
-class TimerViewModel : ViewModel() {
+class TimerViewModel(
+    val alarmPlayer: AlarmPlayer,
+) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
 
-    private val alarmPlayer = AlarmPlayer()
     private lateinit var pomodoroTimer: CountDownTimer
     private lateinit var shortBreakTimer: CountDownTimer
     private lateinit var longBreakTimer: CountDownTimer

@@ -8,4 +8,6 @@ class WindowInfo(val size: Size)
 @Composable
 expect fun remeberWindowInfo(): WindowInfo
 
-fun WindowInfo.isMobileDevice() = size.width < 600
+fun WindowInfo.isSmallScreen() = size.width < 600
+
+expect fun isWeb() :Boolean

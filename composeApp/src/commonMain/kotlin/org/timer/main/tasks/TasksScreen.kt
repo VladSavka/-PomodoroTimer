@@ -8,12 +8,13 @@ import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import androidx.lifecycle.viewmodel.compose.*
+import org.koin.compose.viewmodel.*
 import org.timer.main.data.*
 
 @Composable
 fun TasksScreen(
     modifier: Modifier = Modifier,
-    viewModel: TasksViewModel = viewModel { TasksViewModel() },
+    viewModel: TasksViewModel = koinViewModel(),
 ) {
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()

@@ -9,12 +9,12 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
-import androidx.lifecycle.viewmodel.compose.*
+import org.koin.compose.viewmodel.*
 import org.timer.main.*
 
 @Composable
 fun SettingsDialogScreen(
-    viewModel: SettingsViewModel = viewModel { SettingsViewModel() },
+    viewModel: SettingsViewModel = koinViewModel(),
     isDialogVisible: (Boolean) -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -47,7 +47,7 @@ fun SingleChoiceDialog(
     val (selectedItemIndex, setSelectedItemIndex) = remember {
         mutableStateOf(indexOfDefault)
     }
-    if (remeberWindowInfo().isMobileDevice()) {
+    if (remeberWindowInfo().isSmallScreen()) {
         Column {
             Text(text = title)
             RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)

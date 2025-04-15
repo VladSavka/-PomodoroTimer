@@ -1,5 +1,5 @@
 package org.timer
 
-import androidx.compose.ui.window.ComposeUIViewController
+import androidx.compose.ui.window.*
 
-fun MainViewController() = ComposeUIViewController { App() }
+fun MainViewController() = ComposeUIViewController(configure = { initializeKoin() }) { App() }

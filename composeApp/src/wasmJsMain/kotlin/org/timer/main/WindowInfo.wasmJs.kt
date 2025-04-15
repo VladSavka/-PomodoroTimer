@@ -11,3 +11,5 @@ actual fun remeberWindowInfo(): WindowInfo {
     val height = window.innerHeight.toFloat()
     return remember { WindowInfo(Size(width, height)) }
 }
+
+actual fun isWeb() = true

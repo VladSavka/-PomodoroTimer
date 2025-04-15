@@ -7,6 +7,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import androidx.lifecycle.viewmodel.compose.*
+import org.koin.compose.viewmodel.*
 import org.timer.main.tasks.*
 import org.timer.main.timer.*
 import org.timer.main.video.*
@@ -14,7 +15,7 @@ import org.timer.main.video.*
 @ExperimentalMaterial3Api
 @Composable
 fun WebMainScreen(
-    viewModel: TimerViewModel = viewModel { TimerViewModel() },
+    viewModel: TimerViewModel = koinViewModel(),
 ) {
 
 

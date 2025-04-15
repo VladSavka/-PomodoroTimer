@@ -11,12 +11,14 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import androidx.lifecycle.viewmodel.compose.*
+import kotlinx.coroutines.*
+import org.koin.compose.viewmodel.*
 
 @ExperimentalMaterial3Api
 @Composable
 fun TimerScreen(
     modifier: Modifier = Modifier,
-    viewModel: TimerViewModel = viewModel { TimerViewModel() },
+    viewModel: TimerViewModel = koinViewModel(),
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
@@ -33,13 +35,14 @@ fun TimerScreen(
 
         val titles = listOf("Kittydoro", "Short Break", "Long Break")
         val pagerState = rememberPagerState(pageCount = { titles.size })
+        val scope = rememberCoroutineScope()
 
         LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
+            snapshotFlow { pagerState.targetPage }.collect { page ->
                 viewModel.onPageChanged(page)
             }
         }
-        LaunchedEffect(viewState.selectedTabIndex) {
+        LaunchedEffect(viewState) {
             pagerState.animateScrollToPage(viewState.selectedTabIndex)
         }
 
@@ -56,7 +59,9 @@ fun TimerScreen(
                     titles.forEachIndexed { index, title ->
                         Tab(
                             selected = viewState.selectedTabIndex == index,
-                            onClick = { viewModel.onPageChanged(index) },
+                            onClick = {
+                                scope.launch { pagerState.animateScrollToPage(index) }
+                            },
                             text = {
                                 Text(
                                     text = title,

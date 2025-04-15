@@ -10,15 +10,17 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
-import androidx.lifecycle.viewmodel.compose.*
 import kotlinx.coroutines.*
 import org.koin.compose.viewmodel.*
+import org.timer.main.*
+import org.timer.main.video.*
 
 @ExperimentalMaterial3Api
 @Composable
 fun TimerScreen(
     modifier: Modifier = Modifier,
     viewModel: TimerViewModel = koinViewModel(),
+    windowInfo: WindowInfo = remeberWindowInfo()
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
@@ -101,7 +103,36 @@ fun TimerScreen(
                 fontWeight = FontWeight.SemiBold
             )
         }
-    }
+        if (windowInfo.isSmallScreen()){
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier.align(Alignment.TopCenter)
+                        .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Youtube video:",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+
+                    viewState.videoLink?.let {
+                        VideoPlayer(
+                            modifier = Modifier.padding(
+                                top = 8.dp,
+                                bottom = 8.dp
+                            ).fillMaxWidth()
+                                .aspectRatio(16f / 9f),
+                            url = it,
+                        )
+                    }
+                }
+            }
+        }
+        }
 }
 
 @Composable

@@ -36,9 +36,7 @@ actual class CountDownTimer actual constructor(
     }
 
     private fun onTick() {
-        val timePass =
-            ((Clock.System.now()
-                .toEpochMilliseconds() - startMoment).toDouble() / 1000).toLong() * 1000
+        val timePass = ((Clock.System.now().toEpochMilliseconds() - startMoment).toDouble() / 1000).toLong() * 1000
         currentMillis = totalMillis - timePass
 
         if (currentMillis <= 0) {
@@ -66,6 +64,6 @@ actual class CountDownTimer actual constructor(
     }
 
     actual fun isFinished() : Boolean{
-        return currentMillis == 0L
+        return currentMillis <= 0L
     }
 }

@@ -8,7 +8,7 @@ import org.jetbrains.compose.ui.tooling.preview.*
 import org.koin.compose.*
 import org.timer.main.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 @Preview
 fun App() {

@@ -10,8 +10,8 @@ actual class CountDownTimer actual constructor(
     actual val isRunning: (Boolean) -> Unit
 ) {
     actual var currentMillis: Long = totalMillis
-    private var targetTimeMillis: Long = 0L
-
+    private var startMoment: Long = 0L
+    private val initalTotalMillis = totalMillis
     private var isTimerRunning = false
 
     private var iosTimer: NSTimer? = null
@@ -20,23 +20,8 @@ actual class CountDownTimer actual constructor(
         if (isTimerRunning) return // Prevent starting if already running
         isTimerRunning = true
         isRunning(true)
-//        countDownTimer =
-//            object : android.os.CountDownTimer(currentMillis, 1000) { // Tick every 1 second
-//                override fun onTick(millisUntilFinished: Long) {
-//                    currentMillis = millisUntilFinished
-//                    this@CountDownTimer.onTick(millisUntilFinished)
-//                }
-//
-//                override fun onFinish() {
-//                    isTimerRunning = false
-//                    isRunning(false)
-//                    currentMillis = 0
-//                    this@CountDownTimer.onFinish()
-//                }
-//            }.start()
         // Calculate the target time in milliseconds (future time)
-        val timeInFuture = totalMillis
-        targetTimeMillis = DateTime.getCurrentTimeInMilliSeconds() + timeInFuture
+        startMoment =  getCurrentTime()
 
         // Schedule the timer with the given interval
         iosTimer = NSTimer.scheduledTimerWithTimeInterval(
@@ -50,39 +35,33 @@ actual class CountDownTimer actual constructor(
     @ObjCAction
     fun onTimerTick(timer: NSTimer) {
         // Get the current time in milliseconds
-        val currentTimeMillis = (NSDate().timeIntervalSince1970 * 1000).toLong()
+        val currentTimeMillis = getCurrentTime()
 
         // Calculate the remaining time
-        val millisUntilFinished = targetTimeMillis - currentTimeMillis
-
-        if (millisUntilFinished <= 0) {
+        val timePass = ((currentTimeMillis - startMoment).toDouble() / 1000).toLong() * 1000
+        currentMillis = totalMillis - timePass
+        onTick(currentMillis)
+        if (currentMillis <= 0) {
             // If the countdown is complete, call the finish method
             onTimerFinish(timer)
             return
         }
-
-        // Calculate days, hours, minutes, and seconds
-        val totalSeconds = millisUntilFinished / 1000
-        val days = (totalSeconds / (24 * 60 * 60))
-        val hours = ((totalSeconds % (24 * 60 * 60)) / (60 * 60))
-        val minutes = ((totalSeconds % (60 * 60)) / 60)
-        val seconds = (totalSeconds % 60)
-
-        // Trigger the onTick callback with the correct time values
-        onTick(days, hours, minutes, seconds)
-
-        // Debugging print statement
-        println("$days:$hours:$minutes:$seconds")
     }
+
+    private fun getCurrentTime() = (NSDate().timeIntervalSince1970 * 1000).toLong()
 
     @ObjCAction
     fun onTimerFinish(timer: NSTimer) {
-        onCountDownFinish()
-        cancel() // Stop the timer
+        iosTimer?.invalidate()
+        isTimerRunning = false
+        isRunning(false)
+        currentMillis = 0
+        onFinish()
     }
 
     actual fun pauseTimer() {
         iosTimer?.invalidate()
+        totalMillis = currentMillis
         isTimerRunning = false
         isRunning(false)
     }
@@ -91,8 +70,9 @@ actual class CountDownTimer actual constructor(
         iosTimer?.invalidate()
         isTimerRunning = false
         isRunning(false)
-        currentMillis = totalMillis
-        onTick(totalMillis) // Update UI with initial value
+        totalMillis = initalTotalMillis
+        currentMillis = initalTotalMillis
+        onTick.invoke(initalTotalMillis)
     }
 
     actual fun isFinished(): Boolean {

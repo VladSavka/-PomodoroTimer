@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
@@ -48,10 +49,12 @@ fun SingleChoiceDialog(
         mutableStateOf(indexOfDefault)
     }
     if (remeberWindowInfo().isSmallScreen()) {
+        val keyboard = LocalSoftwareKeyboardController.current
         Column {
             Text(text = title)
             RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
             TextButton(enabled = viewState.isConfirmEnabled, onClick = {
+                keyboard?.hide()
                 isDialogVisible(false)
                 onItemSelected(selectedItemIndex)
             }) {
@@ -99,6 +102,7 @@ fun RadioItem(
     viewModel: SettingsViewModel,
     viewState: SettingsViewState
 ) {
+
     Column(modifier = Modifier.fillMaxWidth()) {
         items.forEachIndexed { index, text ->
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier

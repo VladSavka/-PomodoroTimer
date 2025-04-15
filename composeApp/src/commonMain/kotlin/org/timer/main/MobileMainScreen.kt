@@ -78,7 +78,7 @@ fun RowScope.AddItem(
             if (currentDestination == screen.destanation) {
                 return@NavigationBarItem
             }
-            navController.navigate(screen.destanation,  {
+            navController.navigate(screen.destanation, {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }

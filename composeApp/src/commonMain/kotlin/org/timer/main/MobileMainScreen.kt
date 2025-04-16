@@ -11,7 +11,7 @@ import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import org.timer.main.settings.*
-import org.timer.main.tasks.*
+import org.timer.main.projects.*
 import org.timer.main.timer.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +30,7 @@ fun MobileMainScreen() {
                     TimerScreen()
                 }
                 composable(MainRouts.Profile.destanation) {
-                    TasksScreen()
+                    ProjectsScreen()
                 }
                 composable(MainRouts.Settings.destanation) {
                     SettingsDialogScreen(isDialogVisible = {})

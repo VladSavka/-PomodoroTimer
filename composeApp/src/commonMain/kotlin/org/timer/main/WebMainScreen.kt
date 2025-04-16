@@ -6,9 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
-import androidx.lifecycle.viewmodel.compose.*
 import org.koin.compose.viewmodel.*
-import org.timer.main.tasks.*
+import org.timer.main.projects.*
 import org.timer.main.timer.*
 import org.timer.main.video.*
 
@@ -33,7 +32,8 @@ fun WebMainScreen(
                         .fillMaxWidth(),
                     viewModel,
                 )
-                TasksScreen(
+                Row { HorizontalDivider(thickness = 2.dp) }
+                ProjectsScreen(
                     modifier = Modifier
                         .fillMaxHeight(1f)
                         .fillMaxWidth()

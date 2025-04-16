@@ -26,8 +26,6 @@ fun YouTubeIFramePlayer(
         url.substringAfter("v=").substringBefore("&").ifEmpty { url.substringAfterLast("/") }
     }
 
-    val thumbnailUrl = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
-
     val htmlContent = """
         <html>
         <head>
@@ -72,13 +70,14 @@ fun YouTubeIFramePlayer(
         </html>
     """.trimIndent()
 
-    UIKitView<WKWebView>(
+    UIKitView(
         factory = {
             val webView = WKWebView().apply {
                 scrollView.scrollEnabled = false
                 backgroundColor = UIColor.whiteColor
                 configuration.allowsInlineMediaPlayback = true
-                configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypes.MAX_VALUE
+                configuration.mediaTypesRequiringUserActionForPlayback =
+                    WKAudiovisualMediaTypes.MAX_VALUE
                 loadHTMLString(htmlContent, baseURL = null)
             }
             webView

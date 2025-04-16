@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.viewinterop.*
 import kotlinx.coroutines.*
+import platform.UIKit.*
 import platform.WebKit.*
 
 @Composable
@@ -37,27 +38,22 @@ fun YouTubeIFramePlayer(
                     padding: 0;
                     height: 100%;
                     overflow: hidden;
-                    background-color: black;
+                    background-color: white;
                 }
                 .video-container {
                     position: relative;
                     width: 100%;
                     height: 100%;
+                    background-color: white;
                 }
-                .video-container iframe, .video-container img {
+                .video-container iframe{
                     position: absolute;
                     top: 0;
                     left: 0;
                     width: 100%;
                     height: 100%;
                     border: none;
-                }
-                #thumbnail {
-                    display: none;
-                    background-color: black;
-                }
-                #youtubePlayer {
-                    display: block;
+                   background-color: white;
                 }
             </style>
           
@@ -65,7 +61,6 @@ fun YouTubeIFramePlayer(
         </head>
         <body>
             <div class="video-container">
-                <img id="thumbnail" src="$thumbnailUrl" alt="Video thumbnail" />
                 <iframe 
                     id="youtubePlayer"
                     src="https://www.youtube.com/embed/$videoId?autoplay=1&mute=0&modestbranding=1&rel=0&showinfo=0" 
@@ -81,6 +76,7 @@ fun YouTubeIFramePlayer(
         factory = {
             val webView = WKWebView().apply {
                 scrollView.scrollEnabled = false
+                backgroundColor = UIColor.whiteColor
                 configuration.allowsInlineMediaPlayback = true
                 configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypes.MAX_VALUE
                 loadHTMLString(htmlContent, baseURL = null)

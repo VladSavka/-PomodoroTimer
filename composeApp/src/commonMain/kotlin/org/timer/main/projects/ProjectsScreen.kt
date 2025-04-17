@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
+import com.diamondedge.logging.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.domain.project.*
 
@@ -30,9 +31,19 @@ fun ProjectsScreen(
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
 
+    var prevSize by remember { mutableStateOf(0) }
+
     val lazyListState = rememberLazyListState()
     LaunchedEffect(viewState.projects.size) {
-        lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
+        val currentSize = viewState.projects.size
+        if (prevSize > currentSize){
+            prevSize = currentSize
+        } else {
+            prevSize = currentSize
+            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
+        }
+
+
     }
 
     viewState.projects.forEachIndexed { index, project ->

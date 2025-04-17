@@ -16,7 +16,7 @@ fun appModule() = module {
     viewModel { SettingsViewModel() }
     viewModel { TimerViewModel(get()) }
     singleOf(::ProjectsViewModel)
-    singleOf<ProjectsGateway>(::ItanMemoryProjectsGateway)
+    singleOf<ProjectsGateway>(::InMemoryProjectsGateway)
     factoryOf(::GetProjectsUseCase)
     factoryOf(::AddProjectUseCase)
     factoryOf(::RemoveProjectUseCase)

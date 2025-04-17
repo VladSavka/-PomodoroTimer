@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
@@ -102,10 +103,15 @@ fun ProjectsScreen(
     }
 
     if (showDialog) {
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
         AlertDialog(
             title = { Text(text = "Add Project") },
             text = {
                 OutlinedTextField(
+                    modifier = Modifier.focusRequester(focusRequester),
                     value = viewState.projectName,
                     onValueChange = { viewModel.onProjectTitleUpdate(it) },
                     label = { Text("Name") }

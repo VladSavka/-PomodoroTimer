@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.*
+import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
@@ -11,12 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
-import org.timer.main.data.entity.*
+import org.timer.main.domain.project.*
 
 @Composable
 fun ProjectsScreen(
@@ -26,6 +29,66 @@ fun ProjectsScreen(
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
+    LaunchedEffect(viewState.projects.size) {
+        lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
+    }
+
+    viewState.projects.forEachIndexed { index, project ->
+        LaunchedEffect(project.tasks.size) {
+            if (lazyListState.layoutInfo.totalItemsCount - 1 == index) {
+                lazyListState.animateScrollToItem(index + 1)
+            }
+        }
+    }
+
+    Box(modifier.fillMaxSize()) {
+        if (viewState.projects.isEmpty()) {
+            Text(
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center),
+                text = "Your project list is empty.\n Add your first project using button below."
+            )
+        } else {
+            Row(Modifier.padding(horizontal = 16.dp)) {
+                LazyColumn(
+                    Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(bottom = 36.dp, top = 8.dp),
+                    state = lazyListState,
+                ) {
+                    items(viewState.projects) { task ->
+                        ProjectItem(
+                            Modifier.animateItem(),
+                            task,
+                            { viewModel.removeProject(it) },
+                            { project, description ->
+                                viewModel.onTaskSubmit(
+                                    project.id,
+                                    description
+                                )
+                            },
+                            { project, task -> viewModel.onTaskDoneClick(project.id, task.id) },
+                            { project, task -> viewModel.onTaskUndoneClick(project.id, task.id) }
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                    }
+                }
+            }
+        }
+
+        FloatingActionButton(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            onClick = {
+                viewModel.onProjectTitleUpdate("")
+                showDialog = true
+            },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.secondary
+        ) {
+            Icon(Icons.Filled.Add, "Add Project")
+        }
+    }
 
     if (showDialog) {
         AlertDialog(
@@ -56,43 +119,104 @@ fun ProjectsScreen(
             }
         )
     }
-    Box(modifier) {
-        Row(Modifier.padding(horizontal = 16.dp)) {
-            LazyColumn(Modifier.fillMaxWidth().padding(top = 8.dp)) {
-                items(viewState.projects) { task ->
-                    ProjectItem(task) { id ->
-                        viewModel.removeProject(id)
-                    }
-                    Spacer(modifier = Modifier.size(8.dp))
-                }
-            }
-        }
+}
 
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            onClick = {
-                viewModel.onProjectTitleUpdate("")
-                showDialog = true
-            },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Icon(Icons.Filled.Add, "Add Project")
+@Composable
+fun ProjectItem(
+    modifier: Modifier,
+    project: Project,
+    onDeleteClick: (Long) -> Unit,
+    onAddTaskClick: (Project, String) -> Unit,
+    onTaskDoneClick: (Project, Task) -> Unit,
+    onTaskUndoneClick: (Project, Task) -> Unit
+) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
+        modifier = modifier.fillMaxWidth().wrapContentHeight()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Header(project, { onDeleteClick(project.id) })
+            HorizontalDivider()
+            project.tasks.forEach { task ->
+                TaskItem(
+                    task,
+                    { onTaskDoneClick.invoke(project, it) },
+                    { onTaskUndoneClick.invoke(project, it) })
+                HorizontalDivider()
+            }
+            HorizontalDivider()
+            AddTaskFooter { onAddTaskClick(project, it) }
         }
     }
 }
 
 @Composable
-fun ProjectItem(project: Project, onCloseClick: (Long) -> Unit) {
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        ),
-        modifier = Modifier.fillMaxWidth().wrapContentHeight()
+fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
+    var taskName by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Header(project, { onCloseClick(project.id) })
-            HorizontalDivider()
+        OutlinedTextField(
+            value = taskName,
+            onValueChange = { taskName = it },
+            label = { Text("Add Task") },
+            modifier = Modifier.weight(1f)
+                .padding(start = 0.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = { keyboardController?.hide() }
+            )
+        )
+        IconButton(
+            modifier = Modifier.size(20.dp),
+            onClick = {
+                if (taskName.isNotBlank()) {
+                    onAddTaskClick(taskName)
+                    taskName = "" // Clear the text field after submission
+                }
+            },
+            enabled = taskName.isNotBlank()
+        ) {
+            Icon(Icons.Rounded.Send, contentDescription = "Submit Task")
+        }
+    }
+}
+
+@Composable
+fun TaskItem(task: Task, onTaskDoneClick: (Task) -> Unit, onTaskUndoneClick: (Task) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp).alpha(if (task.isDone) 0.5f else 1f),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = task.isDone,
+            onCheckedChange = { isChecked ->
+                if (isChecked) {
+                    onTaskDoneClick(task)
+                } else {
+                    onTaskUndoneClick(task)
+                }
+            }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        if (task.isDone) {
+            Text(
+                text = task.description,
+                modifier = Modifier.weight(1f),
+                style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
+            )
+        } else {
+            Text(
+                text = task.description,
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }
@@ -108,10 +232,10 @@ private fun Header(
         Text(
             text = project.title,
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
-                .weight(1f), // Use weight to take remaining space
+                .padding(start = 0.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
+                .weight(1f),
             fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center, // Align text to the start
+            textAlign = TextAlign.Center,
         )
         Box(modifier = Modifier) {
             IconButton(

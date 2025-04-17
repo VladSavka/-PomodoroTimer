@@ -1,4 +1,4 @@
-package org.timer.main.data
+package org.timer.main.domain.video
 
 object WorkoutVideosGateway {
     private val videos = listOf(

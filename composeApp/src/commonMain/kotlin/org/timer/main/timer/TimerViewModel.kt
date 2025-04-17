@@ -6,7 +6,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.*
 import kotlinx.datetime.format.*
-import org.timer.main.data.*
+import org.timer.main.domain.settings.*
+import org.timer.main.domain.video.*
 
 private const val ITERATIONS_IN_ONE_CYCLE = 4
 

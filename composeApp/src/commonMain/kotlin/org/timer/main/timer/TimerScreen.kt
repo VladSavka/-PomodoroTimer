@@ -103,7 +103,7 @@ fun TimerScreen(
                 fontWeight = FontWeight.SemiBold
             )
         }
-        if (windowInfo.isSmallScreen()){
+        if (windowInfo.isSmallScreen()) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -132,7 +132,7 @@ fun TimerScreen(
                 }
             }
         }
-        }
+    }
 }
 
 @Composable

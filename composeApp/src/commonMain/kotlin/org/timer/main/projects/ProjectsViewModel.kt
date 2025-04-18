@@ -13,7 +13,7 @@ class ProjectsViewModel(
     private val addTaskUseCase: AddTaskUseCase,
     private val doneTaskUseCase: DoneTaskUseCase,
     private val undoneTaskUseCase: UndoneTaskUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
 
@@ -42,11 +42,11 @@ class ProjectsViewModel(
         addTaskUseCase(projectID, taskDescription)
     }
 
-    fun onTaskDoneClick(projectId: Long, taskId: Long) = viewModelScope.launch  {
+    fun onTaskDoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
         doneTaskUseCase(projectId, taskId)
     }
 
-    fun onTaskUndoneClick(projectId: Long, taskId: Long) = viewModelScope.launch  {
+    fun onTaskUndoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
         undoneTaskUseCase(projectId, taskId)
     }
 

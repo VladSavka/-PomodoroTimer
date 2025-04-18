@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
-import com.diamondedge.logging.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.domain.project.*
 
@@ -37,7 +36,7 @@ fun ProjectsScreen(
     val lazyListState = rememberLazyListState()
     LaunchedEffect(viewState.projects.size) {
         val currentSize = viewState.projects.size
-        if (prevSize > currentSize){
+        if (prevSize > currentSize) {
             prevSize = currentSize
         } else {
             prevSize = currentSize
@@ -199,7 +198,7 @@ fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
             },
             enabled = taskName.isNotBlank()
         ) {
-            Icon(Icons.Rounded.Send, contentDescription = "Submit Task")
+            Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = "Submit Task")
         }
     }
 }

@@ -10,8 +10,8 @@ import androidx.compose.ui.graphics.vector.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
-import org.timer.main.settings.*
 import org.timer.main.projects.*
+import org.timer.main.settings.*
 import org.timer.main.timer.*
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -10,4 +10,4 @@ expect fun remeberWindowInfo(): WindowInfo
 
 fun WindowInfo.isSmallScreen() = size.width < 600
 
-expect fun isWeb() :Boolean
+expect fun isWeb(): Boolean

@@ -1,7 +1,5 @@
 package org.timer.main.domain.project
 
-import com.diamondedge.logging.*
-
 class DoneTaskUseCase(private val projectsGateway: ProjectsGateway) {
 
     suspend operator fun invoke(projectId: Long, taskId: Long) {

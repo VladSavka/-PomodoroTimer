@@ -1,7 +1,8 @@
 package org.timer.main.domain.video
 
 object WorkoutVideosGateway {
-    private val videos = listOf(
+
+    fun getWorkoutVideos() = listOf(
         "https://www.youtube.com/watch?v=YAUGMT0_PiE",
         "https://www.youtube.com/watch?v=ml9ik3htY_w",
         "https://www.youtube.com/watch?v=d-tqetfOt5Q",
@@ -15,5 +16,9 @@ object WorkoutVideosGateway {
         "https://www.youtube.com/watch?v=Ef6LwAaB3_E",
     )
 
-    fun getYoutubeVideos() = videos
+    fun getDanceAudios() =  listOf(
+        "https://www.youtube.com/watch?v=mBXBOLG06Wc",
+        "https://www.youtube.com/watch?v=SW_iujvUAzQ",
+    )
+
 }

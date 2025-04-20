@@ -32,7 +32,7 @@ fun ProjectsScreen(
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
 
-    var prevSize by remember { mutableStateOf(0) }
+    var prevSize by remember { mutableStateOf(viewState.projects.size) }
 
     val lazyListState = rememberLazyListState()
     LaunchedEffect(viewState.projects.size) {

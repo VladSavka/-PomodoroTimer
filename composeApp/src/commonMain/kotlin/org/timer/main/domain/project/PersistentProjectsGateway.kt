@@ -6,12 +6,10 @@ import com.russhwolf.settings.serialization.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.*
 
-@Serializable
-data class ProjectListDto(val projects: List<Project>)
 
 class PersistentProjectsGateway : ProjectsGateway {
 
-    val settings: Settings = Settings()
+    private val settings: Settings = Settings()
     private val flow = MutableStateFlow(getProjectListFromStorage())
 
     override fun getProjects(): Flow<List<Project>> {
@@ -59,6 +57,9 @@ class PersistentProjectsGateway : ProjectsGateway {
     }
 
     private companion object {
-        const val KEY = "ProjectListKey"
+        private const val KEY = "ProjectListKey"
+
+        @Serializable
+        private data class ProjectListDto(val projects: List<Project>)
     }
 }

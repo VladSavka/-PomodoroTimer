@@ -10,10 +10,12 @@ import org.timer.main.domain.project.*
 import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
+import org.timer.main.video.*
 
 @ExperimentalResourceApi
 fun appModule() = module {
     viewModel { SettingsViewModel() }
+    viewModel { BreakActivityViewModel() }
     viewModel { TimerViewModel(get()) }
     singleOf(::ProjectsViewModel)
     singleOf<ProjectsGateway>(::PersistentProjectsGateway)

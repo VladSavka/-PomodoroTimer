@@ -16,8 +16,6 @@ import org.timer.main.video.*
 fun WebMainScreen(
     viewModel: TimerViewModel = koinViewModel(),
 ) {
-
-
     Row {
         Card(
             modifier = Modifier
@@ -47,7 +45,7 @@ fun WebMainScreen(
                 .padding(start = 4.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
         ) {
             val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-            VideoPlayerScreen(viewState)
+            BreakActivityScreen(viewState)
         }
     }
 }

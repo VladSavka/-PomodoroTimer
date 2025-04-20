@@ -104,33 +104,7 @@ fun TimerScreen(
             )
         }
         if (windowInfo.isSmallScreen()) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier.align(Alignment.TopCenter)
-                        .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Youtube video:",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
-                    )
-
-                    viewState.videoLink?.let {
-                        VideoPlayer(
-                            modifier = Modifier.padding(
-                                top = 8.dp,
-                                bottom = 8.dp
-                            ).fillMaxWidth()
-                                .aspectRatio(16f / 9f),
-                            url = it,
-                        )
-                    }
-                }
-            }
+            BreakActivityScreen(viewState = viewState)
         }
     }
 }

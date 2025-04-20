@@ -94,7 +94,7 @@ sealed class MainRouts(
     val resourceId: String? = null,
     val icon: ImageVector? = null
 ) {
-    data object Home : MainRouts("home", "Timer", Icons.Filled.Home)
+    data object Home : MainRouts("timer", "Timer", Icons.Filled.Home)
     data object Profile : MainRouts("projects", "Projects", Icons.Filled.CheckCircle)
     data object Settings : MainRouts("settings", "Settings", Icons.Filled.Settings)
 }

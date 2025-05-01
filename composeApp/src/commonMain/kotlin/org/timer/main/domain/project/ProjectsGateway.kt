@@ -11,6 +11,9 @@ interface ProjectsGateway {
 
     suspend fun updateProject(project: Project)
 
+    suspend fun updateProjects(projects: List<Project>)
+
+
     suspend fun removeProjectById(id: Long)
 
 }

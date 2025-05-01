@@ -36,6 +36,11 @@ class PersistentProjectsGateway : ProjectsGateway {
         flow.update { projects.deepCopy() }
     }
 
+    override suspend fun updateProjects(projects: List<Project>) {
+        saveProjectListToStorage(projects)
+        flow.update { projects.deepCopy() }
+    }
+
     override suspend fun removeProjectById(id: Long) {
         val projects = getProjectListFromStorage().toMutableList()
         val projectToRemove = projects.first { it.id == id }

@@ -24,6 +24,12 @@ class InMemoryProjectsGateway : ProjectsGateway {
         flow.update { projects.deepCopy() }
     }
 
+    override suspend fun updateProjects(projects: List<Project>) {
+        this.projects.clear()
+        this.projects.addAll(projects)
+        flow.update { this.projects.deepCopy() }
+    }
+
 
     override suspend fun removeProjectById(id: Long) {
         val project = projects.first { it.id == id }

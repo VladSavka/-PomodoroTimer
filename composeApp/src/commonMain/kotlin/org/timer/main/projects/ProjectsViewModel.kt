@@ -13,7 +13,9 @@ class ProjectsViewModel(
     private val addTaskUseCase: AddTaskUseCase,
     private val doneTaskUseCase: DoneTaskUseCase,
     private val undoneTaskUseCase: UndoneTaskUseCase,
-) : ViewModel() {
+    private val updateProjectsOrderUseCase: UpdateProjectsOrderUseCase,
+
+    ) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
 
@@ -48,6 +50,24 @@ class ProjectsViewModel(
 
     fun onTaskUndoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
         undoneTaskUseCase(projectId, taskId)
+    }
+
+    fun onProjectsDrugAndDrop(fromIndex: Int, toIndex: Int) = viewModelScope.launch {
+        val newList =
+            _viewState.value.projects.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+        updateProjectsOrderUseCase(newList)
+    }
+
+    fun onTasksDrugAndDrop(projectId: Long, fromIndex: Int, toIndex: Int) = viewModelScope.launch {
+        val newList = viewState.value.projects.map {
+            if (it.id == projectId) {
+                it.copy(
+                    tasks = it.tasks.toMutableList().apply { add(toIndex, removeAt(fromIndex)) })
+            } else {
+                it
+            }
+        }
+        updateProjectsOrderUseCase(newList)
     }
 
     companion object {

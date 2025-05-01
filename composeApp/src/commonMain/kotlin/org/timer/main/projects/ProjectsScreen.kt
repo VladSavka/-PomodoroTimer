@@ -1,5 +1,6 @@
 package org.timer.main.projects
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -10,7 +11,12 @@ import androidx.compose.material.icons.automirrored.rounded.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.focus.*
@@ -55,6 +61,12 @@ fun ProjectsScreen(
         }
     }
 
+
+    val dragDropState =
+        rememberDragDropState(lazyListState) { fromIndex, toIndex ->
+            viewModel.onProjectsDrugAndDrop(fromIndex, toIndex)
+        }
+
     Box(modifier.fillMaxSize()) {
         if (viewState.projects.isEmpty()) {
             Text(
@@ -65,26 +77,43 @@ fun ProjectsScreen(
         } else {
             Row(Modifier.padding(horizontal = 16.dp)) {
                 LazyColumn(
-                    Modifier.fillMaxWidth(),
+                    modifier = Modifier.dragContainer(dragDropState),
                     contentPadding = PaddingValues(bottom = 36.dp, top = 8.dp),
                     state = lazyListState,
                 ) {
-                    items(viewState.projects) { task ->
-                        ProjectItem(
-                            Modifier.animateItem(),
-                            task,
-                            { viewModel.removeProject(it) },
-                            { project, description ->
-                                viewModel.onTaskSubmit(
-                                    project.id,
-                                    description
-                                )
-                            },
-                            { project, task -> viewModel.onTaskDoneClick(project.id, task.id) },
-                            { project, task -> viewModel.onTaskUndoneClick(project.id, task.id) }
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
+                    itemsIndexed(viewState.projects, key = { _, item -> item.id }) { index, item ->
+                        DraggableItem(dragDropState, index) { isDragging ->
+                            ProjectItem(
+                                modifier = Modifier.animateItem(),
+                                project = item,
+                                isDrugging = isDragging,
+                                onDeleteClick = { viewModel.removeProject(it) },
+                                onAddTaskClick = { project, description ->
+                                    viewModel.onTaskSubmit(
+                                        project.id,
+                                        description
+                                    )
+                                },
+                                onTaskDoneClick = { project, task ->
+                                    viewModel.onTaskDoneClick(
+                                        project.id,
+                                        task.id
+                                    )
+                                },
+                                onTaskUndoneClick = { project, task ->
+                                    viewModel.onTaskUndoneClick(
+                                        project.id,
+                                        task.id
+                                    )
+                                },
+                                onTasksReorder = { project, fromIndex, toIndex ->
+                                    viewModel.onTasksDrugAndDrop(project.id, fromIndex, toIndex)
+                                }
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                        }
                     }
+
                 }
             }
         }
@@ -142,26 +171,49 @@ fun ProjectsScreen(
 fun ProjectItem(
     modifier: Modifier,
     project: Project,
+    isDrugging: Boolean,
     onDeleteClick: (Long) -> Unit,
     onAddTaskClick: (Project, String) -> Unit,
     onTaskDoneClick: (Project, Task) -> Unit,
-    onTaskUndoneClick: (Project, Task) -> Unit
-) {
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        ),
-        modifier = modifier.fillMaxWidth().wrapContentHeight()
+    onTaskUndoneClick: (Project, Task) -> Unit,
+    onTasksReorder: (Project, Int, Int) -> Unit,
+
     ) {
+    val elevation by animateDpAsState(if (isDrugging) 6.dp else 2.dp)
+
+    ElevatedCard(
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 2.dp,
+        ),
+        modifier = modifier.fillMaxWidth().wrapContentHeight().shadow(
+            elevation = elevation,
+            shape = CardDefaults.shape,
+        )
+    ) {
+
+        val lazyListState = rememberLazyListState()
+        val dragDropState =
+            rememberDragDropState(lazyListState) { fromIndex, toIndex ->
+                onTasksReorder.invoke(project, fromIndex, toIndex)
+            }
         Column(modifier = Modifier.padding(16.dp)) {
             Header(project, { onDeleteClick(project.id) })
             HorizontalDivider()
-            project.tasks.forEach { task ->
-                TaskItem(
-                    task,
-                    { onTaskDoneClick.invoke(project, it) },
-                    { onTaskUndoneClick.invoke(project, it) })
-                HorizontalDivider()
+            LazyColumn(
+                modifier = Modifier.dragContainer(dragDropState).wrapContentHeight()
+                    .heightIn(max = 1000.dp),
+                state = lazyListState,
+            ) {
+                itemsIndexed(project.tasks, key = { _, item -> item.id }) { index, item ->
+                    DraggableItem(dragDropState, index) { isDragging ->
+                        TaskItem(
+                            item,
+                            isDragging,
+                            { onTaskDoneClick.invoke(project, it) },
+                            { onTaskUndoneClick.invoke(project, it) })
+                        HorizontalDivider()
+                    }
+                }
             }
             HorizontalDivider()
             AddTaskFooter { onAddTaskClick(project, it) }
@@ -205,11 +257,19 @@ fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
 }
 
 @Composable
-fun TaskItem(task: Task, onTaskDoneClick: (Task) -> Unit, onTaskUndoneClick: (Task) -> Unit) {
+fun TaskItem(
+    task: Task,
+    isDrugging: Boolean,
+    onTaskDoneClick: (Task) -> Unit,
+    onTaskUndoneClick: (Task) -> Unit
+) {
+    val elevation by animateDpAsState(if (isDrugging) 2.dp else 0.dp)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp).alpha(if (task.isDone) 0.5f else 1f),
+            .padding(vertical = 4.dp).alpha(if (task.isDone) 0.5f else 1f)
+            .shadow(elevation = elevation),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -268,3 +328,5 @@ private fun Header(
         }
     }
 }
+
+

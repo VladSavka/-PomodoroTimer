@@ -26,6 +26,7 @@ fun appModule() = module {
     factoryOf(::DoneTaskUseCase)
     factoryOf(::UndoneTaskUseCase)
     factoryOf(::UpdateProjectsOrderUseCase)
+    factoryOf(::UpdateTasksOrderUseCase)
 }
 
 expect fun platformSpecificModule(): Module

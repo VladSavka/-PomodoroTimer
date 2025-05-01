@@ -211,7 +211,6 @@ fun ProjectItem(
                             isDragging,
                             { onTaskDoneClick.invoke(project, it) },
                             { onTaskUndoneClick.invoke(project, it) })
-                        HorizontalDivider()
                     }
                 }
             }
@@ -264,37 +263,38 @@ fun TaskItem(
     onTaskUndoneClick: (Task) -> Unit
 ) {
     val elevation by animateDpAsState(if (isDrugging) 2.dp else 0.dp)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp).alpha(if (task.isDone) 0.5f else 1f)
-            .shadow(elevation = elevation),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(
-            checked = task.isDone,
-            onCheckedChange = { isChecked ->
-                if (isChecked) {
-                    onTaskDoneClick(task)
-                } else {
-                    onTaskUndoneClick(task)
+    Column(modifier = Modifier.shadow(elevation = elevation)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp).alpha(if (task.isDone) 0.5f else 1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = task.isDone,
+                onCheckedChange = { isChecked ->
+                    if (isChecked) {
+                        onTaskDoneClick(task)
+                    } else {
+                        onTaskUndoneClick(task)
+                    }
                 }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            if (task.isDone) {
+                Text(
+                    text = task.description,
+                    modifier = Modifier.weight(1f),
+                    style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
+                )
+            } else {
+                Text(
+                    text = task.description,
+                    modifier = Modifier.weight(1f),
+                )
             }
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        if (task.isDone) {
-            Text(
-                text = task.description,
-                modifier = Modifier.weight(1f),
-                style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
-            )
-        } else {
-            Text(
-                text = task.description,
-                modifier = Modifier.weight(1f),
-            )
         }
+        HorizontalDivider()
     }
 }
 

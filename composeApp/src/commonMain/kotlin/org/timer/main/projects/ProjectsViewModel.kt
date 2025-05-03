@@ -15,14 +15,17 @@ class ProjectsViewModel(
     private val undoneTaskUseCase: UndoneTaskUseCase,
     private val updateProjectsOrderUseCase: UpdateProjectsOrderUseCase,
     private val updateTasksOrderUseCase: UpdateTasksOrderUseCase,
-) : ViewModel() {
+    private val updateProjectNameUseCase: UpdateProjectNameUseCase,
+    private val updateTaskDescriptionUseCase: UpdateTaskDescriptionUseCase,
+
+    ) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
 
     init {
         getProjectsUseCase()
+            .map { it.map { it.toPresentableProject() } }
             .onEach { projects ->
-                log.debug { "projects " + projects }
                 _viewState.update { it.copy(projects = projects) }
             }
             .launchIn(viewModelScope)
@@ -60,7 +63,24 @@ class ProjectsViewModel(
         updateTasksOrderUseCase(projectId, fromIndex, toIndex)
     }
 
+    fun onSubmitEditProjectName(id: Long, name: String) = viewModelScope.launch {
+        updateProjectNameUseCase(id, name)
+    }
+
+    fun onSubmitEditTaskDescription(projectId: Long, taskId: Long, desc: String) =
+        viewModelScope.launch {
+            updateTaskDescriptionUseCase(projectId, taskId, desc)
+        }
+
     companion object {
         val log = logging()
     }
+
+    private fun Project.toPresentableProject(): PresentableProject =
+        PresentableProject(
+            this.id,
+            this.name,
+            this.tasks,
+            this.tasks.isEmpty() || this.tasks.all { it.isDone })
 }
+

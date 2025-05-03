@@ -83,13 +83,15 @@ fun BreakActivityScreen(
             if (!windowInfo.isSmallScreen()) {
                 Spacer(Modifier.height(48.dp))
             }
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Break activity:",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
+            if (viewState.selectedTabIndex == 1 || viewState.selectedTabIndex == 2) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Break time",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center
+                )
+            }
             when (viewState.timerState) {
                 is TimerState.ShortBreak -> {
                     TwoLevelDeepList(
@@ -237,30 +239,37 @@ fun TwoLevelDeepList(
                         }
                     ) {
                         ListItem(
-                            headlineContent = { Text(modifier = Modifier.fillMaxWidth(),text = item.title, textAlign = TextAlign.Center) },
+                            headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = item.title, textAlign = TextAlign.Center) },
                             modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
             }
         } else {
-            // Level 2: Sub-items list
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                items(selectedItem!!.subItems) { subItem ->
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        onClick = {
-                            onItemSelected(subItem.id)
-                        }
-                    ) {
-                        ListItem(
-                            headlineContent = { Text(modifier = Modifier.fillMaxWidth(),text = subItem.title, textAlign = TextAlign.Center) },
-                            modifier = Modifier.padding(8.dp),
-
+            // Level 2: Sub-items list with "Back" button
+            Column {
+                IconButton(
+                    onClick = { selectedItem = null },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+                LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
+                    items(selectedItem!!.subItems) { subItem ->
+                        ElevatedCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            onClick = {
+                                onItemSelected(subItem.id)
+                            }
+                        ) {
+                            ListItem(
+                                headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = subItem.title, textAlign = TextAlign.Center) },
+                                modifier = Modifier.padding(8.dp)
                             )
+                        }
                     }
                 }
             }

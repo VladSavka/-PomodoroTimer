@@ -28,7 +28,7 @@ fun TimerScreen(
         Row(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Welcome to Kittydoro timer",
+                text = "Kittydoro timer",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center

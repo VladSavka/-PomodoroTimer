@@ -40,7 +40,7 @@ class ProjectsViewModel(
         removeProjectUseCase(id)
     }
 
-    fun onTaskSubmit(projectID: Long, taskDescription: String) = viewModelScope.launch {
+    fun onTaskSubmitClick(projectID: Long, taskDescription: String) = viewModelScope.launch {
         addTaskUseCase(projectID, taskDescription)
     }
 

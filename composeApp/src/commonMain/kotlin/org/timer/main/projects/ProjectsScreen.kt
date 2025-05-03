@@ -2,25 +2,27 @@ package org.timer.main.projects
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
+import androidx.compose.foundation.text.selection.*
 import androidx.compose.material.icons.*
-import androidx.compose.material.icons.automirrored.rounded.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.focus.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
@@ -88,8 +90,8 @@ fun ProjectsScreen(
                                 project = item,
                                 isDrugging = isDragging,
                                 onDeleteClick = { viewModel.removeProject(it) },
-                                onAddTaskClick = { project, description ->
-                                    viewModel.onTaskSubmit(
+                                onSubmitTaskClick = { project, description ->
+                                    viewModel.onTaskSubmitClick(
                                         project.id,
                                         description
                                     )
@@ -173,12 +175,14 @@ fun ProjectItem(
     project: Project,
     isDrugging: Boolean,
     onDeleteClick: (Long) -> Unit,
-    onAddTaskClick: (Project, String) -> Unit,
+    onSubmitTaskClick: (Project, String) -> Unit,
     onTaskDoneClick: (Project, Task) -> Unit,
     onTaskUndoneClick: (Project, Task) -> Unit,
     onTasksReorder: (Project, Int, Int) -> Unit,
+) {
 
-    ) {
+    var showAddTaskFooter by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
     val elevation by animateDpAsState(if (isDrugging) 6.dp else 2.dp)
 
     ElevatedCard(
@@ -189,6 +193,13 @@ fun ProjectItem(
             elevation = elevation,
             shape = CardDefaults.shape,
         )
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    if (showAddTaskFooter) {
+                        showAddTaskFooter = false
+                    }
+                })
+            }
     ) {
 
         val lazyListState = rememberLazyListState()
@@ -197,7 +208,12 @@ fun ProjectItem(
                 onTasksReorder.invoke(project, fromIndex, toIndex)
             }
         Column(modifier = Modifier.padding(16.dp)) {
-            Header(project, { onDeleteClick(project.id) })
+            Header(
+                project = project,
+                onCloseProjectClick = { onDeleteClick(project.id) },
+                onAddTaskClick = { showAddTaskFooter = true },
+                onEditProjectClick = { }
+            )
             HorizontalDivider()
             LazyColumn(
                 modifier = Modifier.dragContainer(dragDropState).wrapContentHeight()
@@ -214,17 +230,25 @@ fun ProjectItem(
                     }
                 }
             }
-            HorizontalDivider()
-            AddTaskFooter { onAddTaskClick(project, it) }
+            if (showAddTaskFooter) {
+                HorizontalDivider()
+                AddTaskFooter(focusRequester) {
+                    onSubmitTaskClick(project, it)
+                    showAddTaskFooter = false
+                }
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+            }
+
         }
     }
 }
 
 @Composable
-fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
+fun AddTaskFooter(focusRequester: FocusRequester, onSubmitTaskClick: (String) -> Unit) {
     var taskName by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -233,24 +257,38 @@ fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
             value = taskName,
             onValueChange = { taskName = it },
             label = { Text("Add Task") },
-            modifier = Modifier.weight(1f)
-                .padding(start = 0.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            modifier = Modifier.weight(1f).focusRequester(focusRequester)
+                .padding(start = 0.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                .onKeyEvent {
+                    if (it.key == Key.Enter && it.type == KeyEventType.KeyUp) {
+                        if (taskName.isNotBlank()) {
+                            onSubmitTaskClick(taskName)
+                            taskName = "" // Clear the text field after submission
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
-                onDone = { keyboardController?.hide() }
-            )
+                onDone = {
+                    keyboardController?.hide()
+                }
+            ),
+            singleLine = true,
         )
-        IconButton(
-            modifier = Modifier.size(20.dp),
+        Button(
+            modifier = Modifier.padding(top = 8.dp),
             onClick = {
                 if (taskName.isNotBlank()) {
-                    onAddTaskClick(taskName)
+                    onSubmitTaskClick(taskName)
                     taskName = "" // Clear the text field after submission
                 }
             },
             enabled = taskName.isNotBlank()
         ) {
-            Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = "Submit Task")
+            Text("Submit")
         }
     }
 }
@@ -301,32 +339,117 @@ fun TaskItem(
 @Composable
 private fun Header(
     project: Project,
-    onCloseClick: () -> Unit
+    onCloseProjectClick: () -> Unit,
+    onAddTaskClick: () -> Unit,
+    onEditProjectClick: (String) -> Unit,
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(project.title, TextRange(project.title.length)))
+    }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val customTextSelectionColors = TextSelectionColors(
+        handleColor = MaterialTheme.colorScheme.primary,
+        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+    )
+
     Row(
         modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = project.title,
-            modifier = Modifier
-                .padding(start = 0.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
-                .weight(1f),
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-        )
-        Box(modifier = Modifier) {
+        if (isEditing) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp, bottom = 8.dp)
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(4.dp)
+                    )
+            ) {
+                CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { textFieldValue = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .background(Color.Transparent),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                onEditProjectClick(textFieldValue.text)
+                                isEditing = false
+                                keyboardController?.hide()
+                            }
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        visualTransformation = VisualTransformation.None
+                    )
+                }
+            }
+            LaunchedEffect(isEditing) {
+                if (isEditing) {
+                    focusRequester.requestFocus()
+                }
+            }
+        } else {
+            Text(
+                text = project.title,
+                modifier = Modifier
+                    .padding(start = 0.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
+                    .weight(1f),
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+        Row(
+            modifier = Modifier.wrapContentWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(
-                modifier = Modifier.size(20.dp).align(Alignment.TopEnd)
+                modifier = Modifier
+                    .size(20.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                    .padding(2.dp)
+                    .clip(CircleShape),
+                onClick = {
+                    isEditing = true
+                    textFieldValue = TextFieldValue(project.title, TextRange(project.title.length))
+                }
+            ) {
+                Icon(Icons.Rounded.Edit, contentDescription = "Edit")
+            }
+            IconButton(
+                modifier = Modifier
+                    .size(20.dp)
                     .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     .padding(1.dp)
                     .clip(CircleShape),
-
-                onClick = onCloseClick
+                onClick = onAddTaskClick
+            ) {
+                Icon(Icons.Rounded.Add, contentDescription = "Add")
+            }
+            IconButton(
+                modifier = Modifier
+                    .size(20.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                    .padding(1.dp)
+                    .clip(CircleShape),
+                onClick = onCloseProjectClick
             ) {
                 Icon(Icons.Rounded.Close, contentDescription = "Close")
             }
         }
     }
 }
-
-

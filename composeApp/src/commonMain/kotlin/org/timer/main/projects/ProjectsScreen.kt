@@ -223,7 +223,7 @@ fun ProjectItem(
             HorizontalDivider()
             LazyColumn(
                 modifier = Modifier.dragContainer(dragDropState).wrapContentHeight()
-                    .heightIn(max = 1000.dp),
+                    .heightIn(max = 5000.dp),
                 state = lazyListState,
             ) {
                 itemsIndexed(project.tasks, key = { _, item -> item.id }) { index, item ->

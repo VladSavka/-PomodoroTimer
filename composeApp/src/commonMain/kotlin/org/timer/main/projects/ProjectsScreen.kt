@@ -2,25 +2,25 @@ package org.timer.main.projects
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.*
-import androidx.compose.material.icons.automirrored.rounded.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.focus.*
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
@@ -88,8 +88,8 @@ fun ProjectsScreen(
                                 project = item,
                                 isDrugging = isDragging,
                                 onDeleteClick = { viewModel.removeProject(it) },
-                                onAddTaskClick = { project, description ->
-                                    viewModel.onTaskSubmit(
+                                onSubmitTaskClick = { project, description ->
+                                    viewModel.onTaskSubmitClick(
                                         project.id,
                                         description
                                     )
@@ -108,6 +108,12 @@ fun ProjectsScreen(
                                 },
                                 onTasksReorder = { project, fromIndex, toIndex ->
                                     viewModel.onTasksDrugAndDrop(project.id, fromIndex, toIndex)
+                                },
+                                onSubmitEditProjectName = { id, name ->
+                                    viewModel.onSubmitEditProjectName(id, name)
+                                },
+                                onSubmitEditTaskDescription = { projectId, taskId, name ->
+                                    viewModel.onSubmitEditTaskDescription(projectId, taskId, name)
                                 }
                             )
                             Spacer(modifier = Modifier.size(8.dp))
@@ -170,15 +176,19 @@ fun ProjectsScreen(
 @Composable
 fun ProjectItem(
     modifier: Modifier,
-    project: Project,
+    project: PresentableProject,
     isDrugging: Boolean,
     onDeleteClick: (Long) -> Unit,
-    onAddTaskClick: (Project, String) -> Unit,
-    onTaskDoneClick: (Project, Task) -> Unit,
-    onTaskUndoneClick: (Project, Task) -> Unit,
-    onTasksReorder: (Project, Int, Int) -> Unit,
+    onSubmitTaskClick: (PresentableProject, String) -> Unit,
+    onTaskDoneClick: (PresentableProject, Task) -> Unit,
+    onTaskUndoneClick: (PresentableProject, Task) -> Unit,
+    onTasksReorder: (PresentableProject, Int, Int) -> Unit,
+    onSubmitEditProjectName: (Long, String) -> Unit,
+    onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
+) {
 
-    ) {
+    var showAddTaskFooter by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
     val elevation by animateDpAsState(if (isDrugging) 6.dp else 2.dp)
 
     ElevatedCard(
@@ -189,6 +199,13 @@ fun ProjectItem(
             elevation = elevation,
             shape = CardDefaults.shape,
         )
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    if (showAddTaskFooter) {
+                        showAddTaskFooter = false
+                    }
+                })
+            }
     ) {
 
         val lazyListState = rememberLazyListState()
@@ -197,11 +214,16 @@ fun ProjectItem(
                 onTasksReorder.invoke(project, fromIndex, toIndex)
             }
         Column(modifier = Modifier.padding(16.dp)) {
-            Header(project, { onDeleteClick(project.id) })
+            Header(
+                project = project,
+                onCloseProjectClick = { onDeleteClick(project.id) },
+                onAddTaskClick = { showAddTaskFooter = true },
+                onSubmitEditProjectName = onSubmitEditProjectName
+            )
             HorizontalDivider()
             LazyColumn(
                 modifier = Modifier.dragContainer(dragDropState).wrapContentHeight()
-                    .heightIn(max = 1000.dp),
+                    .heightIn(max = 5000.dp),
                 state = lazyListState,
             ) {
                 itemsIndexed(project.tasks, key = { _, item -> item.id }) { index, item ->
@@ -210,20 +232,47 @@ fun ProjectItem(
                             item,
                             isDragging,
                             { onTaskDoneClick.invoke(project, it) },
-                            { onTaskUndoneClick.invoke(project, it) })
+                            { onTaskUndoneClick.invoke(project, it) },
+                            { taskId, desc ->
+                                onSubmitEditTaskDescription(project.id, taskId, desc)
+                            })
                     }
                 }
             }
-            HorizontalDivider()
-            AddTaskFooter { onAddTaskClick(project, it) }
+            if (showAddTaskFooter) {
+                HorizontalDivider()
+                AddTaskFooter(focusRequester,
+                    onSubmitTaskClick = {
+                        onSubmitTaskClick(project, it)
+                        showAddTaskFooter = false
+                    }, onLostFocus = {
+                        showAddTaskFooter = false
+                    })
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+            }
+
         }
     }
 }
 
 @Composable
-fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
+fun AddTaskFooter(
+    focusRequester: FocusRequester,
+    onSubmitTaskClick: (String) -> Unit,
+    onLostFocus: () -> Unit
+) {
     var taskName by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    var isFocused by remember { mutableStateOf(false) }
+    var isSubmitButtonClicked by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(isSubmitButtonClicked) {
+        if (isSubmitButtonClicked) {
+            onLostFocus()
+        }
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -233,24 +282,39 @@ fun AddTaskFooter(onAddTaskClick: (String) -> Unit) {
             value = taskName,
             onValueChange = { taskName = it },
             label = { Text("Add Task") },
-            modifier = Modifier.weight(1f)
-                .padding(start = 0.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
+                .padding(end = 16.dp, top = 8.dp, bottom = 8.dp)
+                .onFocusChanged {
+                    isFocused = it.isFocused
+                },
+            singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
-                onDone = { keyboardController?.hide() }
-            )
-        )
-        IconButton(
-            modifier = Modifier.size(20.dp),
-            onClick = {
-                if (taskName.isNotBlank()) {
-                    onAddTaskClick(taskName)
-                    taskName = "" // Clear the text field after submission
+                onDone = {
+                    if (taskName.isNotBlank()) {
+                        onSubmitTaskClick(taskName)
+                        taskName = ""
+                    }
+                    focusManager.clearFocus()
+                    onLostFocus()
                 }
+            ),
+        )
+        Button(
+            modifier = Modifier.padding(top = 8.dp),
+            onClick = {
+                isSubmitButtonClicked = true
+                if (taskName.isNotBlank()) {
+                    onSubmitTaskClick(taskName)
+                    taskName = ""
+                }
+                focusManager.clearFocus()
             },
             enabled = taskName.isNotBlank()
         ) {
-            Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = "Submit Task")
+            Text("Submit")
         }
     }
 }
@@ -260,10 +324,22 @@ fun TaskItem(
     task: Task,
     isDrugging: Boolean,
     onTaskDoneClick: (Task) -> Unit,
-    onTaskUndoneClick: (Task) -> Unit
+    onTaskUndoneClick: (Task) -> Unit,
+    onSubmitEditTaskDescription: (Long, String) -> Unit,
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var shouldSubmit by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(false) }
+
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(task.description, TextRange(task.description.length)))
+    }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
     val elevation by animateDpAsState(if (isDrugging) 2.dp else 0.dp)
-    Column(modifier = Modifier.shadow(elevation = elevation)) {
+
+    Column(modifier = Modifier.shadow(elevation = elevation).onFocusChanged {
+    }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -281,17 +357,75 @@ fun TaskItem(
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            if (task.isDone) {
-                Text(
-                    text = task.description,
-                    modifier = Modifier.weight(1f),
-                    style = LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough),
-                )
+            if (isEditing) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary,
+                            RoundedCornerShape(4.dp)
+                        )
+                ) {
+                    BasicTextField(
+                        value = textFieldValue,
+                        onValueChange = { textFieldValue = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .background(Color.Transparent)
+                            .onFocusChanged { focusState ->
+                                if (isFocused != focusState.isFocused) {
+                                    isFocused = focusState.isFocused
+                                    if (!focusState.isFocused && shouldSubmit) {
+                                        onSubmitEditTaskDescription(task.id, textFieldValue.text)
+                                        isEditing = false
+                                    }
+                                }
+                                shouldSubmit = true
+                            },
+                        textStyle = if (task.isDone) LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) else LocalTextStyle.current,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                onSubmitEditTaskDescription(task.id, textFieldValue.text)
+                                isEditing = false
+                                keyboardController?.hide()
+                            }
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                        visualTransformation = VisualTransformation.None
+                    )
+                }
+                LaunchedEffect(isEditing) {
+                    if (isEditing) {
+                        focusRequester.requestFocus()
+                    }
+                }
             } else {
                 Text(
                     text = task.description,
                     modifier = Modifier.weight(1f),
+                    style = if (task.isDone) LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) else LocalTextStyle.current,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(
+                modifier = Modifier
+                    .size(20.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                    .padding(2.dp)
+                    .clip(CircleShape),
+                onClick = {
+                    isEditing = true
+                    textFieldValue =
+                        TextFieldValue(task.description, TextRange(task.description.length))
+                }
+            ) {
+                Icon(Icons.Rounded.Edit, contentDescription = "Edit")
             }
         }
         HorizontalDivider()
@@ -300,33 +434,130 @@ fun TaskItem(
 
 @Composable
 private fun Header(
-    project: Project,
-    onCloseClick: () -> Unit
+    project: PresentableProject,
+    onCloseProjectClick: () -> Unit,
+    onAddTaskClick: () -> Unit,
+    onSubmitEditProjectName: (Long, String) -> Unit,
 ) {
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(project.name, TextRange(project.name.length)))
+    }
+    val focusRequester = remember { FocusRequester() }
+    var isEditing by remember { mutableStateOf(false) }
+    var shouldSubmit by remember { mutableStateOf(false) }
+    var isFocused by remember { mutableStateOf(false) }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+
     Row(
         modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = project.title,
-            modifier = Modifier
-                .padding(start = 0.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
-                .weight(1f),
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-        )
-        Box(modifier = Modifier) {
+        if (isEditing) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 32.dp, end = 16.dp, bottom = 8.dp)
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.primary,
+                        RoundedCornerShape(4.dp)
+                    )
+            ) {
+                BasicTextField(
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .background(Color.Transparent)
+                        .onFocusChanged { focusState ->
+                            if (isFocused != focusState.isFocused) {
+                                isFocused = focusState.isFocused
+                                if (!focusState.isFocused && shouldSubmit) {
+                                    onSubmitEditProjectName(project.id, textFieldValue.text)
+                                    isEditing = false
+                                }
+                            }
+                            shouldSubmit = true
+                        },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onSubmitEditProjectName(project.id, textFieldValue.text)
+                            isEditing = false
+                            keyboardController?.hide()
+                        }
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    visualTransformation = VisualTransformation.None
+                )
+            }
+            LaunchedEffect(isEditing) {
+                if (isEditing) {
+                    focusRequester.requestFocus()
+                }
+            }
+        } else {
+            Text(
+                text = project.name,
+                modifier = Modifier
+                    .padding(start = 32.dp, end = 16.dp, top = 0.dp, bottom = 8.dp)
+                    .weight(1f),
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyLarge,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        }
+        Row(
+            modifier = Modifier.wrapContentWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             IconButton(
-                modifier = Modifier.size(20.dp).align(Alignment.TopEnd)
+                modifier = Modifier
+                    .size(20.dp)
+                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                    .padding(2.dp)
+                    .clip(CircleShape),
+                onClick = {
+                    isEditing = true
+                    textFieldValue = TextFieldValue(project.name, TextRange(project.name.length))
+                }
+            ) {
+                Icon(Icons.Rounded.Edit, contentDescription = "Edit")
+            }
+            IconButton(
+                modifier = Modifier
+                    .size(20.dp)
                     .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     .padding(1.dp)
                     .clip(CircleShape),
-
-                onClick = onCloseClick
+                onClick = onAddTaskClick
             ) {
-                Icon(Icons.Rounded.Close, contentDescription = "Close")
+                Icon(Icons.Rounded.Add, contentDescription = "Add")
             }
+            if (project.showCloseButton) {
+                IconButton(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                        .padding(1.dp)
+                        .clip(CircleShape),
+                    onClick = onCloseProjectClick
+                ) {
+                    Icon(Icons.Rounded.Close, contentDescription = "Close")
+                }
+            }
+
         }
     }
 }
-
-

@@ -10,7 +10,7 @@ import org.timer.main.domain.project.*
 import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
-import org.timer.main.video.*
+import org.timer.main.breakactivity.*
 
 @ExperimentalResourceApi
 fun appModule() = module {

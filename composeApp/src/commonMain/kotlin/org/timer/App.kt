@@ -7,6 +7,7 @@ import org.jetbrains.compose.resources.*
 import org.jetbrains.compose.ui.tooling.preview.*
 import org.koin.compose.*
 import org.timer.main.*
+import org.timer.ui.theme.*
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -29,7 +30,7 @@ fun App() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent() {
-    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
+    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkScheme else lightScheme) {
         MainScreen()
     }
 }

@@ -1,4 +1,4 @@
-package org.timer.main.video
+package org.timer.main.breakactivity
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.*

@@ -1,4 +1,4 @@
-package org.timer.main.video
+package org.timer.main.breakactivity
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.flow.*

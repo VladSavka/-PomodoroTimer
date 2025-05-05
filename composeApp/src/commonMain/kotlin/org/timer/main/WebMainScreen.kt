@@ -9,7 +9,7 @@ import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.projects.*
 import org.timer.main.timer.*
-import org.timer.main.video.*
+import org.timer.main.breakactivity.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -21,8 +21,12 @@ fun WebMainScreen(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight()
-                .padding(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-        ) {
+                .padding(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
+
+            ) {
             Column {
                 TimerScreen(
                     modifier = Modifier
@@ -43,6 +47,9 @@ fun WebMainScreen(
                 .fillMaxWidth(1f)
                 .fillMaxHeight()
                 .padding(start = 4.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
         ) {
             val viewState by viewModel.viewState.collectAsStateWithLifecycle()
             BreakActivityScreen(viewState)

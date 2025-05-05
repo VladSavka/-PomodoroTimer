@@ -1,4 +1,4 @@
-package org.timer.main.video
+package org.timer.main.breakactivity
 
 data class BreakActivityViewState(
     val selectedActivityId: String = "",

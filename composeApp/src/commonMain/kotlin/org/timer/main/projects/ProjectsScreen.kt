@@ -195,6 +195,9 @@ fun ProjectItem(
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 2.dp,
         ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
         modifier = modifier.fillMaxWidth().wrapContentHeight().shadow(
             elevation = elevation,
             shape = CardDefaults.shape,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.pager.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
@@ -13,7 +14,7 @@ import androidx.lifecycle.compose.*
 import kotlinx.coroutines.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
-import org.timer.main.video.*
+import org.timer.main.breakactivity.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -54,9 +55,10 @@ fun TimerScreen(
                 end = 16.dp
             )
         ) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)) {
                 SecondaryTabRow(
-                    selectedTabIndex = viewState.selectedTabIndex
+                    selectedTabIndex = viewState.selectedTabIndex,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     titles.forEachIndexed { index, title ->
                         Tab(
@@ -68,9 +70,9 @@ fun TimerScreen(
                                 Text(
                                     text = title,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
                                 )
-                            }
+                            },
                         )
                     }
 
@@ -122,12 +124,14 @@ private fun KittidoroContent(
             text = "Keep the eye on the ball!",
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.padding(8.dp)
         )
 
         Text(
             text = viewState.pomodoroTime,
             fontSize = 30.sp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -170,12 +174,14 @@ private fun ShortBreakContent(viewState: TimerViewState, viewModel: TimerViewMod
         Text(
             text = "Take a break Kitty",
             fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(8.dp),
         )
         Text(
             text = viewState.shortBreakTime,
             fontSize = 30.sp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )
@@ -219,12 +225,14 @@ private fun LongBreakContent(viewState: TimerViewState, viewModel: TimerViewMode
         Text(
             text = "Take a long break Kitty",
             fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(8.dp),
         )
         Text(
             text = viewState.longBreakTime,
             fontSize = 30.sp,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )

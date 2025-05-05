@@ -1,4 +1,4 @@
-package org.timer.main.video
+package org.timer.main.breakactivity
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -231,6 +231,9 @@ fun TwoLevelDeepList(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        ),
                         onClick = {
                             selectedItem = item
                             if (item.subItems.isEmpty()) {
@@ -240,7 +243,10 @@ fun TwoLevelDeepList(
                     ) {
                         ListItem(
                             headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = item.title, textAlign = TextAlign.Center) },
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.padding(8.dp),
+                            colors = ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            )
                         )
                     }
                 }
@@ -261,13 +267,19 @@ fun TwoLevelDeepList(
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ),
                             onClick = {
                                 onItemSelected(subItem.id)
                             }
                         ) {
                             ListItem(
                                 headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = subItem.title, textAlign = TextAlign.Center) },
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier.padding(8.dp),
+                                colors = ListItemDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                )
                             )
                         }
                     }

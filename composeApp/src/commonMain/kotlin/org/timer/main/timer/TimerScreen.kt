@@ -1,12 +1,10 @@
 package org.timer.main.timer
 
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
@@ -32,7 +30,8 @@ fun TimerScreen(
                 text = "Kittydoro timer",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
@@ -55,7 +54,11 @@ fun TimerScreen(
                 end = 16.dp
             )
         ) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.secondaryContainer)) {
+            ElevatedCard(
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                )
+            ) {
                 SecondaryTabRow(
                     selectedTabIndex = viewState.selectedTabIndex,
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -91,19 +94,16 @@ fun TimerScreen(
                         }
                     }
                 }
+                Text(
+                    text = "Kittydoros: ${viewState.kittyDoroNumber - 1}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
             }
-        }
-        Row(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(bottom = 8.dp)
-        ) {
-            Text(
-                text = "Kittydoros: ${viewState.kittyDoroNumber - 1}",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.SemiBold
-            )
         }
         if (windowInfo.isSmallScreen()) {
             BreakActivityScreen(viewState = viewState)

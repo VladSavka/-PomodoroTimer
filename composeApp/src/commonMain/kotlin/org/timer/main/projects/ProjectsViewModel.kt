@@ -17,8 +17,10 @@ class ProjectsViewModel(
     private val updateTasksOrderUseCase: UpdateTasksOrderUseCase,
     private val updateProjectNameUseCase: UpdateProjectNameUseCase,
     private val updateTaskDescriptionUseCase: UpdateTaskDescriptionUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase
 
-    ) : ViewModel() {
+
+) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
 
@@ -80,7 +82,11 @@ class ProjectsViewModel(
         PresentableProject(
             this.id,
             this.name,
-            this.tasks,
-            this.tasks.isEmpty() || this.tasks.all { it.isDone })
+            this.tasks
+        )
+
+    fun onDeleteTaskClick(projectId: Long, taskId: Long) = viewModelScope.launch {
+        deleteTaskUseCase(projectId, taskId)
+    }
 }
 

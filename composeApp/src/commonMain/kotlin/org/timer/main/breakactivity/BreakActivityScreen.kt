@@ -89,7 +89,8 @@ fun BreakActivityScreen(
                     text = "Break time",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             when (viewState.timerState) {
@@ -146,7 +147,8 @@ fun BoxScope.Audio(viewState: TimerViewState, showDialog: Boolean) {
                 modifier = Modifier.fillMaxWidth(),
                 text = "Show those moves! Dance like nobody watching",
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onPrimary
             )
             if (!showDialog) {
                 VideoPlayer(
@@ -191,7 +193,8 @@ fun GoForIt(modifier: Modifier, viewState: TimerViewState) {
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.headlineMedium,
-            text = "Go for it!"
+            text = "Go for it!",
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -204,7 +207,8 @@ fun BoxScope.LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.headlineMedium,
-            text = "Have some food, check direct and stretch a bit, buddy, you deserve it!"
+            text = "Have some food, check direct and stretch a bit, buddy, you deserve it!",
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

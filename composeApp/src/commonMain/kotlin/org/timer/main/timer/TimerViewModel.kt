@@ -12,7 +12,7 @@ import org.timer.main.domain.video.*
 private const val ITERATIONS_IN_ONE_CYCLE = 4
 
 class TimerViewModel(
-    val alarmPlayer: AlarmPlayer,
+    private val alarmPlayer: AlarmPlayer,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
@@ -92,13 +92,11 @@ class TimerViewModel(
         longBreakTimer.resetTimer()
         shortBreakTimer.resetTimer()
         pomodoroTimer.startTimer()
-        var kittyDoroNumber = viewState.value.kittyDoroNumber
-        kittyDoroNumber++
+
         _viewState.update {
             it.copy(
                 selectedTabIndex = 0,
                 timerState = TimerState.Pomodoro,
-                kittyDoroNumber = kittyDoroNumber
             )
         }
     }
@@ -107,6 +105,7 @@ class TimerViewModel(
 
     private fun onPomodoroFinish() {
         log.debug { "onFinish" }
+        incrementKittydoroNumber()
         timerJob = viewModelScope.launch {
             alarmPlayer.play(onEnded = {
                 if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
@@ -116,6 +115,12 @@ class TimerViewModel(
                 }
             })
         }
+    }
+
+    private fun incrementKittydoroNumber() {
+        var kittyDoroNumber = viewState.value.kittyDoroNumber
+        kittyDoroNumber++
+        _viewState.update { it.copy(kittyDoroNumber = kittyDoroNumber) }
     }
 
     private fun startLongBreak() {

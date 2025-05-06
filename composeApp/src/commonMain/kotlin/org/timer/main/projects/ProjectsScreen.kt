@@ -12,8 +12,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.focus.*
@@ -114,6 +112,9 @@ fun ProjectsScreen(
                                 },
                                 onSubmitEditTaskDescription = { projectId, taskId, name ->
                                     viewModel.onSubmitEditTaskDescription(projectId, taskId, name)
+                                },
+                                onDeleteTaskClick = { projectId, taskId ->
+                                    viewModel.onDeleteTaskClick(projectId, taskId)
                                 }
                             )
                             Spacer(modifier = Modifier.size(8.dp))
@@ -130,8 +131,8 @@ fun ProjectsScreen(
                 viewModel.onProjectTitleUpdate("")
                 showDialog = true
             },
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.secondary
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(Icons.Filled.Add, "Add Project")
         }
@@ -185,9 +186,10 @@ fun ProjectItem(
     onTasksReorder: (PresentableProject, Int, Int) -> Unit,
     onSubmitEditProjectName: (Long, String) -> Unit,
     onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
-) {
-
-    var showAddTaskFooter by remember { mutableStateOf(false) }
+    onDeleteTaskClick:(Long, Long) -> Unit,
+    ) {
+    var showAddTaskFooter by remember { mutableStateOf(project.tasks.isEmpty()) }
+    var hasRequestedFocus by remember { mutableStateOf(true) } // New state variable
     val focusRequester = remember { FocusRequester() }
     val elevation by animateDpAsState(if (isDrugging) 6.dp else 2.dp)
 
@@ -198,10 +200,13 @@ fun ProjectItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
-        modifier = modifier.fillMaxWidth().wrapContentHeight().shadow(
-            elevation = elevation,
-            shape = CardDefaults.shape,
-        )
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .shadow(
+                elevation = elevation,
+                shape = CardDefaults.shape,
+            )
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     if (showAddTaskFooter) {
@@ -210,22 +215,25 @@ fun ProjectItem(
                 })
             }
     ) {
-
         val lazyListState = rememberLazyListState()
-        val dragDropState =
-            rememberDragDropState(lazyListState) { fromIndex, toIndex ->
-                onTasksReorder.invoke(project, fromIndex, toIndex)
-            }
+        val dragDropState = rememberDragDropState(lazyListState) { fromIndex, toIndex ->
+            onTasksReorder.invoke(project, fromIndex, toIndex)
+        }
         Column(modifier = Modifier.padding(16.dp)) {
             Header(
                 project = project,
-                onCloseProjectClick = { onDeleteClick(project.id) },
-                onAddTaskClick = { showAddTaskFooter = true },
+                onDeletProjectClick = { onDeleteClick(project.id) },
+                onAddTaskClick = {
+                    showAddTaskFooter = true
+                    hasRequestedFocus = false // Reset the flag when the footer is shown
+                },
                 onSubmitEditProjectName = onSubmitEditProjectName
             )
             HorizontalDivider()
             LazyColumn(
-                modifier = Modifier.dragContainer(dragDropState).wrapContentHeight()
+                modifier = Modifier
+                    .dragContainer(dragDropState)
+                    .wrapContentHeight()
                     .heightIn(max = 5000.dp),
                 state = lazyListState,
             ) {
@@ -238,24 +246,32 @@ fun ProjectItem(
                             { onTaskUndoneClick.invoke(project, it) },
                             { taskId, desc ->
                                 onSubmitEditTaskDescription(project.id, taskId, desc)
-                            })
+                            },
+                            { taskId ->
+                                onDeleteTaskClick(project.id, taskId)
+                            } )
                     }
                 }
             }
             if (showAddTaskFooter) {
                 HorizontalDivider()
-                AddTaskFooter(focusRequester,
+                AddTaskFooter(
+                    focusRequester = focusRequester,
                     onSubmitTaskClick = {
                         onSubmitTaskClick(project, it)
                         showAddTaskFooter = false
-                    }, onLostFocus = {
+                    },
+                    onLostFocus = {
                         showAddTaskFooter = false
-                    })
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
+                    }
+                )
+                LaunchedEffect(showAddTaskFooter) {
+                    if (showAddTaskFooter && !hasRequestedFocus) {
+                        focusRequester.requestFocus()
+                        hasRequestedFocus = true // Set the flag after requesting focus
+                    }
                 }
             }
-
         }
     }
 }
@@ -329,10 +345,12 @@ fun TaskItem(
     onTaskDoneClick: (Task) -> Unit,
     onTaskUndoneClick: (Task) -> Unit,
     onSubmitEditTaskDescription: (Long, String) -> Unit,
+    onDeleteTaskClick: (Long) -> Unit,
 ) {
     var isEditing by remember { mutableStateOf(false) }
     var shouldSubmit by remember { mutableStateOf(false) }
     var isFocused by remember { mutableStateOf(false) }
+    var isMenuExpanded by remember { mutableStateOf(false) }
 
     var textFieldValue by remember {
         mutableStateOf(TextFieldValue(task.description, TextRange(task.description.length)))
@@ -416,19 +434,36 @@ fun TaskItem(
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                modifier = Modifier
-                    .size(20.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                    .padding(2.dp)
-                    .clip(CircleShape),
-                onClick = {
-                    isEditing = true
-                    textFieldValue =
-                        TextFieldValue(task.description, TextRange(task.description.length))
+            Box {
+                IconButton(
+                    modifier = Modifier
+                        .size(20.dp),
+                    onClick = { isMenuExpanded = true }
+                ) {
+                    Icon(Icons.Rounded.MoreVert, contentDescription = "More")
                 }
-            ) {
-                Icon(Icons.Rounded.Edit, contentDescription = "Edit")
+                DropdownMenu(
+                    expanded = isMenuExpanded,
+                    onDismissRequest = { isMenuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        onClick = {
+                            isEditing = true
+                            textFieldValue =
+                                TextFieldValue(task.description, TextRange(task.description.length))
+                            isMenuExpanded = false
+                        }
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        onClick = {
+                            onDeleteTaskClick(task.id)
+                            isMenuExpanded = false
+                        }
+                    )
+                }
             }
         }
         HorizontalDivider()
@@ -438,7 +473,7 @@ fun TaskItem(
 @Composable
 private fun Header(
     project: PresentableProject,
-    onCloseProjectClick: () -> Unit,
+    onDeletProjectClick: () -> Unit,
     onAddTaskClick: () -> Unit,
     onSubmitEditProjectName: (Long, String) -> Unit,
 ) {
@@ -449,9 +484,9 @@ private fun Header(
     var isEditing by remember { mutableStateOf(false) }
     var shouldSubmit by remember { mutableStateOf(false) }
     var isFocused by remember { mutableStateOf(false) }
+    var isMenuExpanded by remember { mutableStateOf(false) }
 
     val keyboardController = LocalSoftwareKeyboardController.current
-
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -499,7 +534,7 @@ private fun Header(
                         }
                     ),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    visualTransformation = VisualTransformation.None
+                    visualTransformation = androidx.compose.ui.text.input.VisualTransformation.None
                 )
             }
             LaunchedEffect(isEditing) {
@@ -521,23 +556,12 @@ private fun Header(
             )
         }
         Row(
-            modifier = Modifier.wrapContentWidth().padding(bottom = 8.dp),
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                modifier = Modifier
-                    .size(20.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                    .padding(2.dp)
-                    .clip(CircleShape),
-                onClick = {
-                    isEditing = true
-                    textFieldValue = TextFieldValue(project.name, TextRange(project.name.length))
-                }
-            ) {
-                Icon(Icons.Rounded.Edit, contentDescription = "Edit")
-            }
             IconButton(
                 modifier = Modifier
                     .size(20.dp)
@@ -548,19 +572,37 @@ private fun Header(
             ) {
                 Icon(Icons.Rounded.Add, contentDescription = "Add")
             }
-            if (project.showCloseButton) {
+            Box {
                 IconButton(
                     modifier = Modifier
-                        .size(20.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                        .padding(1.dp)
-                        .clip(CircleShape),
-                    onClick = onCloseProjectClick
+                        .size(20.dp),
+                    onClick = { isMenuExpanded = true }
                 ) {
-                    Icon(Icons.Rounded.Close, contentDescription = "Close")
+                    Icon(Icons.Rounded.MoreVert, contentDescription = "More")
+                }
+                DropdownMenu(
+                    expanded = isMenuExpanded,
+                    onDismissRequest = { isMenuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Edit name") },
+                        onClick = {
+                            isEditing = true
+                            textFieldValue =
+                                TextFieldValue(project.name, TextRange(project.name.length))
+                            isMenuExpanded = false
+                        }
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        onClick = {
+                            onDeletProjectClick()
+                            isMenuExpanded = false
+                        }
+                    )
                 }
             }
-
         }
     }
 }

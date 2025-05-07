@@ -11,26 +11,31 @@ class SettingsViewModel : ViewModel() {
     fun onPresetConfirmed(position: Int) {
         _viewState.update { it.copy(selectedPresetPosition = position) }
         when (position) {
-            0 -> SettingsGateway.setTimeSettings(
-                TimeSettings(
-                    25000L * 60,
-                    5000L * 60,
-                    15000L * 60
-                )
-            )
+            0 -> {
 
-            1 -> SettingsGateway.setTimeSettings(
-                TimeSettings(
-                    50000L * 60,
-                    10000L * 60,
-                    30000L * 60
+                SettingsGateway.setTimeSettings(
+                    TimeSettings(
+                        25000L * 60,
+                        5000L * 60,
+                        15000L * 60
+                    )
                 )
-            )
+            }
+
+            1 -> {
+                SettingsGateway.setTimeSettings(
+                    TimeSettings(
+                        50000L * 60,
+                        10000L * 60,
+                        30000L * 60
+                    )
+                )
+            }
 
             2 -> if (isFormValid()) {
                 SettingsGateway.setTimeSettings(
                     TimeSettings(
-                        _viewState.value.focusMinutes.toLong() * 1000 * 60,
+                        _viewState.value.pomodoroMinutes.toLong() * 1000 * 60,
                         _viewState.value.shortBreakMinutes.toLong() * 1000 * 60,
                         _viewState.value.longBreakMinutes.toLong() * 1000 * 60
                     )
@@ -46,8 +51,8 @@ class SettingsViewModel : ViewModel() {
     fun updateFocusMinutes(focusedMinutes: String) {
         _viewState.update {
             it.copy(
-                focusMinutes = focusedMinutes,
-                showFocusError = focusedMinutes.isEmpty(),
+                pomodoroMinutes = focusedMinutes,
+                showPomodoroError = focusedMinutes.isEmpty(),
             )
         }
         updateConfirmButtonVisibility()
@@ -76,6 +81,18 @@ class SettingsViewModel : ViewModel() {
     }
 
     fun onPresetSelected(position: Int) {
+        if (position == 0 || position == 1){
+            _viewState.update {
+                it.copy(
+                    shortBreakMinutes = "",
+                    longBreakMinutes = "",
+                    pomodoroMinutes = "",
+                    showPomodoroError = false,
+                    showShortBreakError = false,
+                    showLongBreakError = false,
+                )
+            }
+        }
         _viewState.update { it.copy(selectedPresetPosition = position) }
         updateConfirmButtonVisibility()
     }
@@ -89,7 +106,7 @@ class SettingsViewModel : ViewModel() {
     }
 
     private fun isFormValid() =
-        _viewState.value.focusMinutes.isNotEmpty()
+        _viewState.value.pomodoroMinutes.isNotEmpty()
                 && _viewState.value.shortBreakMinutes.isNotEmpty()
                 && _viewState.value.longBreakMinutes.isNotEmpty()
 }

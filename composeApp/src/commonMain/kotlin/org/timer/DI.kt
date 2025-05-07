@@ -30,6 +30,7 @@ fun appModule() = module {
     factoryOf(::UpdateProjectNameUseCase)
     factoryOf(::UpdateTaskDescriptionUseCase)
     factoryOf(::DeleteTaskUseCase)
+    factoryOf(::MoveTaskToTheEndOfListUseCase)
 
 }
 

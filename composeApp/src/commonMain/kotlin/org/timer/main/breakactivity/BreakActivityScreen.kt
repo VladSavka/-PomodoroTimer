@@ -37,7 +37,11 @@ fun BreakActivityScreen(
                 onClick = { showDialog.value = true },
                 modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
             ) {
-                Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                Icon(
+                    Icons.Filled.Settings,
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 
@@ -246,7 +250,13 @@ fun TwoLevelDeepList(
                         }
                     ) {
                         ListItem(
-                            headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = item.title, textAlign = TextAlign.Center) },
+                            headlineContent = {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = item.title,
+                                    textAlign = TextAlign.Center
+                                )
+                            },
                             modifier = Modifier.padding(8.dp),
                             colors = ListItemDefaults.colors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -279,7 +289,13 @@ fun TwoLevelDeepList(
                             }
                         ) {
                             ListItem(
-                                headlineContent = { Text(modifier = Modifier.fillMaxWidth(), text = subItem.title, textAlign = TextAlign.Center) },
+                                headlineContent = {
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        text = subItem.title,
+                                        textAlign = TextAlign.Center
+                                    )
+                                },
                                 modifier = Modifier.padding(8.dp),
                                 colors = ListItemDefaults.colors(
                                     containerColor = MaterialTheme.colorScheme.secondaryContainer,

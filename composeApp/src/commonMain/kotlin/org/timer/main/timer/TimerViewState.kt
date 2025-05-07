@@ -7,7 +7,7 @@ data class TimerViewState(
     private val isPomodoroTimerRunning: Boolean = false,
     private val isShortBreakTimerRunning: Boolean = false,
     private val isLongBreakTimerRunning: Boolean = false,
-    val kittyDoroNumber: Int = 1,
+    val kittyDoroNumber: Int = 0,
     val timerState: TimerState = TimerState.Pomodoro,
     val selectedTabIndex: Int = 0,
     val isShortBreakStarted: Boolean = false,

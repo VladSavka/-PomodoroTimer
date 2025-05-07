@@ -203,7 +203,7 @@ class TimerViewModel(
         initTimers()
         _viewState.update {
             it.copy(
-                kittyDoroNumber = 1,
+                kittyDoroNumber = 0,
                 timerState = TimerState.Pomodoro
             )
         }

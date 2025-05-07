@@ -1,5 +1,6 @@
 package org.timer.main
 
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.*
@@ -21,7 +22,10 @@ fun MobileMainScreen() {
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(
+            modifier = Modifier.padding(innerPadding)
+                .background(MaterialTheme.colorScheme.primaryContainer)
+        ) {
             NavHost(
                 navController = navController,
                 startDestination = MainRouts.Home.destanation,

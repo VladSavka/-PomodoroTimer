@@ -17,7 +17,8 @@ class ProjectsViewModel(
     private val updateTasksOrderUseCase: UpdateTasksOrderUseCase,
     private val updateProjectNameUseCase: UpdateProjectNameUseCase,
     private val updateTaskDescriptionUseCase: UpdateTaskDescriptionUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val moveTaskToTheEndOfListTaskUseCase: MoveTaskToTheEndOfListUseCase
 
 
 ) : ViewModel() {
@@ -51,6 +52,7 @@ class ProjectsViewModel(
 
     fun onTaskDoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
         doneTaskUseCase(projectId, taskId)
+        moveTaskToTheEndOfListTaskUseCase(projectId, taskId)
     }
 
     fun onTaskUndoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {

@@ -95,7 +95,7 @@ fun TimerScreen(
                     }
                 }
                 Text(
-                    text = "Kittydoros: ${viewState.kittyDoroNumber - 1}",
+                    text = "Kittydoros: ${viewState.kittyDoroNumber}",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),

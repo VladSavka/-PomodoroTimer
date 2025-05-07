@@ -50,7 +50,7 @@ fun SingleChoiceDialog(
     }
     if (remeberWindowInfo().isSmallScreen()) {
         val keyboard = LocalSoftwareKeyboardController.current
-        Column {
+        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
             Text(text = title)
             RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
             TextButton(enabled = viewState.isConfirmEnabled, onClick = {
@@ -117,7 +117,7 @@ fun RadioItem(
                 Column {
                     Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
                         OutlinedTextField(
-                            value = viewState.focusMinutes,
+                            value = viewState.pomodoroMinutes,
                             onValueChange = {
                                 if (it.isEmpty() || it.isDigits()) viewModel.updateFocusMinutes(it)
                             },
@@ -125,9 +125,9 @@ fun RadioItem(
                             singleLine = true,
                             enabled = selectedItemIndex == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewState.showFocusError,
+                            isError = viewState.showPomodoroError,
                             supportingText = {
-                                if (viewState.showFocusError) {
+                                if (viewState.showPomodoroError) {
                                     Text(text = "Please enter a valid number")
                                 }
                             }

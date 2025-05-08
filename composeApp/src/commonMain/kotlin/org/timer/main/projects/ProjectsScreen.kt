@@ -70,7 +70,8 @@ fun ProjectsScreen(
             Text(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.Center),
-                text = "Your project list is empty.\n Add your first project using button below."
+                text = "Your project list is empty.\n Add your first project using button below.",
+                color = MaterialTheme.colorScheme.onPrimary
             )
         } else {
             Row(Modifier.padding(horizontal = 16.dp)) {
@@ -186,8 +187,8 @@ fun ProjectItem(
     onTasksReorder: (PresentableProject, Int, Int) -> Unit,
     onSubmitEditProjectName: (Long, String) -> Unit,
     onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
-    onDeleteTaskClick:(Long, Long) -> Unit,
-    ) {
+    onDeleteTaskClick: (Long, Long) -> Unit,
+) {
     var showAddTaskFooter by remember { mutableStateOf(project.tasks.isEmpty()) }
     var hasRequestedFocus by remember { mutableStateOf(true) } // New state variable
     val focusRequester = remember { FocusRequester() }
@@ -249,7 +250,7 @@ fun ProjectItem(
                             },
                             { taskId ->
                                 onDeleteTaskClick(project.id, taskId)
-                            } )
+                            })
                     }
                 }
             }

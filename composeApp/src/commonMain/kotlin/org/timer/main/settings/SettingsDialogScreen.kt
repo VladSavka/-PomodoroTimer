@@ -6,12 +6,15 @@ import androidx.compose.foundation.text.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
+import org.timer.ui.theme.*
 
 @Composable
 fun SettingsDialogScreen(
@@ -48,17 +51,32 @@ fun SingleChoiceDialog(
     val (selectedItemIndex, setSelectedItemIndex) = remember {
         mutableStateOf(indexOfDefault)
     }
-    if (remeberWindowInfo().isSmallScreen()) {
+    val isSmallScreen = remeberWindowInfo().isSmallScreen()
+    if (isSmallScreen) {
         val keyboard = LocalSoftwareKeyboardController.current
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
-            Text(text = title)
-            RadioItem(radioOptions, selectedItemIndex, setSelectedItemIndex, viewModel, viewState)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimary,
+                textAlign = TextAlign.Center
+            )
+            RadioItem(
+                radioOptions,
+                selectedItemIndex,
+                setSelectedItemIndex,
+                viewModel,
+                viewState,
+                isSmallScreen
+            )
             TextButton(enabled = viewState.isConfirmEnabled, onClick = {
                 keyboard?.hide()
                 isDialogVisible(false)
                 onItemSelected(selectedItemIndex)
             }) {
-                Text(text = "Confirm")
+                Text(
+                    text = "Confirm", color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     } else {
@@ -70,7 +88,8 @@ fun SingleChoiceDialog(
                     selectedItemIndex,
                     setSelectedItemIndex,
                     viewModel,
-                    viewState
+                    viewState,
+                    isSmallScreen
                 )
             },
             onDismissRequest = {
@@ -100,9 +119,9 @@ fun RadioItem(
     selectedItemIndex: Int,
     setIndexOfSelected: (Int) -> Unit,
     viewModel: SettingsViewModel,
-    viewState: SettingsViewState
+    viewState: SettingsViewState,
+    isSmallScreen: Boolean
 ) {
-
     Column(modifier = Modifier.fillMaxWidth()) {
         items.forEachIndexed { index, text ->
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
@@ -111,7 +130,13 @@ fun RadioItem(
                     setIndexOfSelected(index)
                     viewModel.onPresetSelected(index)
                 }) {
-                RadioButtonWithText(index, selectedItemIndex, setIndexOfSelected, text)
+                RadioButtonWithText(
+                    index,
+                    selectedItemIndex,
+                    setIndexOfSelected,
+                    text,
+                    isSmallScreen
+                )
             }
             if (index == items.size - 1) {
                 Column {
@@ -150,8 +175,7 @@ fun RadioItem(
                                 if (viewState.showShortBreakError) {
                                     Text(text = "Please enter a valid number")
                                 }
-                            }
-
+                            },
                         )
                     }
                     Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
@@ -187,7 +211,8 @@ private fun RadioButtonWithText(
     index: Int,
     selectedItemIndex: Int,
     setIndexOfSelected: (Int) -> Unit,
-    text: String
+    text: String,
+    isSmallScreen: Boolean
 ) {
     RadioButton(
         selected = (index == selectedItemIndex),
@@ -196,6 +221,7 @@ private fun RadioButtonWithText(
         }
     )
     Text(
-        text = text
+        text = text,
+        color = if (isSmallScreen)  MaterialTheme.colorScheme.onPrimary else Color.Unspecified
     )
 }

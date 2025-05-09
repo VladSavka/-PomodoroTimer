@@ -53,12 +53,15 @@ kotlin {
     }
     
     sourceSets {
-        
+        iosMain.dependencies {
+            implementation(libs.alarmee)
+        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.core)
+            implementation(libs.alarmee)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -80,6 +83,8 @@ kotlin {
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.multiplatform.settings.serialization)
             api(libs.logging)
+
+
         }
     }
 }
@@ -92,7 +97,7 @@ android {
         applicationId = "org.timer"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
+        versionCode = 4
         versionName = "1.0"
     }
     packaging {

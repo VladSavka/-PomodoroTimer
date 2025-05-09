@@ -22,6 +22,7 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
                 audio.currentTime = 0.0
                 onEnded.invoke()
             }
+
         } catch (e: Exception) {
             print("Error playing audio: " + e.message)
             onEnded.invoke()

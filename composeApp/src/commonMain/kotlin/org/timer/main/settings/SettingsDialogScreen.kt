@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
-import org.timer.ui.theme.*
 
 @Composable
 fun SettingsDialogScreen(
@@ -30,9 +29,8 @@ fun SettingsDialogScreen(
             "50min/10min/30min",
             "Custom time (minutes)"
         ),
-        indexOfDefault = viewState.selectedPresetPosition,
         isDialogVisible = { isDialogVisible(it) },
-        onItemSelected = { viewModel.onPresetConfirmed(it) },
+        onItemSelected = { viewModel.onPresetConfirmed() },
         viewModel,
         viewState
     )
@@ -42,15 +40,12 @@ fun SettingsDialogScreen(
 fun SingleChoiceDialog(
     title: String,
     radioOptions: List<String>,
-    indexOfDefault: Int,
     isDialogVisible: (Boolean) -> Unit,
-    onItemSelected: (Int) -> Unit,
+    onItemSelected: () -> Unit,
     viewModel: SettingsViewModel,
     viewState: SettingsViewState
 ) {
-    val (selectedItemIndex, setSelectedItemIndex) = remember {
-        mutableStateOf(indexOfDefault)
-    }
+
     val isSmallScreen = remeberWindowInfo().isSmallScreen()
     if (isSmallScreen) {
         val keyboard = LocalSoftwareKeyboardController.current
@@ -63,8 +58,6 @@ fun SingleChoiceDialog(
             )
             RadioItem(
                 radioOptions,
-                selectedItemIndex,
-                setSelectedItemIndex,
                 viewModel,
                 viewState,
                 isSmallScreen
@@ -72,7 +65,7 @@ fun SingleChoiceDialog(
             TextButton(enabled = viewState.isConfirmEnabled, onClick = {
                 keyboard?.hide()
                 isDialogVisible(false)
-                onItemSelected(selectedItemIndex)
+                onItemSelected()
             }) {
                 Text(
                     text = "Confirm", color = MaterialTheme.colorScheme.onPrimary
@@ -85,8 +78,6 @@ fun SingleChoiceDialog(
             text = {
                 RadioItem(
                     radioOptions,
-                    selectedItemIndex,
-                    setSelectedItemIndex,
                     viewModel,
                     viewState,
                     isSmallScreen
@@ -103,7 +94,7 @@ fun SingleChoiceDialog(
             confirmButton = {
                 TextButton(enabled = viewState.isConfirmEnabled, onClick = {
                     isDialogVisible(false)
-                    onItemSelected(selectedItemIndex)
+                    onItemSelected()
                 }) {
                     Text(text = "Confirm")
                 }
@@ -116,24 +107,20 @@ fun SingleChoiceDialog(
 @Composable
 fun RadioItem(
     items: List<String>,
-    selectedItemIndex: Int,
-    setIndexOfSelected: (Int) -> Unit,
     viewModel: SettingsViewModel,
     viewState: SettingsViewState,
     isSmallScreen: Boolean
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         items.forEachIndexed { index, text ->
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(48.dp)
                 .fillMaxWidth()
                 .clickable {
-                    setIndexOfSelected(index)
-                    viewModel.onPresetSelected(index)
+                    viewModel.onPresetClick(index)
                 }) {
                 RadioButtonWithText(
                     index,
-                    selectedItemIndex,
-                    setIndexOfSelected,
+                    viewState.selectedPresetPosition,
                     text,
                     isSmallScreen
                 )
@@ -148,7 +135,7 @@ fun RadioItem(
                             },
                             label = { Text("Focus time") },
                             singleLine = true,
-                            enabled = selectedItemIndex == items.size - 1,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = viewState.showPomodoroError,
                             supportingText = {
@@ -168,7 +155,7 @@ fun RadioItem(
                             },
                             label = { Text("Short break") },
                             singleLine = true,
-                            enabled = selectedItemIndex == items.size - 1,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = viewState.showShortBreakError,
                             supportingText = {
@@ -188,7 +175,7 @@ fun RadioItem(
                             },
                             label = { Text("Long break") },
                             singleLine = true,
-                            enabled = selectedItemIndex == items.size - 1,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = viewState.showLongBreakError,
                             supportingText = {
@@ -210,18 +197,16 @@ private fun String.isDigits() = matches(Regex("^\\d+\$"))
 private fun RadioButtonWithText(
     index: Int,
     selectedItemIndex: Int,
-    setIndexOfSelected: (Int) -> Unit,
     text: String,
     isSmallScreen: Boolean
 ) {
     RadioButton(
         selected = (index == selectedItemIndex),
-        onClick = {
-            setIndexOfSelected(index)
-        }
+        onClick = null
     )
+    Spacer(modifier = Modifier.width(8.dp))
     Text(
         text = text,
-        color = if (isSmallScreen)  MaterialTheme.colorScheme.onPrimary else Color.Unspecified
+        color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
     )
 }

@@ -8,9 +8,8 @@ class SettingsViewModel : ViewModel() {
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState> = _viewState.asStateFlow()
 
-    fun onPresetConfirmed(position: Int) {
-        _viewState.update { it.copy(selectedPresetPosition = position) }
-        when (position) {
+    fun onPresetConfirmed() {
+        when (viewState.value.selectedPresetPosition) {
             0 -> {
 
                 SettingsGateway.setTimeSettings(
@@ -80,8 +79,8 @@ class SettingsViewModel : ViewModel() {
 
     }
 
-    fun onPresetSelected(position: Int) {
-        if (position == 0 || position == 1){
+    fun onPresetClick(position: Int) {
+        if (position == 0 || position == 1) {
             _viewState.update {
                 it.copy(
                     shortBreakMinutes = "",

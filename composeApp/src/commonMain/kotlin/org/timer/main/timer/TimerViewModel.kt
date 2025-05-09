@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.*
 import kotlinx.datetime.format.*
 import org.timer.main.domain.settings.*
+import org.timer.main.domain.timer.*
 import org.timer.main.domain.video.*
 
 private const val ITERATIONS_IN_ONE_CYCLE = 4
 
 class TimerViewModel(
-    private val alarmPlayer: AlarmPlayer,
+    private val settings: SettingsGateway,
+    private val playAlarmUseCase: PlayAlarmUseCase,
+    private val cancelAlarmUseCase: CancelAlarmUseCase
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
@@ -27,13 +30,13 @@ class TimerViewModel(
             initTimers()
         }
 
-        SettingsGateway.getTimeSettings()
+        settings.getTimeSettings()
             .onEach { resetTimers() }
             .launchIn(viewModelScope)
     }
 
     private suspend fun initTimers() {
-        val settings = SettingsGateway.getTimeSettings().first()
+        val settings = settings.getTimeSettings().first()
         pomodoroTimer = CountDownTimer(
             settings.pomodoroTime,
             onTick = ::onPomodoroTick,
@@ -79,13 +82,14 @@ class TimerViewModel(
         }
     }
 
-    private fun onShortBreakFinish() {
-        alarmPlayer.play(onEnded = ::startNextPomodoroIteration)
+    private fun onShortBreakFinish() = viewModelScope.launch {
+        playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
     }
 
-    private fun onLongBreakFinish() {
-        alarmPlayer.play(onEnded = ::startNextPomodoroIteration)
+    private fun onLongBreakFinish() = viewModelScope.launch {
+        playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
     }
+
 
     private fun startNextPomodoroIteration() = viewModelScope.launch {
         pomodoroTimer.resetTimer()
@@ -107,7 +111,7 @@ class TimerViewModel(
         log.debug { "onFinish" }
         incrementKittydoroNumber()
         timerJob = viewModelScope.launch {
-            alarmPlayer.play(onEnded = {
+            playAlarmUseCase.invoke(onEnded = {
                 if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
                     startLongBreak()
                 } else {
@@ -196,7 +200,7 @@ class TimerViewModel(
 
     private fun resetTimers() = viewModelScope.launch {
         timerJob?.cancel()
-        alarmPlayer.cancel()
+        cancelAlarmUseCase.invoke()
         pomodoroTimer.pauseTimer()
         shortBreakTimer.pauseTimer()
         longBreakTimer.pauseTimer()
@@ -253,6 +257,7 @@ class TimerViewModel(
     fun onPageChanged(currentPage: Int) {
         _viewState.update { it.copy(selectedTabIndex = currentPage) }
     }
+
 
     companion object {
         val log = logging()

@@ -11,13 +11,16 @@ import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
 import org.timer.main.breakactivity.*
+import org.timer.main.domain.settings.*
+import org.timer.main.domain.timer.*
 
 @ExperimentalResourceApi
 fun appModule() = module {
-    viewModel { SettingsViewModel() }
+    viewModel { SettingsViewModel(get(),get(),get()) }
     viewModel { BreakActivityViewModel() }
-    viewModel { TimerViewModel(get()) }
+    viewModel { TimerViewModel(get(),get(),get())}
     singleOf(::ProjectsViewModel)
+    singleOf(::SettingsGateway)
     singleOf<ProjectsGateway>(::PersistentProjectsGateway)
     factoryOf(::GetProjectsUseCase)
     factoryOf(::AddProjectUseCase)
@@ -31,7 +34,8 @@ fun appModule() = module {
     factoryOf(::UpdateTaskDescriptionUseCase)
     factoryOf(::DeleteTaskUseCase)
     factoryOf(::MoveTaskToTheEndOfListUseCase)
-
+    factoryOf(::PlayAlarmUseCase)
+    factoryOf(::CancelAlarmUseCase)
 }
 
 expect fun platformSpecificModule(): Module

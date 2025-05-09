@@ -1,14 +1,31 @@
 package org.timer.main.domain.settings
 
+import com.russhwolf.settings.*
 import kotlinx.coroutines.flow.*
 
-object SettingsGateway {
-    private val flow = MutableStateFlow(TimeSettings(25000L * 60, 5000L * 60, 15000L * 60))
-    //private val flow = MutableStateFlow(TimeSettings(5_000L , 5_000, 10_000))
+class SettingsGateway {
+    private val settings: Settings = Settings()
 
-    fun getTimeSettings(): Flow<TimeSettings> = flow.asStateFlow()
+    private val timeSettingsFlow =
+        MutableStateFlow(TimeSettings(25000L * 60, 5000L * 60, 15000L * 60))
+
+    private val alarmSoundFlow = MutableStateFlow(AlarmSound.entries[settings.getInt(KEY, 0)])
+
+
+    fun getTimeSettings(): Flow<TimeSettings> = timeSettingsFlow.asStateFlow()
 
     fun setTimeSettings(timeSettings: TimeSettings) {
-        flow.value = timeSettings
+        timeSettingsFlow.value = timeSettings
+    }
+
+    fun setAlarmSound(alarmSound: AlarmSound) {
+        alarmSoundFlow.value = alarmSound
+        settings.putInt(KEY, alarmSound.ordinal)
+    }
+
+    fun getAlarmSound() = alarmSoundFlow.asStateFlow()
+
+    private companion object {
+        private const val KEY = "alarmSound"
     }
 }

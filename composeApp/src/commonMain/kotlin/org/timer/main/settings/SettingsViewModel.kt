@@ -1,18 +1,33 @@
 package org.timer.main.settings
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.timer.main.domain.settings.*
+import org.timer.main.domain.timer.*
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(
+    private val settingsGateway: SettingsGateway,
+    private val playAlarmUseCase: PlayAlarmUseCase,
+    private val cancelAlarmUseCase: CancelAlarmUseCase
+) : ViewModel() {
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState> = _viewState.asStateFlow()
+
+    init {
+        settingsGateway.getAlarmSound()
+            .onEach { alarmSound ->
+                _viewState.update {
+                    it.copy(selectedAlarmPos = alarmSound.ordinal)
+                }
+            }.launchIn(viewModelScope)
+    }
 
     fun onPresetConfirmed() {
         when (viewState.value.selectedPresetPosition) {
             0 -> {
 
-                SettingsGateway.setTimeSettings(
+                settingsGateway.setTimeSettings(
                     TimeSettings(
                         25000L * 60,
                         5000L * 60,
@@ -22,7 +37,7 @@ class SettingsViewModel : ViewModel() {
             }
 
             1 -> {
-                SettingsGateway.setTimeSettings(
+                settingsGateway.setTimeSettings(
                     TimeSettings(
                         50000L * 60,
                         10000L * 60,
@@ -32,7 +47,7 @@ class SettingsViewModel : ViewModel() {
             }
 
             2 -> if (isFormValid()) {
-                SettingsGateway.setTimeSettings(
+                settingsGateway.setTimeSettings(
                     TimeSettings(
                         _viewState.value.pomodoroMinutes.toLong() * 1000 * 60,
                         _viewState.value.shortBreakMinutes.toLong() * 1000 * 60,
@@ -108,4 +123,13 @@ class SettingsViewModel : ViewModel() {
         _viewState.value.pomodoroMinutes.isNotEmpty()
                 && _viewState.value.shortBreakMinutes.isNotEmpty()
                 && _viewState.value.longBreakMinutes.isNotEmpty()
+
+    fun onAlarmSoundClick(position: Int) {
+        settingsGateway.setAlarmSound(AlarmSound.entries[position])
+    }
+
+    fun onPlayAlarmSoundPreviewClick() = viewModelScope.launch {
+        cancelAlarmUseCase.invoke()
+        playAlarmUseCase.invoke()
+    }
 }

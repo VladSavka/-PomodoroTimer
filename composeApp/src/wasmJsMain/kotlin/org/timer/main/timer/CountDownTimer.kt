@@ -1,7 +1,8 @@
 package org.timer.main.timer
 
 import kotlinx.browser.document
-import kotlinx.datetime.Clock
+import kotlinx.datetime.*
+import kotlinx.datetime.format.*
 import org.w3c.dom.Worker
 
 actual class CountDownTimer actual constructor(
@@ -14,7 +15,6 @@ actual class CountDownTimer actual constructor(
     private val initalTotalMillis = totalMillis
     init {
         isRunning.invoke(false)
-       // document.title = (currentMillis / 1000).toInt().toString()
     }
 
     private var worker: Worker? = null
@@ -40,11 +40,13 @@ actual class CountDownTimer actual constructor(
         currentMillis = totalMillis - timePass
 
         if (currentMillis <= 0) {
+            document.title = 0L.formatToMMSS()
             onTick.invoke(0)
             onFinish.invoke()
             isRunning.invoke(false)
             worker?.terminate()
         } else {
+            document.title = currentMillis.formatToMMSS()
             onTick.invoke(currentMillis)
         }
     }
@@ -59,6 +61,7 @@ actual class CountDownTimer actual constructor(
         isRunning.invoke(false)
         totalMillis = initalTotalMillis
         currentMillis = initalTotalMillis
+        document.title = initalTotalMillis.formatToMMSS()
         onTick.invoke(initalTotalMillis)
         worker?.terminate()
     }
@@ -66,4 +69,24 @@ actual class CountDownTimer actual constructor(
     actual fun isFinished() : Boolean{
         return currentMillis <= 0L
     }
+
+    private fun Long.formatToMMSS(): String {
+        val time = LocalTime.fromMillisecondOfDay(this.toInt())
+        return if (time.hour >= 1) {
+            time.format(LocalTime.Format {
+                hour()
+                char(':')
+                minute()
+                char(':')
+                second()
+            })
+        } else {
+            time.format(LocalTime.Format {
+                minute()
+                char(':')
+                second()
+            })
+        }
+    }
 }
+

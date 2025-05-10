@@ -9,8 +9,8 @@ class PlayAlarmUseCase(
     private val settingsGateway: SettingsGateway
 ) {
 
-    suspend fun invoke(onEnded: () -> Unit = {}) {
-        val alarmSound = settingsGateway.getAlarmSound().first()
+    fun invoke(onEnded: () -> Unit = {}) {
+        val alarmSound = settingsGateway.getAlarmSound().value
         alarmPlayer.play(alarmSound.toUri(), onEnded = onEnded)
     }
 }

@@ -15,7 +15,8 @@ private const val ITERATIONS_IN_ONE_CYCLE = 4
 class TimerViewModel(
     private val settings: SettingsGateway,
     private val playAlarmUseCase: PlayAlarmUseCase,
-    private val cancelAlarmUseCase: CancelAlarmUseCase
+    private val cancelAlarmUseCase: CancelAlarmUseCase,
+    private val alarmPlayer: AlarmPlayer
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
@@ -82,11 +83,11 @@ class TimerViewModel(
         }
     }
 
-    private fun onShortBreakFinish() = viewModelScope.launch {
+    private fun onShortBreakFinish() {
         playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
     }
 
-    private fun onLongBreakFinish() = viewModelScope.launch {
+    private fun onLongBreakFinish() {
         playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
     }
 
@@ -110,15 +111,13 @@ class TimerViewModel(
     private fun onPomodoroFinish() {
         log.debug { "onFinish" }
         incrementKittydoroNumber()
-        timerJob = viewModelScope.launch {
-            playAlarmUseCase.invoke(onEnded = {
-                if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
-                    startLongBreak()
-                } else {
-                    startShortBreak()
-                }
-            })
-        }
+        playAlarmUseCase.invoke(onEnded = {
+            if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
+                startLongBreak()
+            } else {
+                startShortBreak()
+            }
+        })
     }
 
     private fun incrementKittydoroNumber() {
@@ -153,6 +152,8 @@ class TimerViewModel(
     }
 
     fun onPomodoroStartClick() {
+        viewModelScope.launch {  alarmPlayer.feckePlay() }
+
         shortBreakTimer.resetTimer()
         longBreakTimer.resetTimer()
         pomodoroTimer.startTimer()

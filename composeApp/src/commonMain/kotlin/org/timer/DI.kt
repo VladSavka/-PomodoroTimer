@@ -18,7 +18,7 @@ import org.timer.main.domain.timer.*
 fun appModule() = module {
     viewModel { SettingsViewModel(get(),get(),get()) }
     viewModel { BreakActivityViewModel() }
-    viewModel { TimerViewModel(get(),get(),get())}
+    viewModel { TimerViewModel(get(),get(),get(),get())}
     singleOf(::ProjectsViewModel)
     singleOf(::SettingsGateway)
     singleOf<ProjectsGateway>(::PersistentProjectsGateway)

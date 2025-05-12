@@ -152,8 +152,6 @@ class TimerViewModel(
     }
 
     fun onPomodoroStartClick() {
-        viewModelScope.launch {  alarmPlayer.feckePlay() }
-
         shortBreakTimer.resetTimer()
         longBreakTimer.resetTimer()
         pomodoroTimer.startTimer()

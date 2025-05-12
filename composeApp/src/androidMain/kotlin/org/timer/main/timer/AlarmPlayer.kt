@@ -3,8 +3,8 @@ package org.timer.main.timer
 import android.content.*
 import android.media.*
 import android.net.*
-import android.net.wifi.*
 import android.os.*
+import org.timer.main.domain.settings.*
 
 actual class AlarmPlayer actual constructor(actual val context: Any?) {
     private var mediaPlayer: MediaPlayer? = null
@@ -18,11 +18,11 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
         }
         mediaPlayer = null
     }
-    actual fun play(uri: String, onEnded: () -> Unit) {
+    actual fun play(alarmSound: AlarmSound, onEnded: () -> Unit) {
         mediaPlayer = MediaPlayer().apply {
             try {
                 setWakeMode(context as Context, PowerManager.PARTIAL_WAKE_LOCK)
-                setDataSource(context,  Uri.parse(uri))
+                setDataSource(context,  Uri.parse(alarmSound))
                 prepare()
                 setOnCompletionListener {
                     onEnded()

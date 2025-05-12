@@ -1,6 +1,7 @@
 package org.timer.main.timer
 
 import kotlinx.cinterop.*
+import org.timer.main.domain.settings.*
 import platform.AVFAudio.*
 import platform.AVFoundation.*
 import platform.Foundation.*
@@ -13,9 +14,9 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
         setUpAudioSession()
     }
 
-    actual fun play(uri:String, onEnded: () -> Unit) {
+    actual fun play(alarmSound: AlarmSound, onEnded: () -> Unit) {
         val alarmSoundUrl: NSURL? =
-            NSURL.URLWithString(uri)
+            NSURL.URLWithString(alarmSound)
         alarmSoundUrl?.let { url ->
             audioPlayer = AVPlayer(url)
             NSNotificationCenter.defaultCenter.addObserverForName(

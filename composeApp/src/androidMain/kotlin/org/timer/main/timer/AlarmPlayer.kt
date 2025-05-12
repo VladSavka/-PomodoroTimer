@@ -22,7 +22,7 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
         mediaPlayer = MediaPlayer().apply {
             try {
                 setWakeMode(context as Context, PowerManager.PARTIAL_WAKE_LOCK)
-                setDataSource(context,  Uri.parse(alarmSound))
+                setDataSource(context,  Uri.parse(alarmSound.toUri()))
                 prepare()
                 setOnCompletionListener {
                     onEnded()

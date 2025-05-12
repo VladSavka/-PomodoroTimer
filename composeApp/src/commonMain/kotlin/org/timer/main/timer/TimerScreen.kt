@@ -106,7 +106,7 @@ fun TimerScreen(
             }
         }
         if (windowInfo.isSmallScreen()) {
-            BreakActivityScreen(viewState = viewState)
+            BreakActivityScreen(timerViewState = viewState)
         }
     }
 }

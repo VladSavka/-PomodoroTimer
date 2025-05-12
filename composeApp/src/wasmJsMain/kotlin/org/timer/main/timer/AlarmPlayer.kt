@@ -12,7 +12,7 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
     private val buffalo: Audio = Audio(Res.getUri("files/buffalo.mp3"))
     private val cat: Audio = Audio(Res.getUri("files/cat.mp3"))
     private val dog: Audio = Audio(Res.getUri("files/dog.mp3"))
-    private val standart: Audio = Audio(Res.getUri("files/standart.mp3"))
+    private val standart: Audio = Audio(Res.getUri("files/standard.mp3"))
     private val wolf: Audio = Audio(Res.getUri("files/wolf.mp3"))
     private var alarmSound :AlarmSound? = null
 

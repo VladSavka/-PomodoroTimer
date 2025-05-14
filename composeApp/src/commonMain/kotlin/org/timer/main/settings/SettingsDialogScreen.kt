@@ -58,7 +58,6 @@ fun SingleChoiceDialog(
 
     val isSmallScreen = remeberWindowInfo().isSmallScreen()
     if (isSmallScreen) {
-        val keyboard = LocalSoftwareKeyboardController.current
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -70,17 +69,10 @@ fun SingleChoiceDialog(
                 radioOptions,
                 viewModel,
                 viewState,
-                isSmallScreen
+                isSmallScreen,
+                onItemSelected
             )
-            TextButton(enabled = viewState.isConfirmEnabled, onClick = {
-                keyboard?.hide()
-                isDialogVisible(false)
-                onItemSelected()
-            }) {
-                Text(
-                    text = "Confirm", color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+
         }
     } else {
         AlertDialog(
@@ -119,21 +111,23 @@ fun Content(
     items: List<String>,
     viewModel: SettingsViewModel,
     viewState: SettingsViewState,
-    isSmallScreen: Boolean
-) {
+    isSmallScreen: Boolean,
+    onItemSelected: () -> Unit = {}
+    ) {
     // Create a ScrollState and a ScrollbarAdapter using multiplatform components
-    val scrollState = rememberScrollState()
-    val scrollbarAdapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
+   val scrollState = rememberScrollState()
+//    val scrollbarAdapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
+    val keyboard = LocalSoftwareKeyboardController.current
 
     // Define a minimalist scrollbar style
-    val minimalistScrollbarStyle = ScrollbarStyle(
-        minimalHeight = 16.dp, // Minimum height of the thumb
-        thickness = 4.dp, // Thickness of the scrollbar
-        shape = MaterialTheme.shapes.small, // Shape of the thumb
-        hoverDurationMillis = 300, // Duration for hover animation
-        unhoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f), // Subtle color when not hovered
-        hoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f) // Slightly more visible color when hovered
-    )
+//    val minimalistScrollbarStyle = ScrollbarStyle(
+//        minimalHeight = 16.dp, // Minimum height of the thumb
+//        thickness = 4.dp, // Thickness of the scrollbar
+//        shape = MaterialTheme.shapes.small, // Shape of the thumb
+//        hoverDurationMillis = 300, // Duration for hover animation
+//        unhoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f), // Subtle color when not hovered
+//        hoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f) // Slightly more visible color when hovered
+//    )
 
     // Use a Box to place the scrollbar next to the scrollable Column
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -143,16 +137,26 @@ fun Content(
             .padding(end = 8.dp) // Add padding to the end of the column
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
+            if (isSmallScreen){
+                Button(enabled = viewState.isConfirmEnabled, onClick = {
+                    keyboard?.hide()
+                    onItemSelected()
+                }) {
+                    Text(
+                        text = "Confirm", color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
             AlarmSoundContent(viewState, viewModel)
         }
 
         // Add the VerticalScrollbar using multiplatform component with the minimalist style
-        androidx.compose.foundation.VerticalScrollbar(
-            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(), // Align to the end and fill height
-            adapter = scrollbarAdapter,
-            style = minimalistScrollbarStyle // Apply the minimalist style
-        )
+//        androidx.compose.foundation.VerticalScrollbar(
+//            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(), // Align to the end and fill height
+//            adapter = scrollbarAdapter,
+//            style = minimalistScrollbarStyle // Apply the minimalist style
+//        )
     }
 }
 

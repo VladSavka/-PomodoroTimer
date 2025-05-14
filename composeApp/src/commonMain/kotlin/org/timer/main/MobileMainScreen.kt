@@ -11,13 +11,15 @@ import androidx.compose.ui.graphics.vector.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
+import org.koin.compose.viewmodel.*
+import org.timer.main.breakactivity.*
 import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MobileMainScreen() {
+fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
@@ -31,9 +33,12 @@ fun MobileMainScreen() {
                 startDestination = MainRouts.Home.destanation,
             ) {
                 composable(MainRouts.Home.destanation) {
-                    TimerScreen()
+                    TimerScreen(viewModel = timerViewModel)
                 }
-                composable(MainRouts.Profile.destanation) {
+                composable(MainRouts.Activities.destanation) {
+                    BreakActivityScreen(timerViewModel)
+                }
+                composable(MainRouts.Projects.destanation) {
                     ProjectsScreen()
                 }
                 composable(MainRouts.Settings.destanation) {
@@ -48,7 +53,8 @@ fun MobileMainScreen() {
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         MainRouts.Home,
-        MainRouts.Profile,
+        MainRouts.Activities,
+        MainRouts.Projects,
         MainRouts.Settings,
     )
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -99,6 +105,7 @@ sealed class MainRouts(
     val icon: ImageVector? = null
 ) {
     data object Home : MainRouts("timer", "Timer", Icons.Filled.Home)
-    data object Profile : MainRouts("projects", "Projects", Icons.Filled.CheckCircle)
+    data object Activities : MainRouts("activities", "Activities", Icons.Filled.Place)
+    data object Projects : MainRouts("projects", "Projects", Icons.Filled.CheckCircle)
     data object Settings : MainRouts("settings", "Settings", Icons.Filled.Settings)
 }

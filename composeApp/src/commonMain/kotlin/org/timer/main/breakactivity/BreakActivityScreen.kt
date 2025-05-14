@@ -19,12 +19,13 @@ import org.timer.main.timer.*
 
 @Composable
 fun BreakActivityScreen(
-    timerViewState: TimerViewState,
+    timerViewModel: TimerViewModel = koinViewModel(),
     windowInfo: WindowInfo = remeberWindowInfo(),
     viewModel: BreakActivityViewModel = koinViewModel(),
 ) {
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val timerViewState by timerViewModel.viewState.collectAsStateWithLifecycle()
     val showDialog = remember { mutableStateOf(false) }
 
     Box(

@@ -51,8 +51,7 @@ fun WebMainScreen(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
             ),
         ) {
-            val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-            BreakActivityScreen(viewState)
+            BreakActivityScreen()
         }
     }
 }

@@ -16,7 +16,7 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
 
     actual fun play(alarmSound: AlarmSound, onEnded: () -> Unit) {
         val alarmSoundUrl: NSURL? =
-            NSURL.URLWithString(alarmSound)
+            NSURL.URLWithString(alarmSound.toUri())
         alarmSoundUrl?.let { url ->
             audioPlayer = AVPlayer(url)
             NSNotificationCenter.defaultCenter.addObserverForName(

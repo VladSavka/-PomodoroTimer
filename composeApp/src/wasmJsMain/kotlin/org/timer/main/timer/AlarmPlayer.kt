@@ -17,17 +17,18 @@ actual class AlarmPlayer actual constructor(actual val context: Any?) {
     private var alarmSound :AlarmSound? = null
 
     init {
-        bird.load()
-        buffalo.load()
-        cat.load()
-        dog.load()
-        standart.load()
-        wolf.load()
+//        bird.load()
+//        buffalo.load()
+//        cat.load()
+//        dog.load()
+//        standart.load()
+//        wolf.load()
     }
     actual fun play(alarmSound: AlarmSound, onEnded: () -> Unit) {
         this.alarmSound = alarmSound
         val audio = getAudio(alarmSound)
         playAudio(audio, onEnded)
+
     }
 
     private fun playAudio(

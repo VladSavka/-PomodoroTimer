@@ -1,10 +1,7 @@
 package org.timer.main.settings
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.*
@@ -12,18 +9,17 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
+import org.timer.ui.theme.*
 
 @Composable
 fun SettingsDialogScreen(
@@ -58,12 +54,15 @@ fun SingleChoiceDialog(
 
     val isSmallScreen = remeberWindowInfo().isSmallScreen()
     if (isSmallScreen) {
+
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
                 text = title,
-                color = MaterialTheme.colorScheme.onPrimary,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimary
             )
             Content(
                 radioOptions,
@@ -74,6 +73,7 @@ fun SingleChoiceDialog(
             )
 
         }
+
     } else {
         AlertDialog(
             title = { Text(text = title) },
@@ -113,9 +113,9 @@ fun Content(
     viewState: SettingsViewState,
     isSmallScreen: Boolean,
     onItemSelected: () -> Unit = {}
-    ) {
+) {
     // Create a ScrollState and a ScrollbarAdapter using multiplatform components
-   val scrollState = rememberScrollState()
+    val scrollState = rememberScrollState()
 //    val scrollbarAdapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -131,13 +131,14 @@ fun Content(
 
     // Use a Box to place the scrollbar next to the scrollable Column
     Box(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState) // Use the created scrollState
-            .padding(end = 8.dp) // Add padding to the end of the column
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState) // Use the created scrollState
+                .padding(end = 8.dp) // Add padding to the end of the column
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
-            if (isSmallScreen){
+            if (isSmallScreen) {
                 Button(enabled = viewState.isConfirmEnabled, onClick = {
                     keyboard?.hide()
                     onItemSelected()
@@ -168,11 +169,12 @@ private fun TimerSettingsContent(
     isSmallScreen: Boolean
 ) {
     items.forEachIndexed { index, text ->
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(48.dp)
-            .fillMaxWidth()
-            .clickable {
-                viewModel.onPresetClick(index)
-            }) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(36.dp).padding(horizontal = 8.dp)
+                .fillMaxWidth()
+                .clickable {
+                    viewModel.onPresetClick(index)
+                }) {
             RadioButtonWithText(
                 index,
                 viewState.selectedPresetPosition,
@@ -182,64 +184,67 @@ private fun TimerSettingsContent(
         }
         // This Column with OutlinedTextFields should only appear for the last radio item
         if (index == items.size - 1) {
-            Column {
-                Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
-                    OutlinedTextField(
-                        value = viewState.pomodoroMinutes,
-                        onValueChange = {
-                            if (it.isEmpty() || it.isDigits()) viewModel.updateFocusMinutes(it)
-                        },
-                        label = { Text("Focus time") },
-                        singleLine = true,
-                        enabled = viewState.selectedPresetPosition == items.size - 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewState.showPomodoroError,
-                        supportingText = {
-                            if (viewState.showPomodoroError) {
-                                Text(text = "Please enter a valid number")
+            MaterialTheme(colorScheme = darkScheme) {
+
+                Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Column(modifier = Modifier.width(150.dp)) {
+                        OutlinedTextField(
+                            value = viewState.pomodoroMinutes,
+                            onValueChange = {
+                                if (it.isEmpty() || it.isDigits()) viewModel.updateFocusMinutes(it)
+                            },
+                            label = { Text("Focus time") },
+                            singleLine = true,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = viewState.showPomodoroError,
+                            supportingText = {
+                                if (viewState.showPomodoroError) {
+                                    Text(text = "Please enter a valid number")
+                                }
                             }
-                        }
-                    )
-                }
-                Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
-                    OutlinedTextField(
-                        value = viewState.shortBreakMinutes,
-                        onValueChange = {
-                            if (it.isEmpty() || it.isDigits()) viewModel.updateShortBreakMinutes(
-                                it
-                            )
-                        },
-                        label = { Text("Short break") },
-                        singleLine = true,
-                        enabled = viewState.selectedPresetPosition == items.size - 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewState.showShortBreakError,
-                        supportingText = {
-                            if (viewState.showShortBreakError) {
-                                Text(text = "Please enter a valid number")
+                        )
+                    }
+                    Column(modifier = Modifier.width(150.dp)) {
+                        OutlinedTextField(
+                            value = viewState.shortBreakMinutes,
+                            onValueChange = {
+                                if (it.isEmpty() || it.isDigits()) viewModel.updateShortBreakMinutes(
+                                    it
+                                )
+                            },
+                            label = { Text("Short break") },
+                            singleLine = true,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = viewState.showShortBreakError,
+                            supportingText = {
+                                if (viewState.showShortBreakError) {
+                                    Text(text = "Please enter a valid number")
+                                }
+                            },
+                        )
+                    }
+                    Column(modifier = Modifier.width(150.dp)) {
+                        OutlinedTextField(
+                            value = viewState.longBreakMinutes,
+                            onValueChange = {
+                                if (it.isEmpty() || it.isDigits()) viewModel.updateLongBreakMinutes(
+                                    it
+                                )
+                            },
+                            label = { Text("Long break") },
+                            singleLine = true,
+                            enabled = viewState.selectedPresetPosition == items.size - 1,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = viewState.showLongBreakError,
+                            supportingText = {
+                                if (viewState.showLongBreakError) {
+                                    Text(text = "Please enter a valid number")
+                                }
                             }
-                        },
-                    )
-                }
-                Column(modifier = Modifier.width(150.dp).padding(8.dp)) {
-                    OutlinedTextField(
-                        value = viewState.longBreakMinutes,
-                        onValueChange = {
-                            if (it.isEmpty() || it.isDigits()) viewModel.updateLongBreakMinutes(
-                                it
-                            )
-                        },
-                        label = { Text("Long break") },
-                        singleLine = true,
-                        enabled = viewState.selectedPresetPosition == items.size - 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewState.showLongBreakError,
-                        supportingText = {
-                            if (viewState.showLongBreakError) {
-                                Text(text = "Please enter a valid number")
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -255,14 +260,17 @@ private fun RadioButtonWithText(
     text: String,
     isSmallScreen: Boolean
 ) {
-    RadioButton(
-        selected = (index == selectedItemIndex),
-        onClick = null
-    )
+    MaterialTheme(colorScheme = darkScheme) {
+        RadioButton(
+            selected = (index == selectedItemIndex),
+            onClick = null
+        )
+    }
     Spacer(modifier = Modifier.width(8.dp))
     Text(
         text = text,
-        color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
+        color = MaterialTheme.colorScheme.onPrimary
+
     )
 }
 
@@ -278,47 +286,67 @@ private fun AlarmSoundContent(viewState: SettingsViewState, viewModel: SettingsV
             text = "Alarm sound: ",
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            color = MaterialTheme.colorScheme.onPrimary
+
         )
 
         // Add the clickable sound icon here
-        Icon(
-            imageVector = Icons.Rounded.PlayArrow, // Use a sound-related icon
-            contentDescription = "Play alarm sound preview",
-            modifier = Modifier
-                .size(24.dp) // Adjust size as needed
-                .clip(CircleShape) // Clip the icon to a circle
-                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape) // Add a round border
-                .clickable {
-                    viewModel.onPlayAlarmSoundPreviewClick()
-                }
-                .align(Alignment.CenterVertically) // Align icon vertically
-                .padding(4.dp) // Add padding inside the circle
-        )
+        MaterialTheme(colorScheme = darkScheme) {
+            Icon(
+                imageVector = Icons.Rounded.PlayArrow, // Use a sound-related icon
+                contentDescription = "Play alarm sound preview",
+                modifier = Modifier
+                    .size(24.dp) // Adjust size as needed
+                    .clip(CircleShape) // Clip the icon to a circle
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline,
+                        CircleShape
+                    ) // Add a round border
+                    .clickable {
+                        viewModel.onPlayAlarmSoundPreviewClick()
+                    }
+                    .align(Alignment.CenterVertically) // Align icon vertically
+                    .padding(4.dp) // Add padding inside the circle
+            )
+        }
 
         Spacer(modifier = Modifier.width(8.dp)) // Add space between icon and TextButton
 
         var expanded by remember { mutableStateOf(false) }
         val alarmSoundOptions = viewState.alarmSoundOptions
-        val selectedAlarmSound = alarmSoundOptions[viewState.selectedAlarmPos] // Use val here as it's derived from state
+        val selectedAlarmSound =
+            alarmSoundOptions[viewState.selectedAlarmPos] // Use val here as it's derived from state
+
 
         Box {
-            TextButton(
-                onClick = { expanded = true },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface // Adjust color as needed
-                ),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), // Add padding
-                shape = MaterialTheme.shapes.small, // Apply a shape
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline) // Add a border
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(selectedAlarmSound) // Display the selected sound
-                    Spacer(Modifier.width(4.dp)) // Space between text and icon
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
-                        contentDescription = "Expand alarm sound options"
-                    )
+            MaterialTheme(colorScheme = darkScheme) {
+
+                TextButton(
+                    onClick = { expanded = true },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface // Adjust color as needed
+                    ),
+                    contentPadding = PaddingValues(
+                        horizontal = 16.dp,
+                        vertical = 8.dp
+                    ), // Add padding
+                    shape = MaterialTheme.shapes.small, // Apply a shape
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline) // Add a border
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        MaterialTheme(colorScheme = lightScheme) {
+                        Text(
+                            selectedAlarmSound, color = MaterialTheme.colorScheme.onPrimary
+                        ) // Display the selected sound
+                            }
+                        Spacer(Modifier.width(4.dp)) // Space between text and icon
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
+                            contentDescription = "Expand alarm sound options"
+                        )
+                    }
                 }
             }
             DropdownMenu(

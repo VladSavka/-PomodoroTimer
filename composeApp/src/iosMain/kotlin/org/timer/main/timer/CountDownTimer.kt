@@ -40,11 +40,14 @@ actual class CountDownTimer actual constructor(
         // Calculate the remaining time
         val timePass = ((currentTimeMillis - startMoment).toDouble() / 1000).toLong() * 1000
         currentMillis = totalMillis - timePass
-        onTick(currentMillis)
+
         if (currentMillis <= 0) {
             // If the countdown is complete, call the finish method
+            onTick(0)
             onTimerFinish(timer)
             return
+        } else {
+            onTick(currentMillis)
         }
     }
 

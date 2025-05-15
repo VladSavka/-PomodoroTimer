@@ -13,3 +13,4 @@ actual fun remeberWindowInfo(): WindowInfo {
 }
 
 actual fun isWeb() = true
+actual fun isIOS(): Boolean =false

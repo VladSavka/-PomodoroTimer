@@ -13,13 +13,13 @@ import org.timer.ui.theme.*
 @Composable
 @Preview
 fun App() {
-    if (isWeb()) {
+    if (isWeb() || isIOS()) {
         KoinApplication(application = {
             modules(appModule(), platformSpecificModule())
         }) {
             MainContent()
         }
-    } else {
+    } else { //android
         KoinContext {
             MainContent()
         }

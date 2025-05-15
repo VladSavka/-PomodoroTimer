@@ -1,11 +1,9 @@
 package org.timer.main
 
-import android.content.res.Resources
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.ui.geometry.*
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.unit.*
 
 @Composable
 actual fun remeberWindowInfo(): WindowInfo {
@@ -15,3 +13,4 @@ actual fun remeberWindowInfo(): WindowInfo {
 }
 
 actual fun isWeb() = false
+actual fun isIOS(): Boolean = false

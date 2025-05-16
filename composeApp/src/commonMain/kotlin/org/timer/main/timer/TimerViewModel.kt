@@ -15,8 +15,7 @@ private const val ITERATIONS_IN_ONE_CYCLE = 4
 class TimerViewModel(
     private val settings: SettingsGateway,
     private val playAlarmUseCase: PlayAlarmUseCase,
-    private val cancelAlarmUseCase: CancelAlarmUseCase,
-    private val alarmPlayer: AlarmPlayer
+    private val cancelAlarmUseCase: CancelAlarmUseCase
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
@@ -70,7 +69,7 @@ class TimerViewModel(
     private fun startShortBreak() {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
-        shortBreakTimer.startTimer()
+        shortBreakTimer.resetTimer()
         _viewState.update {
             it.copy(
                 selectedTabIndex = 1,
@@ -84,24 +83,26 @@ class TimerViewModel(
     }
 
     private fun onShortBreakFinish() {
-        playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
+        playAlarmUseCase.invoke(onEnded = ::startPomodoro)
     }
 
     private fun onLongBreakFinish() {
-        playAlarmUseCase.invoke(onEnded = ::startNextPomodoroIteration)
+        playAlarmUseCase.invoke(onEnded = ::startPomodoro)
     }
 
 
-    private fun startNextPomodoroIteration() = viewModelScope.launch {
+    private fun startPomodoro() = viewModelScope.launch {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         shortBreakTimer.resetTimer()
-        pomodoroTimer.startTimer()
 
         _viewState.update {
             it.copy(
                 selectedTabIndex = 0,
-                timerState = TimerState.Pomodoro,
+                timerState = TimerState.Pomodoro(
+                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getDanceAudios().random()
+                ),
             )
         }
     }
@@ -129,7 +130,7 @@ class TimerViewModel(
     private fun startLongBreak() {
         shortBreakTimer.resetTimer()
         pomodoroTimer.resetTimer()
-        longBreakTimer.startTimer()
+        longBreakTimer.resetTimer()
         _viewState.update {
             it.copy(
                 selectedTabIndex = 2,
@@ -154,11 +155,17 @@ class TimerViewModel(
     fun onPomodoroStartClick() {
         shortBreakTimer.resetTimer()
         longBreakTimer.resetTimer()
-        pomodoroTimer.startTimer()
+        if (!_viewState.value.isPomodoroTimerRunning) {
+            pomodoroTimer.startTimer()
+        }
         if (_viewState.value.timerState !is TimerState.Pomodoro) {
             _viewState.update {
                 it.copy(
-                    timerState = TimerState.Pomodoro
+                    selectedTabIndex = 0,
+                    timerState = TimerState.Pomodoro(
+                        WorkoutVideosGateway.getWorkoutVideos().random(),
+                        WorkoutVideosGateway.getDanceAudios().random()
+                    )
                 )
             }
         }
@@ -167,10 +174,14 @@ class TimerViewModel(
     fun onShortBreakStartClick() {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
-        shortBreakTimer.startTimer()
+        if (!_viewState.value.isShortBreakTimerRunning) { // todo
+            shortBreakTimer.startTimer()
+           // _viewState.update { it.copy(navigateToShortBreakActivity = true) }
+        }
         if (_viewState.value.timerState !is TimerState.ShortBreak) {
             _viewState.update {
                 it.copy(
+                    selectedTabIndex = 1,
                     timerState = TimerState.ShortBreak(
                         WorkoutVideosGateway.getWorkoutVideos().random(),
                         WorkoutVideosGateway.getDanceAudios().random()
@@ -183,10 +194,14 @@ class TimerViewModel(
     fun onLongBreakStartClick() {
         pomodoroTimer.resetTimer()
         shortBreakTimer.resetTimer()
-        longBreakTimer.startTimer()
+        if (!_viewState.value.isLongBreakTimerRunning) {
+            longBreakTimer.startTimer()
+            //_viewState.update { it.copy(navigateToLongBreakActivity = true) }
+        }
         if (_viewState.value.timerState !is TimerState.LongBreak) {
             _viewState.update {
                 it.copy(
+                    selectedTabIndex = 2,
                     timerState = TimerState.LongBreak
                 )
             }
@@ -207,7 +222,10 @@ class TimerViewModel(
         _viewState.update {
             it.copy(
                 kittyDoroNumber = 0,
-                timerState = TimerState.Pomodoro
+                timerState = TimerState.Pomodoro(
+                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getDanceAudios().random()
+                )
             )
         }
     }

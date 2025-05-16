@@ -58,7 +58,7 @@ class SettingsViewModel(
 
             else -> throw IllegalStateException()
         }
-        updateConfirmButtonVisibility()
+        updateConfirmButtonEnabled()
     }
 
 
@@ -69,7 +69,7 @@ class SettingsViewModel(
                 showPomodoroError = focusedMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonVisibility()
+        updateConfirmButtonEnabled()
     }
 
     fun updateShortBreakMinutes(shortBreakMinutes: String) {
@@ -79,7 +79,7 @@ class SettingsViewModel(
                 showShortBreakError = shortBreakMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonVisibility()
+        updateConfirmButtonEnabled()
 
     }
 
@@ -90,7 +90,7 @@ class SettingsViewModel(
                 showLongBreakError = longBreakMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonVisibility()
+        updateConfirmButtonEnabled()
 
     }
 
@@ -108,16 +108,27 @@ class SettingsViewModel(
             }
         }
         _viewState.update { it.copy(selectedPresetPosition = position) }
-        updateConfirmButtonVisibility()
+        updateConfirmButtonEnabled()
     }
 
-    private fun updateConfirmButtonVisibility() {
+    private fun updateConfirmButtonEnabled() {
         if (viewState.value.selectedPresetPosition == 2) {
-            _viewState.update { it.copy(isConfirmEnabled = isFormValid()) }
+            _viewState.update {
+                it.copy(
+                    isWebConfirmEnabled = isFormValid(),
+                    isMobileConfirmEnabled = isFormValid()
+                )
+            }
         } else {
-            _viewState.update { it.copy(isConfirmEnabled = true) }
+            _viewState.update {
+                it.copy(
+                    isWebConfirmEnabled = true,
+                    isMobileConfirmEnabled = false
+                )
+            }
         }
     }
+
 
     private fun isFormValid() =
         _viewState.value.pomodoroMinutes.isNotEmpty()

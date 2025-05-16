@@ -11,11 +11,15 @@ import androidx.compose.ui.graphics.vector.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
+import org.jetbrains.compose.resources.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.breakactivity.*
 import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
+import org.timer.ui.theme.*
+import pomodorotimer.composeapp.generated.resources.*
+import pomodorotimer.composeapp.generated.resources.Res
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,24 +55,26 @@ fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
 
 @Composable
 fun BottomBar(navController: NavHostController) {
-    val screens = listOf(
-        MainRouts.Home,
-        MainRouts.Activities,
-        MainRouts.Projects,
-        MainRouts.Settings,
-    )
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = backStackEntry?.destination?.route ?: ""
+    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkScheme else lightScheme) {
+        val screens = listOf(
+            MainRouts.Home,
+            MainRouts.Activities,
+            MainRouts.Projects,
+            MainRouts.Settings,
+        )
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = backStackEntry?.destination?.route ?: ""
 
-    val bottomBarDestination = screens.any { it.destanation == currentDestination }
-    if (bottomBarDestination) {
-        NavigationBar {
-            screens.forEach { screen ->
-                AddItem(
-                    screen = screen,
-                    currentDestination = currentDestination,
-                    navController = navController
-                )
+        val bottomBarDestination = screens.any { it.destanation == currentDestination }
+        if (bottomBarDestination) {
+            NavigationBar {
+                screens.forEach { screen ->
+                    AddItem(
+                        screen = screen,
+                        currentDestination = currentDestination,
+                        navController = navController
+                    )
+                }
             }
         }
     }
@@ -81,7 +87,7 @@ fun RowScope.AddItem(
     navController: NavHostController
 ) {
     NavigationBarItem(
-        icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
+        icon = { screen.icon?.let { Icon(imageVector = vectorResource(it), contentDescription = null) } },
         label = { screen.resourceId?.let { Text(it) } },
         selected = currentDestination == screen.destanation,
         onClick = {
@@ -102,10 +108,10 @@ fun RowScope.AddItem(
 sealed class MainRouts(
     val destanation: String,
     val resourceId: String? = null,
-    val icon: ImageVector? = null
+    val icon: DrawableResource? = null
 ) {
-    data object Home : MainRouts("timer", "Timer", Icons.Filled.Home)
-    data object Activities : MainRouts("activities", "Activities", Icons.Filled.Place)
-    data object Projects : MainRouts("projects", "Projects", Icons.Filled.CheckCircle)
-    data object Settings : MainRouts("settings", "Settings", Icons.Filled.Settings)
+    data object Home : MainRouts("timer", "Timer", Res.drawable.home)
+    data object Activities : MainRouts("activities", "Activities", Res.drawable.run)
+    data object Projects : MainRouts("projects", "Projects", Res.drawable.checklist)
+    data object Settings : MainRouts("settings", "Settings", Res.drawable.settings)
 }

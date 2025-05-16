@@ -10,7 +10,8 @@ data class SettingsViewState(
     val showPomodoroError: Boolean = false,
     val showShortBreakError: Boolean = false,
     val showLongBreakError: Boolean = false,
-    val isConfirmEnabled: Boolean = true,
+    val isWebConfirmEnabled: Boolean = true,
+    val isMobileConfirmEnabled: Boolean = false,
     val alarmSoundOptions: List<String> = AlarmSound.entries.toTypedArray().map {
         when (it) {
             AlarmSound.CAT -> "Cat"

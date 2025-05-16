@@ -1,6 +1,5 @@
 package org.timer
 
-import androidx.compose.foundation.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import org.jetbrains.compose.resources.*
@@ -14,9 +13,7 @@ import org.timer.ui.theme.*
 @Preview
 fun App() {
     if (isWeb() || isIOS()) {
-        KoinApplication(application = {
-            modules(appModule(), platformSpecificModule())
-        }) {
+        KoinApplication(application = { modules(appModule(), platformSpecificModule()) }) {
             MainContent()
         }
     } else { //android
@@ -30,7 +27,7 @@ fun App() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent() {
-    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkScheme else lightScheme) {
+    MaterialTheme(lightScheme) {
         MainScreen()
     }
 }

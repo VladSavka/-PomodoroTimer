@@ -1,25 +1,29 @@
 package org.timer.main.settings
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
+import org.jetbrains.compose.resources.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.ui.theme.*
+import pomodorotimer.composeapp.generated.resources.*
 
 @Composable
 fun SettingsDialogScreen(
@@ -54,7 +58,6 @@ fun SingleChoiceDialog(
 
     val isSmallScreen = remeberWindowInfo().isSmallScreen()
     if (isSmallScreen) {
-
         Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
             Text(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
@@ -94,7 +97,7 @@ fun SingleChoiceDialog(
                 }
             },
             confirmButton = {
-                TextButton(enabled = viewState.isConfirmEnabled, onClick = {
+                TextButton(enabled = viewState.isWebConfirmEnabled, onClick = {
                     isDialogVisible(false)
                     onItemSelected()
                 }) {
@@ -114,23 +117,25 @@ fun Content(
     isSmallScreen: Boolean,
     onItemSelected: () -> Unit = {}
 ) {
-    // Create a ScrollState and a ScrollbarAdapter using multiplatform components
     val scrollState = rememberScrollState()
-//    val scrollbarAdapter = androidx.compose.foundation.rememberScrollbarAdapter(scrollState = scrollState)
     val keyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
-    // Define a minimalist scrollbar style
-//    val minimalistScrollbarStyle = ScrollbarStyle(
-//        minimalHeight = 16.dp, // Minimum height of the thumb
-//        thickness = 4.dp, // Thickness of the scrollbar
-//        shape = MaterialTheme.shapes.small, // Shape of the thumb
-//        hoverDurationMillis = 300, // Duration for hover animation
-//        unhoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f), // Subtle color when not hovered
-//        hoverColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f) // Slightly more visible color when hovered
-//    )
-
-    // Use a Box to place the scrollbar next to the scrollable Column
-    Box(modifier = Modifier.fillMaxWidth()) {
+    // Use a Box as the clickable container
+    Box(
+        modifier = Modifier
+            .wrapContentSize() // Fill the available space
+            // Add a clickable modifier to dismiss the keyboard
+            .clickable(
+                // Use an empty interactionSource to prevent ripple effect
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null // No visual indication on click
+            ) {
+                // Clear focus and hide the keyboard when clicked outside text fields
+                focusManager.clearFocus()
+                keyboard?.hide()
+            }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,8 +144,9 @@ fun Content(
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
             if (isSmallScreen) {
-                Button(enabled = viewState.isConfirmEnabled, onClick = {
+                Button(enabled = viewState.isMobileConfirmEnabled, onClick = {
                     keyboard?.hide()
+                    focusManager.clearFocus()
                     onItemSelected()
                 }) {
                     Text(
@@ -149,18 +155,10 @@ fun Content(
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
-            AlarmSoundContent(viewState, viewModel)
+            AlarmSoundContent(viewState, viewModel, isSmallScreen)
         }
-
-        // Add the VerticalScrollbar using multiplatform component with the minimalist style
-//        androidx.compose.foundation.VerticalScrollbar(
-//            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(), // Align to the end and fill height
-//            adapter = scrollbarAdapter,
-//            style = minimalistScrollbarStyle // Apply the minimalist style
-//        )
     }
 }
-
 @Composable
 private fun TimerSettingsContent(
     items: List<String>,
@@ -182,10 +180,8 @@ private fun TimerSettingsContent(
                 isSmallScreen
             )
         }
-        // This Column with OutlinedTextFields should only appear for the last radio item
         if (index == items.size - 1) {
-            MaterialTheme(colorScheme = darkScheme) {
-
+            MaterialTheme(if (isSmallScreen) darkScheme else lightScheme) {
                 Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                     Column(modifier = Modifier.width(150.dp)) {
                         OutlinedTextField(
@@ -260,7 +256,7 @@ private fun RadioButtonWithText(
     text: String,
     isSmallScreen: Boolean
 ) {
-    MaterialTheme(colorScheme = darkScheme) {
+    MaterialTheme(colorScheme = if (isSmallScreen) darkScheme else lightScheme) {
         RadioButton(
             selected = (index == selectedItemIndex),
             onClick = null
@@ -269,13 +265,16 @@ private fun RadioButtonWithText(
     Spacer(modifier = Modifier.width(8.dp))
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.onPrimary
-
+        color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
     )
 }
 
 @Composable
-private fun AlarmSoundContent(viewState: SettingsViewState, viewModel: SettingsViewModel) {
+private fun AlarmSoundContent(
+    viewState: SettingsViewState,
+    viewModel: SettingsViewModel,
+    isSmallScreen: Boolean
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -287,31 +286,28 @@ private fun AlarmSoundContent(viewState: SettingsViewState, viewModel: SettingsV
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically),
-            color = MaterialTheme.colorScheme.onPrimary
+            color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
 
         )
-
         // Add the clickable sound icon here
-        MaterialTheme(colorScheme = darkScheme) {
-            Icon(
-                imageVector = Icons.Rounded.PlayArrow, // Use a sound-related icon
-                contentDescription = "Play alarm sound preview",
-                modifier = Modifier
-                    .size(24.dp) // Adjust size as needed
-                    .clip(CircleShape) // Clip the icon to a circle
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.outline,
-                        CircleShape
-                    ) // Add a round border
-                    .clickable {
-                        viewModel.onPlayAlarmSoundPreviewClick()
-                    }
-                    .align(Alignment.CenterVertically) // Align icon vertically
-                    .padding(4.dp) // Add padding inside the circle
-            )
-        }
-
+        Icon(
+            imageVector = vectorResource(Res.drawable.sound), // Use a sound-related icon
+            contentDescription = "Play alarm sound preview",
+            modifier = Modifier
+                .size(24.dp) // Adjust size as needed
+                .clip(CircleShape) // Clip the icon to a circle
+                .border(
+                    1.dp,
+                    if (isSmallScreen) Color.White else Color.Black,
+                    CircleShape
+                ) // Add a round border
+                .clickable {
+                    viewModel.onPlayAlarmSoundPreviewClick()
+                }
+                .align(Alignment.CenterVertically) // Align icon vertically
+                .padding(2.dp) // Add padding inside the circle,
+            , tint = if (isSmallScreen) Color.White else Color.Black
+        )
         Spacer(modifier = Modifier.width(8.dp)) // Add space between icon and TextButton
 
         var expanded by remember { mutableStateOf(false) }
@@ -320,7 +316,7 @@ private fun AlarmSoundContent(viewState: SettingsViewState, viewModel: SettingsV
             alarmSoundOptions[viewState.selectedAlarmPos] // Use val here as it's derived from state
 
 
-        Box {
+        Box(modifier = Modifier.wrapContentHeight()) {
             MaterialTheme(colorScheme = darkScheme) {
 
                 TextButton(
@@ -333,19 +329,25 @@ private fun AlarmSoundContent(viewState: SettingsViewState, viewModel: SettingsV
                         vertical = 8.dp
                     ), // Add padding
                     shape = MaterialTheme.shapes.small, // Apply a shape
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline) // Add a border
+                    border = BorderStroke(
+                        1.dp,
+                        if (isSmallScreen) Color.White else Color.Black
+                    ) // Add a border
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        MaterialTheme(colorScheme = lightScheme) {
-                        Text(
-                            selectedAlarmSound, color = MaterialTheme.colorScheme.onPrimary
-                        ) // Display the selected sound
-                            }
-                        Spacer(Modifier.width(4.dp)) // Space between text and icon
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
-                            contentDescription = "Expand alarm sound options"
-                        )
+                    MaterialTheme(colorScheme = if (isSmallScreen) lightScheme else darkScheme) {
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                selectedAlarmSound, color = MaterialTheme.colorScheme.onPrimary
+                            ) // Display the selected sound
+
+                            Spacer(Modifier.width(4.dp)) // Space between text and icon
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
+                                contentDescription = "Expand alarm sound options",
+                                 tint = if (isSmallScreen) Color.White else Color.Black
+                            )
+                        }
                     }
                 }
             }

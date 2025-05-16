@@ -1,18 +1,25 @@
 package org.timer.main.timer
 
+import org.timer.main.domain.video.*
+
 data class TimerViewState(
     val pomodoroTime: String = "00:00",
     val shortBreakTime: String = "00:00",
     val longBreakTime: String = "00:00",
-    private val isPomodoroTimerRunning: Boolean = false,
-    private val isShortBreakTimerRunning: Boolean = false,
-    private val isLongBreakTimerRunning: Boolean = false,
+     val isPomodoroTimerRunning: Boolean = false,
+     val isShortBreakTimerRunning: Boolean = false,
+     val isLongBreakTimerRunning: Boolean = false,
     val kittyDoroNumber: Int = 0,
-    val timerState: TimerState = TimerState.Pomodoro,
+    val timerState: TimerState = TimerState.Pomodoro(
+        WorkoutVideosGateway.getWorkoutVideos().random(),
+        WorkoutVideosGateway.getDanceAudios().random()
+    ),
     val selectedTabIndex: Int = 0,
     val isShortBreakStarted: Boolean = false,
     val isLongBreakStarted: Boolean = false,
-) {
+    val navigateToShortBreakActivity:Boolean=false,
+    val navigateToLongBreakActivity:Boolean=false,
+    ) {
     val isPomodoroStartVisible: Boolean
         get() = !isPomodoroTimerRunning
     val isPomodoroPauseVisible: Boolean
@@ -30,7 +37,7 @@ data class TimerViewState(
 }
 
 sealed class TimerState {
-    data object Pomodoro : TimerState()
+    data class Pomodoro(val videoLink: String, val audioLink: String) : TimerState()
     data class ShortBreak(val videoLink: String, val audioLink: String) : TimerState()
     data object LongBreak : TimerState()
 }

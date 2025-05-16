@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.*
 import kotlinx.coroutines.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
-import org.timer.main.breakactivity.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -22,88 +21,98 @@ fun TimerScreen(
     windowInfo: WindowInfo = remeberWindowInfo()
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
+        Title()
+        Spacer(modifier = Modifier.height(if (windowInfo.isSmallScreen()) 48.dp else 16.dp))
+        TimerPager(viewModel, viewState)
+    }
+}
 
-    Column(modifier) {
-        Row(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Kittydoro timer",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+
+
+@Composable
+fun Title() {
+    Row() {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Kittydoro timer",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+    }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+private fun TimerPager(
+    viewModel: TimerViewModel,
+    viewState: TimerViewState
+) {
+    val titles = listOf("Kittydoro", "Short Break", "Long Break")
+    val pagerState = rememberPagerState(pageCount = { titles.size })
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.targetPage }.collect { page ->
+            viewModel.onPageChanged(page)
         }
+    }
+    LaunchedEffect(viewState) {
+        pagerState.animateScrollToPage(viewState.selectedTabIndex)
+    }
 
-        val titles = listOf("Kittydoro", "Short Break", "Long Break")
-        val pagerState = rememberPagerState(pageCount = { titles.size })
-        val scope = rememberCoroutineScope()
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.targetPage }.collect { page ->
-                viewModel.onPageChanged(page)
-            }
-        }
-        LaunchedEffect(viewState) {
-            pagerState.animateScrollToPage(viewState.selectedTabIndex)
-        }
-
-        Row(
-            modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp
+    Row {
+        ElevatedCard(
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
             )
         ) {
-            ElevatedCard(
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                )
+            SecondaryTabRow(
+                selectedTabIndex = viewState.selectedTabIndex,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
-                SecondaryTabRow(
-                    selectedTabIndex = viewState.selectedTabIndex,
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                ) {
-                    titles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = viewState.selectedTabIndex == index,
-                            onClick = {
-                                scope.launch { pagerState.animateScrollToPage(index) }
-                            },
-                            text = {
-                                Text(
-                                    text = title,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            },
-                        )
-                    }
+                titles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = viewState.selectedTabIndex == index,
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        },
+                        text = {
+                            Text(
+                                text = title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                    )
+                }
 
-                }
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxWidth()
-                ) { page ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        when (page) {
-                            0 -> KittidoroContent(viewState, viewModel)
-                            1 -> ShortBreakContent(viewState, viewModel)
-                            2 -> LongBreakContent(viewState, viewModel)
-                        }
+            }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth()
+            ) { page ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    when (page) {
+                        0 -> KittidoroContent(viewState, viewModel)
+                        1 -> ShortBreakContent(viewState, viewModel)
+                        2 -> LongBreakContent(viewState, viewModel)
                     }
                 }
-                Text(
-                    text = "Kittydoros: ${viewState.kittyDoroNumber}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
             }
+            Text(
+                text = "Kittydoros: ${viewState.kittyDoroNumber}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
         }
     }
 }

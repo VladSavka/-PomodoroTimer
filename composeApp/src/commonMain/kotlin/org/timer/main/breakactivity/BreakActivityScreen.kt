@@ -85,100 +85,224 @@ fun BreakActivityScreen(
         Column(
             modifier = Modifier.align(Alignment.TopCenter)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
             if (!windowInfo.isSmallScreen()) {
                 Spacer(Modifier.height(48.dp))
             }
             when (timerViewState.timerState) {
                 is TimerState.ShortBreak -> {
-                    Title(viewState.showBackButton, onBackClick = { viewModel.onBackClick() })
+                    Title(
+                        showBackButton = viewState.showBackButton,
+                        onBackClick = { viewModel.onBackClick() },
+                        currentTime = timerViewState.shortBreakTime, // Pass the current time string
+                        onActionButtonClick = { /* Handle action button click */ },
+                        selectedBreakType = timerViewState.timerState
+
+                    )
+                    if (windowInfo.isSmallScreen()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SegmentedButton(
+                            selectedBreakType = timerViewState.timerState,
+                            onButtonSelected = {
+                                when (it) {
+                                    0 -> timerViewModel.onShortBreakStartClick()
+                                    1 -> timerViewModel.onLongBreakStartClick()
+                                }
+                            })
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
                     TwoLevelDeepList(
                         viewState = viewState,
                         items = items,
                         onFirstLevelItemClick = { viewModel.onFirstLevelItemClick(it) },
                         onItemSelected = {
                             viewModel.onActivitySelected(it)
+                            timerViewModel.onShortBreakStartClick()
                         })
                 }
 
                 is TimerState.LongBreak -> {
                     viewModel.onActivitySelected("")
-                    Title(viewState.showBackButton, onBackClick = { viewModel.onBackClick() })
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        LongBreakContent(Modifier.align(Alignment.Center), timerViewState)
+                    Title(
+                        showBackButton = viewState.showBackButton,
+                        onBackClick = { viewModel.onBackClick() },
+                        currentTime = timerViewState.longBreakTime, // Pass the current time string
+                        onActionButtonClick = { /* Handle action button click */ },
+                        selectedBreakType = timerViewState.timerState
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (windowInfo.isSmallScreen()) {
+                        SegmentedButton(
+                            selectedBreakType = timerViewState.timerState,
+                            onButtonSelected = {
+                                when (it) {
+                                    0 -> timerViewModel.onShortBreakStartClick()
+                                    1 -> timerViewModel.onLongBreakStartClick()
+                                }
+                            },
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
+                        LongBreakContent(Modifier, timerViewState)
+
                 }
 
                 is TimerState.Pomodoro -> {
                     viewModel.onActivitySelected("")
+                    if (windowInfo.isSmallScreen()) {
+                        Title(
+                            showBackButton = viewState.showBackButton,
+                            onBackClick = { viewModel.onBackClick() },
+                            currentTime = timerViewState.shortBreakTime, // Pass the current time string
+                            onActionButtonClick = { /* Handle action button click */ },
+                            selectedBreakType = timerViewState.timerState
+
+                        )
+                        if (windowInfo.isSmallScreen()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            SegmentedButton(
+                                selectedBreakType = timerViewState.timerState,
+                                onButtonSelected = {
+                                    when (it) {
+                                        0 -> timerViewModel.onShortBreakStartClick()
+                                        1 -> timerViewModel.onLongBreakStartClick()
+                                    }
+                                })
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TwoLevelDeepList(
+                            viewState = viewState,
+                            items = items,
+                            onFirstLevelItemClick = { viewModel.onFirstLevelItemClick(it) },
+                            onItemSelected = {
+                                viewModel.onActivitySelected(it)
+                                timerViewModel.onShortBreakStartClick()
+                            })
+                    } else {
+                    }
                 }
             }
 
-        }
-        when (viewState.selectedActivityId) {
-            "1.1", "1.2", "1.3" -> Video(timerViewState, showDialog.value)
-            "1.4" -> GoForIt(modifier = Modifier.align(Alignment.Center), timerViewState)
-            "2" -> Audio(timerViewState, showDialog.value)
-            "3.1", "3.2", "3.3", "3.4" -> GoForIt(
-                modifier = Modifier.align(Alignment.Center),
-                timerViewState
-            )
 
-            "4.1", "4.2", "4.3" -> GoForIt(
-                modifier = Modifier.align(Alignment.Center),
-                timerViewState
-            )
+            when (viewState.selectedActivityId) {
+                "1.1", "1.2", "1.3" -> Video(timerViewState, showDialog.value)
+                "1.4" -> GoForIt(modifier = Modifier, timerViewState)
+                "2" -> Audio(timerViewState, showDialog.value)
+                "3.1", "3.2", "3.3", "3.4" -> GoForIt(
+                    modifier = Modifier,
+                    timerViewState
+                )
+
+                "4.1", "4.2", "4.3" -> GoForIt(
+                    modifier = Modifier,
+                    timerViewState
+                )
+            }
         }
     }
 }
 
 
 @Composable
-private fun Title(showBackButton: Boolean, onBackClick: () -> Unit) {
+fun Title(
+    showBackButton: Boolean,
+    onBackClick: () -> Unit,
+    currentTime: String, // Add a parameter for the current time
+    onActionButtonClick: () -> Unit, // Add a parameter for the action button click
+    selectedBreakType: TimerState,
+) {
+    val windowInfo = remeberWindowInfo()
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 48.dp)
+            .heightIn(min = if (windowInfo.isSmallScreen()) 48.dp else 64.dp)
     ) {
-        Box(
-            modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-            if (showBackButton) {
-                IconButton(
-                    onClick = onBackClick,
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+        // Back Button (aligned to start)
+        if (showBackButton) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 
-        Text(
-            text = "Break time",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        // Centered Title and Time
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Break time",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            if (windowInfo.isSmallScreen()) {
+                Text(
+                    text = currentTime, // Display the current time
+                    fontSize = 18.sp, // Adjust font size as needed
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) // Slightly less prominent
+                )
+            }
+
+        }
+
     }
 }
 
 @Composable
-fun BoxScope.Audio(viewState: TimerViewState, showDialog: Boolean) {
-    if (viewState.timerState is TimerState.ShortBreak) {
+fun SegmentedButton(
+    selectedBreakType: TimerState,
+    onButtonSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val options = listOf("Short", "Long")
+    val index = when (selectedBreakType) {
+        TimerState.LongBreak -> 1
+        is TimerState.Pomodoro -> 0
+        is TimerState.ShortBreak -> 0
+    }
+    var selectedIndex by remember { mutableStateOf(index) }
+
+    SingleChoiceSegmentedButtonRow(modifier = modifier) {
+        options.forEachIndexed { index, text ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                onClick = {
+                    selectedIndex = index
+                    onButtonSelected(index)
+                },
+                selected = selectedIndex == index,
+            ) {
+                Text(
+                    text = text,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Audio(viewState: TimerViewState, showDialog: Boolean) {
+    if (viewState.timerState is TimerState.ShortBreak || viewState.timerState is TimerState.Pomodoro) {
         Column(
-            modifier = Modifier.align(Alignment.TopCenter)
-                .padding(top = 64.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            modifier = Modifier
+                .padding(top = 16.dp, bottom = 16.dp),
         ) {
-            val windowInfo = remeberWindowInfo()
-            if (!windowInfo.isSmallScreen()) {
-                Spacer(Modifier.height(48.dp))
+            if (remeberWindowInfo().isSmallScreen()){
+                Spacer(Modifier.height(32.dp))
             }
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -187,6 +311,11 @@ fun BoxScope.Audio(viewState: TimerViewState, showDialog: Boolean) {
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimary
             )
+            val audioLink = when (viewState.timerState) {
+                is TimerState.ShortBreak -> viewState.timerState.audioLink
+                is TimerState.Pomodoro -> viewState.timerState.audioLink
+                else -> ""
+            }
             if (!showDialog) {
                 VideoPlayer(
                     modifier = Modifier.padding(
@@ -194,7 +323,7 @@ fun BoxScope.Audio(viewState: TimerViewState, showDialog: Boolean) {
                         bottom = 8.dp
                     ).fillMaxWidth()
                         .aspectRatio(16f / 9f),
-                    url = viewState.timerState.audioLink,
+                    url = audioLink,
                 )
             }
         }
@@ -202,21 +331,31 @@ fun BoxScope.Audio(viewState: TimerViewState, showDialog: Boolean) {
 }
 
 @Composable
-fun BoxScope.Video(viewState: TimerViewState, showDialog: Boolean) {
-    if (viewState.timerState is TimerState.ShortBreak) {
-        Column(
-            modifier = Modifier.align(Alignment.TopCenter)
-                .padding(top = 64.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-        ) {
-            if (!showDialog) {
-                VideoPlayer(
-                    modifier = Modifier.padding(
-                        top = 8.dp,
-                        bottom = 8.dp
-                    ).fillMaxWidth()
-                        .aspectRatio(16f / 9f),
-                    url = viewState.timerState.videoLink,
-                )
+fun Video(viewState: TimerViewState, showDialog: Boolean) {
+    viewState.timerState.apply {
+        if (this is TimerState.ShortBreak || this is TimerState.Pomodoro) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 16.dp),
+            ) {
+                if (remeberWindowInfo().isSmallScreen()){
+                    Spacer(Modifier.height(32.dp))
+                }
+                val videoLink = when (this@apply) {
+                    is TimerState.ShortBreak -> this@apply.videoLink
+                    is TimerState.Pomodoro -> this@apply.videoLink
+                    else -> ""
+                }
+                if (!showDialog) {
+                    VideoPlayer(
+                        modifier = Modifier.padding(
+                            top = 8.dp,
+                            bottom = 8.dp
+                        ).fillMaxWidth()
+                            .aspectRatio(16f / 9f),
+                        url = videoLink,
+                    )
+                }
             }
         }
     }
@@ -224,7 +363,7 @@ fun BoxScope.Video(viewState: TimerViewState, showDialog: Boolean) {
 
 @Composable
 fun GoForIt(modifier: Modifier, viewState: TimerViewState) {
-    if (viewState.timerState is TimerState.ShortBreak) {
+    if (viewState.timerState is TimerState.ShortBreak || viewState.timerState is TimerState.Pomodoro) {
         Text(
             modifier = modifier.fillMaxWidth().padding(16.dp),
             textAlign = TextAlign.Center,
@@ -237,7 +376,7 @@ fun GoForIt(modifier: Modifier, viewState: TimerViewState) {
 }
 
 @Composable
-fun BoxScope.LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
+fun LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
     if (viewState.timerState is TimerState.LongBreak) {
         Text(
             modifier = modifier.fillMaxWidth().padding(16.dp),

@@ -146,7 +146,7 @@ fun BreakActivityScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                        LongBreakContent(Modifier, timerViewState)
+                    LongBreakContent(Modifier, timerViewState)
 
                 }
 
@@ -182,7 +182,6 @@ fun BreakActivityScreen(
                                 viewModel.onActivitySelected(it)
                                 timerViewModel.onShortBreakStartClick()
                             })
-                    } else {
                     }
                 }
             }
@@ -301,7 +300,7 @@ fun Audio(viewState: TimerViewState, showDialog: Boolean) {
             modifier = Modifier
                 .padding(top = 16.dp, bottom = 16.dp),
         ) {
-            if (remeberWindowInfo().isSmallScreen()){
+            if (remeberWindowInfo().isSmallScreen()) {
                 Spacer(Modifier.height(32.dp))
             }
             Text(
@@ -338,7 +337,7 @@ fun Video(viewState: TimerViewState, showDialog: Boolean) {
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 16.dp),
             ) {
-                if (remeberWindowInfo().isSmallScreen()){
+                if (remeberWindowInfo().isSmallScreen()) {
                     Spacer(Modifier.height(32.dp))
                 }
                 val videoLink = when (this@apply) {

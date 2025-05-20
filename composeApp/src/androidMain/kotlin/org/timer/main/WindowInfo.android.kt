@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.*
 @Composable
 actual fun remeberWindowInfo(): WindowInfo {
     val (height, width) = LocalConfiguration.current.run { screenHeightDp.dp to screenWidthDp.dp }
-
     return remember { WindowInfo(Size(width.value, height.value)) }
 }
 
 actual fun isWeb() = false
 actual fun isIOS(): Boolean = false
+actual fun isMobile() = true

@@ -1,8 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import org.jetbrains.kotlin.gradle.*
+import org.jetbrains.kotlin.gradle.dsl.*
+import org.jetbrains.kotlin.gradle.targets.js.webpack.*
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -20,7 +18,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -31,7 +29,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -51,10 +49,12 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         iosMain.dependencies {
             implementation(libs.alarmee)
+            implementation(libs.permissions.compose)
+            implementation(libs.permissions.notifications)
         }
         androidMain.dependencies {
             implementation(compose.preview)
@@ -62,6 +62,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.core)
             implementation(libs.alarmee)
+            implementation(libs.permissions.compose)
+            implementation(libs.permissions.notifications)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -83,8 +85,6 @@ kotlin {
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.multiplatform.settings.serialization)
             api(libs.logging)
-
-
         }
     }
 }

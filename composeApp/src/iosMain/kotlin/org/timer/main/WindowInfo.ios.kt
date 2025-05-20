@@ -18,3 +18,4 @@ actual fun remeberWindowInfo(): WindowInfo {
 
 actual fun isWeb(): Boolean = false
 actual fun isIOS(): Boolean =true
+actual fun isMobile()= true

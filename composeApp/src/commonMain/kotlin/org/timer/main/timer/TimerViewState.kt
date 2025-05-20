@@ -6,9 +6,9 @@ data class TimerViewState(
     val pomodoroTime: String = "00:00",
     val shortBreakTime: String = "00:00",
     val longBreakTime: String = "00:00",
-     val isPomodoroTimerRunning: Boolean = false,
-     val isShortBreakTimerRunning: Boolean = false,
-     val isLongBreakTimerRunning: Boolean = false,
+    val isPomodoroTimerRunning: Boolean = false,
+    val isShortBreakTimerRunning: Boolean = false,
+    val isLongBreakTimerRunning: Boolean = false,
     val kittyDoroNumber: Int = 0,
     val timerState: TimerState = TimerState.Pomodoro(
         WorkoutVideosGateway.getWorkoutVideos().random(),
@@ -17,9 +17,10 @@ data class TimerViewState(
     val selectedTabIndex: Int = 0,
     val isShortBreakStarted: Boolean = false,
     val isLongBreakStarted: Boolean = false,
-    val navigateToShortBreakActivity:Boolean=false,
-    val navigateToLongBreakActivity:Boolean=false,
-    ) {
+    val navigateToShortBreakActivity: Boolean = false,
+    val navigateToLongBreakActivity: Boolean = false,
+    val navigateToActivitiesScreen: Boolean = false,
+) {
     val isPomodoroStartVisible: Boolean
         get() = !isPomodoroTimerRunning
     val isPomodoroPauseVisible: Boolean
@@ -34,6 +35,7 @@ data class TimerViewState(
         get() = !isLongBreakTimerRunning
     val isLongBreakPauseVisible: Boolean
         get() = isLongBreakTimerRunning
+
 }
 
 sealed class TimerState {

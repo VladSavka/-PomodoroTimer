@@ -5,7 +5,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
-import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.projects.*
 import org.timer.main.timer.*

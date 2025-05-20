@@ -49,4 +49,6 @@ actual class CountDownTimer actual constructor(
     actual fun isFinished(): Boolean {
         return currentMillis <= 0
     }
+
+    actual fun getCurrentTimeMillis(): Long = currentMillis
 }

@@ -6,4 +6,5 @@ import org.timer.main.timer.*
 
 actual fun platformSpecificModule(): Module= module {
     single { AlarmPlayer() }
+    factory { MobileAlarm() }
 }

@@ -13,3 +13,5 @@ fun WindowInfo.isSmallScreen() = size.width < 600
 expect fun isWeb(): Boolean
 
 expect fun isIOS(): Boolean
+
+expect fun isMobile(): Boolean

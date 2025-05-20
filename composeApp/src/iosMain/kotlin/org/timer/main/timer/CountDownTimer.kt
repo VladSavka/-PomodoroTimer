@@ -21,7 +21,7 @@ actual class CountDownTimer actual constructor(
         isTimerRunning = true
         isRunning(true)
         // Calculate the target time in milliseconds (future time)
-        startMoment =  getCurrentTime()
+        startMoment = getCurrentTime()
 
         // Schedule the timer with the given interval
         iosTimer = NSTimer.scheduledTimerWithTimeInterval(
@@ -81,4 +81,6 @@ actual class CountDownTimer actual constructor(
     actual fun isFinished(): Boolean {
         return currentMillis <= 0
     }
+
+    actual fun getCurrentTimeMillis(): Long = currentMillis
 }

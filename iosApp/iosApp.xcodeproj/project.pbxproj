@@ -11,6 +11,17 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		F53B4AA02DDA3482003E5156 /* cat.wav in Resources */ = {isa = PBXBuildFile; fileRef = F53B4A9F2DDA3482003E5156 /* cat.wav */; };
+		F5D6AA592DDCDD580018CB41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6AA582DDCDD550018CB41 /* AppDelegate.swift */; };
+		F5D6AA5B2DDCE4B90018CB41 /* bird.wav in Resources */ = {isa = PBXBuildFile; fileRef = F5D6AA5A2DDCE4B90018CB41 /* bird.wav */; };
+		F5D6AA5D2DDCE4C30018CB41 /* buffalo.wav in Resources */ = {isa = PBXBuildFile; fileRef = F5D6AA5C2DDCE4C30018CB41 /* buffalo.wav */; };
+		F5D6AA5F2DDCE4D00018CB41 /* dog.wav in Resources */ = {isa = PBXBuildFile; fileRef = F5D6AA5E2DDCE4D00018CB41 /* dog.wav */; };
+		F5D6AA612DDCE4E00018CB41 /* standard.wav in Resources */ = {isa = PBXBuildFile; fileRef = F5D6AA602DDCE4E00018CB41 /* standard.wav */; };
+		F5D6AA632DDCE4ED0018CB41 /* wolf.wav in Resources */ = {isa = PBXBuildFile; fileRef = F5D6AA622DDCE4ED0018CB41 /* wolf.wav */; };
+		F5D6AA652DDCEE680018CB41 /* TimerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6AA642DDCEE680018CB41 /* TimerActivityAttributes.swift */; };
+		F5D6AA672DDCEEDA0018CB41 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6AA662DDCEEDA0018CB41 /* LiveActivityManager.swift */; };
+		F5D6AA692DDCF1E40018CB41 /* TimerLiveActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6AA682DDCF1E40018CB41 /* TimerLiveActivityWidgetBundle.swift */; };
+		F5D6AA6B2DDCF34F0018CB41 /* TimerLiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D6AA6A2DDCF34F0018CB41 /* TimerLiveActivityView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +32,17 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		F53B4A9F2DDA3482003E5156 /* cat.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = cat.wav; sourceTree = "<group>"; };
+		F5D6AA582DDCDD550018CB41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F5D6AA5A2DDCE4B90018CB41 /* bird.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bird.wav; sourceTree = "<group>"; };
+		F5D6AA5C2DDCE4C30018CB41 /* buffalo.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = buffalo.wav; sourceTree = "<group>"; };
+		F5D6AA5E2DDCE4D00018CB41 /* dog.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = dog.wav; sourceTree = "<group>"; };
+		F5D6AA602DDCE4E00018CB41 /* standard.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = standard.wav; sourceTree = "<group>"; };
+		F5D6AA622DDCE4ED0018CB41 /* wolf.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wolf.wav; sourceTree = "<group>"; };
+		F5D6AA642DDCEE680018CB41 /* TimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerActivityAttributes.swift; sourceTree = "<group>"; };
+		F5D6AA662DDCEEDA0018CB41 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
+		F5D6AA682DDCF1E40018CB41 /* TimerLiveActivityWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerLiveActivityWidgetBundle.swift; sourceTree = "<group>"; };
+		F5D6AA6A2DDCF34F0018CB41 /* TimerLiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerLiveActivityView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,11 +92,17 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				F5D6AA6A2DDCF34F0018CB41 /* TimerLiveActivityView.swift */,
+				F5D6AA682DDCF1E40018CB41 /* TimerLiveActivityWidgetBundle.swift */,
+				F5D6AA662DDCEEDA0018CB41 /* LiveActivityManager.swift */,
+				F5D6AA642DDCEE680018CB41 /* TimerActivityAttributes.swift */,
+				F53B4A9E2DDA3438003E5156 /* NotificationSounds */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				F5D6AA582DDCDD550018CB41 /* AppDelegate.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -85,6 +113,19 @@
 				AB3632DC29227652001CCB65 /* Config.xcconfig */,
 			);
 			path = Configuration;
+			sourceTree = "<group>";
+		};
+		F53B4A9E2DDA3438003E5156 /* NotificationSounds */ = {
+			isa = PBXGroup;
+			children = (
+				F53B4A9F2DDA3482003E5156 /* cat.wav */,
+				F5D6AA5A2DDCE4B90018CB41 /* bird.wav */,
+				F5D6AA5C2DDCE4C30018CB41 /* buffalo.wav */,
+				F5D6AA5E2DDCE4D00018CB41 /* dog.wav */,
+				F5D6AA602DDCE4E00018CB41 /* standard.wav */,
+				F5D6AA622DDCE4ED0018CB41 /* wolf.wav */,
+			);
+			path = NotificationSounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,8 +192,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F53B4AA02DDA3482003E5156 /* cat.wav in Resources */,
+				F5D6AA5B2DDCE4B90018CB41 /* bird.wav in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
+				F5D6AA612DDCE4E00018CB41 /* standard.wav in Resources */,
+				F5D6AA632DDCE4ED0018CB41 /* wolf.wav in Resources */,
+				F5D6AA5F2DDCE4D00018CB41 /* dog.wav in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
+				F5D6AA5D2DDCE4C30018CB41 /* buffalo.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +231,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5D6AA6B2DDCF34F0018CB41 /* TimerLiveActivityView.swift in Sources */,
+				F5D6AA592DDCDD580018CB41 /* AppDelegate.swift in Sources */,
+				F5D6AA652DDCEE680018CB41 /* TimerActivityAttributes.swift in Sources */,
+				F5D6AA672DDCEEDA0018CB41 /* LiveActivityManager.swift in Sources */,
+				F5D6AA692DDCF1E40018CB41 /* TimerLiveActivityWidgetBundle.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 			);
@@ -326,7 +378,7 @@
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)\n$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -354,7 +406,7 @@
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)\n$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

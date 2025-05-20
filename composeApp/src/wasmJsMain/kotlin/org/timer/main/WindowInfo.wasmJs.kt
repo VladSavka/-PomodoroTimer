@@ -1,9 +1,8 @@
 package org.timer.main
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.geometry.Size
-import kotlinx.browser.window
+import androidx.compose.runtime.*
+import androidx.compose.ui.geometry.*
+import kotlinx.browser.*
 
 @Composable
 actual fun remeberWindowInfo(): WindowInfo {
@@ -13,4 +12,5 @@ actual fun remeberWindowInfo(): WindowInfo {
 }
 
 actual fun isWeb() = true
-actual fun isIOS(): Boolean =false
+actual fun isIOS(): Boolean = false
+actual fun isMobile() = false

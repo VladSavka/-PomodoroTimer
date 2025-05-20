@@ -21,6 +21,8 @@ fun TimerScreen(
     windowInfo: WindowInfo = remeberWindowInfo()
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    AskNotificationPermission()
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
         Title()
         Spacer(modifier = Modifier.height(if (windowInfo.isSmallScreen()) 48.dp else 16.dp))
@@ -28,6 +30,8 @@ fun TimerScreen(
     }
 }
 
+@Composable
+expect fun AskNotificationPermission()
 
 
 @Composable

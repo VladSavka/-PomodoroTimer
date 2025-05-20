@@ -2,12 +2,10 @@ package org.timer.main
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.vector.*
+import androidx.lifecycle.compose.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
@@ -19,12 +17,20 @@ import org.timer.main.settings.*
 import org.timer.main.timer.*
 import org.timer.ui.theme.*
 import pomodorotimer.composeapp.generated.resources.*
-import pomodorotimer.composeapp.generated.resources.Res
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
     val navController = rememberNavController()
+
+    val viewState by timerViewModel.viewState.collectAsStateWithLifecycle()
+    LaunchedEffect(viewState.navigateToActivitiesScreen) {
+        if (viewState.navigateToActivitiesScreen) {
+            timerViewModel.onNavigatedToActivitiesScreen()
+            navigateToScreen(navController, MainRouts.Activities)
+        }
+    }
+
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) { innerPadding ->
@@ -87,22 +93,36 @@ fun RowScope.AddItem(
     navController: NavHostController
 ) {
     NavigationBarItem(
-        icon = { screen.icon?.let { Icon(imageVector = vectorResource(it), contentDescription = null) } },
+        icon = {
+            screen.icon?.let {
+                Icon(
+                    imageVector = vectorResource(it),
+                    contentDescription = null
+                )
+            }
+        },
         label = { screen.resourceId?.let { Text(it) } },
         selected = currentDestination == screen.destanation,
         onClick = {
             if (currentDestination == screen.destanation) {
                 return@NavigationBarItem
             }
-            navController.navigate(screen.destanation, {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            })
+            navigateToScreen(navController, screen)
         }
     )
+}
+
+private fun navigateToScreen(
+    navController: NavHostController,
+    screen: MainRouts
+) {
+    navController.navigate(screen.destanation, {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    })
 }
 
 sealed class MainRouts(

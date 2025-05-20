@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.*
 import kotlinx.datetime.format.*
+import org.timer.main.*
 import org.timer.main.domain.settings.*
 import org.timer.main.domain.timer.*
 import org.timer.main.domain.video.*
@@ -15,7 +16,8 @@ private const val ITERATIONS_IN_ONE_CYCLE = 4
 class TimerViewModel(
     private val settings: SettingsGateway,
     private val playAlarmUseCase: PlayAlarmUseCase,
-    private val cancelAlarmUseCase: CancelAlarmUseCase
+    private val cancelAlarmUseCase: CancelAlarmUseCase,
+    private val mobileAlarm: MobileAlarm
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(TimerViewState())
     val viewState: StateFlow<TimerViewState> = _viewState.asStateFlow()
@@ -66,7 +68,7 @@ class TimerViewModel(
         }
     }
 
-    private fun startShortBreak() {
+    private fun navigateToShortBreakTab() {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         shortBreakTimer.resetTimer()
@@ -83,15 +85,23 @@ class TimerViewModel(
     }
 
     private fun onShortBreakFinish() {
-        playAlarmUseCase.invoke(onEnded = ::startPomodoro)
+        if (isMobile()) {
+            navigateToPomodoroTab()
+        } else {
+            playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
+        }
     }
 
     private fun onLongBreakFinish() {
-        playAlarmUseCase.invoke(onEnded = ::startPomodoro)
+        if (isMobile()) {
+            navigateToPomodoroTab()
+        } else {
+            playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
+        }
     }
 
 
-    private fun startPomodoro() = viewModelScope.launch {
+    private fun navigateToPomodoroTab() = viewModelScope.launch {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         shortBreakTimer.resetTimer()
@@ -112,13 +122,23 @@ class TimerViewModel(
     private fun onPomodoroFinish() {
         log.debug { "onFinish" }
         incrementKittydoroNumber()
-        playAlarmUseCase.invoke(onEnded = {
-            if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
-                startLongBreak()
-            } else {
-                startShortBreak()
-            }
-        })
+        if (isMobile()) {
+            navigateToBreakTab()
+            _viewState.update { it.copy(navigateToActivitiesScreen = true) }
+        } else {
+            playAlarmUseCase.invoke(onEnded = {
+                navigateToBreakTab()
+            })
+        }
+
+    }
+
+    private fun navigateToBreakTab() {
+        if (viewState.value.kittyDoroNumber % ITERATIONS_IN_ONE_CYCLE == 0) {
+            navigateToLongBreakTab()
+        } else {
+            navigateToShortBreakTab()
+        }
     }
 
     private fun incrementKittydoroNumber() {
@@ -127,7 +147,7 @@ class TimerViewModel(
         _viewState.update { it.copy(kittyDoroNumber = kittyDoroNumber) }
     }
 
-    private fun startLongBreak() {
+    private fun navigateToLongBreakTab() {
         shortBreakTimer.resetTimer()
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
@@ -157,6 +177,11 @@ class TimerViewModel(
         longBreakTimer.resetTimer()
         if (!_viewState.value.isPomodoroTimerRunning) {
             pomodoroTimer.startTimer()
+            scheduleAlarm(
+                pomodoroTimer.getCurrentTimeMillis(),
+                "Kittidoro Finished!",
+                "Take a break Kitty"
+            )
         }
         if (_viewState.value.timerState !is TimerState.Pomodoro) {
             _viewState.update {
@@ -171,12 +196,25 @@ class TimerViewModel(
         }
     }
 
+    private fun scheduleAlarm(currentTimerMillis: Long, title: String, body: String) {
+        log.debug { "scheduleAlarm " + currentTimerMillis }
+        mobileAlarm.cancel()
+        val scheduleDate = Clock.System.now().toEpochMilliseconds() + currentTimerMillis
+        val alarmSound = settings.getAlarmSound().value
+        mobileAlarm.schedule(scheduleDate, alarmSound, title, body)
+    }
+
     fun onShortBreakStartClick() {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         if (!_viewState.value.isShortBreakTimerRunning) { // todo
             shortBreakTimer.startTimer()
-           // _viewState.update { it.copy(navigateToShortBreakActivity = true) }
+            scheduleAlarm(
+                shortBreakTimer.getCurrentTimeMillis(),
+                "Short break finished",
+                "Keep the eye on the ball!"
+            )
+            // _viewState.update { it.copy(navigateToShortBreakActivity = true) }
         }
         if (_viewState.value.timerState !is TimerState.ShortBreak) {
             _viewState.update {
@@ -196,6 +234,11 @@ class TimerViewModel(
         shortBreakTimer.resetTimer()
         if (!_viewState.value.isLongBreakTimerRunning) {
             longBreakTimer.startTimer()
+            scheduleAlarm(
+                longBreakTimer.getCurrentTimeMillis(),
+                "Long break finished",
+                "Keep the eye on the ball!"
+            )
             //_viewState.update { it.copy(navigateToLongBreakActivity = true) }
         }
         if (_viewState.value.timerState !is TimerState.LongBreak) {
@@ -218,6 +261,7 @@ class TimerViewModel(
         pomodoroTimer.pauseTimer()
         shortBreakTimer.pauseTimer()
         longBreakTimer.pauseTimer()
+        mobileAlarm.cancel()
         initTimers()
         _viewState.update {
             it.copy(
@@ -234,6 +278,7 @@ class TimerViewModel(
         if (pomodoroTimer.isFinished()) {
             return
         }
+        mobileAlarm.cancel()
         pomodoroTimer.pauseTimer()
     }
 
@@ -241,6 +286,7 @@ class TimerViewModel(
         if (shortBreakTimer.isFinished()) {
             return
         }
+        mobileAlarm.cancel()
         shortBreakTimer.pauseTimer()
     }
 
@@ -248,6 +294,7 @@ class TimerViewModel(
         if (longBreakTimer.isFinished()) {
             return
         }
+        mobileAlarm.cancel()
         longBreakTimer.pauseTimer()
     }
 
@@ -273,6 +320,11 @@ class TimerViewModel(
 
     fun onPageChanged(currentPage: Int) {
         _viewState.update { it.copy(selectedTabIndex = currentPage) }
+    }
+
+    fun onNavigatedToActivitiesScreen() {
+        _viewState.update { it.copy(navigateToActivitiesScreen = false) }
+
     }
 
 

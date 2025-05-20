@@ -8,4 +8,5 @@ import org.timer.main.timer.*
 
 actual fun platformSpecificModule(): Module= module {
     single { AlarmPlayer(context = androidContext()) }
+    factory { MobileAlarm(context = androidContext()) }
 }

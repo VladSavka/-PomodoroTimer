@@ -52,7 +52,6 @@ kotlin {
 
     sourceSets {
         iosMain.dependencies {
-            implementation(libs.alarmee)
             implementation(libs.permissions.compose)
             implementation(libs.permissions.notifications)
         }
@@ -61,7 +60,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.core)
-            implementation(libs.alarmee)
             implementation(libs.permissions.compose)
             implementation(libs.permissions.notifications)
         }

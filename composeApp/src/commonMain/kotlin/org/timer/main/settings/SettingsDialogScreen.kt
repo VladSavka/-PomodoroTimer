@@ -40,7 +40,6 @@ fun SettingsDialogScreen(
             "Custom time (minutes)"
         ),
         isDialogVisible = { isDialogVisible(it) },
-        onItemSelected = { viewModel.onPresetConfirmed() },
         viewModel,
         viewState
     )
@@ -51,7 +50,6 @@ fun SingleChoiceDialog(
     title: String,
     radioOptions: List<String>,
     isDialogVisible: (Boolean) -> Unit,
-    onItemSelected: () -> Unit,
     viewModel: SettingsViewModel,
     viewState: SettingsViewState
 ) {
@@ -72,7 +70,6 @@ fun SingleChoiceDialog(
                 viewModel,
                 viewState,
                 isSmallScreen,
-                onItemSelected
             )
 
         }
@@ -91,15 +88,9 @@ fun SingleChoiceDialog(
             onDismissRequest = {
                 isDialogVisible(false)
             },
-            dismissButton = {
-                TextButton(onClick = { isDialogVisible(false) }) {
-                    Text(text = "Dismiss")
-                }
-            },
             confirmButton = {
-                TextButton(enabled = viewState.isWebConfirmEnabled, onClick = {
+                TextButton(onClick = {
                     isDialogVisible(false)
-                    onItemSelected()
                 }) {
                     Text(text = "Confirm")
                 }
@@ -115,7 +106,6 @@ fun Content(
     viewModel: SettingsViewModel,
     viewState: SettingsViewState,
     isSmallScreen: Boolean,
-    onItemSelected: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val keyboard = LocalSoftwareKeyboardController.current
@@ -143,17 +133,6 @@ fun Content(
                 .padding(end = 8.dp) // Add padding to the end of the column
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
-            if (isSmallScreen) {
-                Button(enabled = viewState.isMobileConfirmEnabled, onClick = {
-                    keyboard?.hide()
-                    focusManager.clearFocus()
-                    onItemSelected()
-                }) {
-                    Text(
-                        text = "Confirm", color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
             AlarmSoundContent(viewState, viewModel, isSmallScreen)
         }
@@ -187,7 +166,7 @@ private fun TimerSettingsContent(
                         OutlinedTextField(
                             value = viewState.pomodoroMinutes,
                             onValueChange = {
-                                if (it.isEmpty() || it.isDigits()) viewModel.updateFocusMinutes(it)
+                                if (it.isEmpty() || it.isDigits()) viewModel.updatePomodoroMinutes(it)
                             },
                             label = { Text("Focus time") },
                             singleLine = true,

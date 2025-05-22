@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
+import org.timer.main.*
 import org.timer.main.domain.project.*
 
 @Composable
@@ -32,58 +33,116 @@ fun ProjectsScreen(
     modifier: Modifier = Modifier,
     viewModel: ProjectsViewModel = koinViewModel(),
 ) {
-
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
-
     var prevSize by remember { mutableStateOf(viewState.projects.size) }
-
     val lazyListState = rememberLazyListState()
+
     LaunchedEffect(viewState.projects.size) {
         val currentSize = viewState.projects.size
-        if (prevSize > currentSize) {
-            prevSize = currentSize
-        } else {
-            prevSize = currentSize
-            lazyListState.animateScrollToItem(lazyListState.layoutInfo.totalItemsCount)
+        if (prevSize < currentSize && currentSize > 0) {
+            lazyListState.animateScrollToItem(currentSize - 1)
         }
-
-
+        prevSize = currentSize
     }
 
-    viewState.projects.forEachIndexed { index, project ->
-        LaunchedEffect(project.tasks.size) {
-            if (lazyListState.layoutInfo.totalItemsCount - 1 == index) {
-                lazyListState.animateScrollToItem(index + 1)
+    viewState.projects.forEachIndexed { projectIndex, project ->
+        LaunchedEffect(key1 = project.id, key2 = project.tasks.size) {
+            if (lazyListState.layoutInfo.totalItemsCount > 0 &&
+                lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == projectIndex &&
+                project.tasks.isNotEmpty()
+            ) {
+                lazyListState.animateScrollBy(200f)
             }
         }
     }
-
 
     val dragDropState =
         rememberDragDropState(lazyListState) { fromIndex, toIndex ->
             viewModel.onProjectsDrugAndDrop(fromIndex, toIndex)
         }
 
-    Box(modifier.fillMaxSize()) {
-        if (viewState.projects.isEmpty()) {
-            Text(
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center),
-                text = "Your project list is empty.\n Add your first project using button below.",
-                color = MaterialTheme.colorScheme.onPrimary
+    Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.primaryContainer, // Explicitly set screen background
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.onProjectTitleUpdate("")
+                    showDialog = true
+                },
+                containerColor = MaterialTheme.colorScheme.primary, // Restored FAB color
+                contentColor = MaterialTheme.colorScheme.onPrimary   // Restored FAB content color
+            ) {
+                Icon(Icons.Filled.Add, "Add Project")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+            // The Column itself doesn't need a background modifier now,
+            // as it will be on top of the Scaffold's background.
+        ) {
+            val isScrolled = remember {
+                derivedStateOf {
+                    lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
+                }
+            }
+            val shadowElevation by animateDpAsState(
+                targetValue = if (isScrolled.value) 4.dp else 0.dp,
+                label = "shadowElevation"
             )
-        } else {
-            Row(Modifier.padding(horizontal = 16.dp)) {
+
+            if (remeberWindowInfo().isSmallScreen()) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shadowElevation = shadowElevation,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 8.dp),
+                        text = "Projects",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+
+            if (viewState.projects.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center),
+                        text = "Your project list is empty.\n Add your first project using button below.",
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            } else {
                 LazyColumn(
-                    modifier = Modifier.dragContainer(dragDropState),
-                    contentPadding = PaddingValues(bottom = 36.dp, top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .dragContainer(dragDropState)
+                        .padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp, top = 8.dp),
                     state = lazyListState,
                 ) {
-                    itemsIndexed(viewState.projects, key = { _, item -> item.id }) { index, item ->
+                    itemsIndexed(
+                        viewState.projects,
+                        key = { _, item -> item.id }) { index, item ->
                         DraggableItem(dragDropState, index) { isDragging ->
                             ProjectItem(
-                                modifier = Modifier.animateItem(),
+                                modifier = Modifier.animateItem(), // Changed from animateItem()
                                 project = item,
                                 isDrugging = isDragging,
                                 onDeleteClick = { viewModel.removeProject(it) },
@@ -112,7 +171,11 @@ fun ProjectsScreen(
                                     viewModel.onSubmitEditProjectName(id, name)
                                 },
                                 onSubmitEditTaskDescription = { projectId, taskId, name ->
-                                    viewModel.onSubmitEditTaskDescription(projectId, taskId, name)
+                                    viewModel.onSubmitEditTaskDescription(
+                                        projectId,
+                                        taskId,
+                                        name
+                                    )
                                 },
                                 onDeleteTaskClick = { projectId, taskId ->
                                     viewModel.onDeleteTaskClick(projectId, taskId)
@@ -121,21 +184,8 @@ fun ProjectsScreen(
                             Spacer(modifier = Modifier.size(8.dp))
                         }
                     }
-
                 }
             }
-        }
-
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-            onClick = {
-                viewModel.onProjectTitleUpdate("")
-                showDialog = true
-            },
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-            Icon(Icons.Filled.Add, "Add Project")
         }
     }
 

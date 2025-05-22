@@ -23,53 +23,15 @@ class SettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
-    fun onPresetConfirmed() {
-        when (viewState.value.selectedPresetPosition) {
-            0 -> {
-
-                settingsGateway.setTimeSettings(
-                    TimeSettings(
-                        25000L * 60,
-                        5000L * 60,
-                        15000L * 60
-                    )
-                )
-            }
-
-            1 -> {
-                settingsGateway.setTimeSettings(
-                    TimeSettings(
-                        50000L * 60,
-                        10000L * 60,
-                        30000L * 60
-                    )
-                )
-            }
-
-            2 -> if (isFormValid()) {
-                settingsGateway.setTimeSettings(
-                    TimeSettings(
-                        _viewState.value.pomodoroMinutes.toLong() * 1000 * 60,
-                        _viewState.value.shortBreakMinutes.toLong() * 1000 * 60,
-                        _viewState.value.longBreakMinutes.toLong() * 1000 * 60
-                    )
-                )
-            }
-
-            else -> throw IllegalStateException()
-        }
-        updateConfirmButtonEnabled()
-    }
-
-
-    fun updateFocusMinutes(focusedMinutes: String) {
+    fun updatePomodoroMinutes(focusedMinutes: String) {
         _viewState.update {
             it.copy(
                 pomodoroMinutes = focusedMinutes,
                 showPomodoroError = focusedMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonEnabled()
+        val timeSettings = getTimeSettingsFromTextFields()
+        settingsGateway.setTimeSettings(timeSettings)
     }
 
     fun updateShortBreakMinutes(shortBreakMinutes: String) {
@@ -79,8 +41,8 @@ class SettingsViewModel(
                 showShortBreakError = shortBreakMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonEnabled()
-
+        val timeSettings = getTimeSettingsFromTextFields()
+        settingsGateway.setTimeSettings(timeSettings)
     }
 
     fun updateLongBreakMinutes(longBreakMinutes: String) {
@@ -90,11 +52,12 @@ class SettingsViewModel(
                 showLongBreakError = longBreakMinutes.isEmpty(),
             )
         }
-        updateConfirmButtonEnabled()
-
+        val timeSettings = getTimeSettingsFromTextFields()
+        settingsGateway.setTimeSettings(timeSettings)
     }
 
     fun onPresetClick(position: Int) {
+        _viewState.update { it.copy(selectedPresetPosition = position) }
         if (position == 0 || position == 1) {
             _viewState.update {
                 it.copy(
@@ -107,33 +70,40 @@ class SettingsViewModel(
                 )
             }
         }
-        _viewState.update { it.copy(selectedPresetPosition = position) }
-        updateConfirmButtonEnabled()
-    }
+        val timeSettings = when (position) {
+            0 -> TimeSettings(
+                25000L * 60,
+                5000L * 60,
+                15000L * 60
+            )
 
-    private fun updateConfirmButtonEnabled() {
-        if (viewState.value.selectedPresetPosition == 2) {
-            _viewState.update {
-                it.copy(
-                    isWebConfirmEnabled = isFormValid(),
-                    isMobileConfirmEnabled = isFormValid()
-                )
+            1 -> TimeSettings(
+                50000L * 60,
+                10000L * 60,
+                30000L * 60
+            )
+
+            2 -> {
+                getTimeSettingsFromTextFields()
             }
-        } else {
-            _viewState.update {
-                it.copy(
-                    isWebConfirmEnabled = true,
-                    isMobileConfirmEnabled = false
-                )
-            }
+
+            else -> throw IllegalStateException()
         }
+
+        settingsGateway.setTimeSettings(timeSettings)
     }
 
+    private fun getTimeSettingsFromTextFields(): TimeSettings {
+        val pomodoroMinutesText = _viewState.value.pomodoroMinutes
+        val shortBreakMinutesText = _viewState.value.shortBreakMinutes
+        val longBreakMinutesText = _viewState.value.longBreakMinutes
 
-    private fun isFormValid() =
-        _viewState.value.pomodoroMinutes.isNotEmpty()
-                && _viewState.value.shortBreakMinutes.isNotEmpty()
-                && _viewState.value.longBreakMinutes.isNotEmpty()
+        return TimeSettings(
+            if (pomodoroMinutesText.isBlank()) 0 else pomodoroMinutesText.toLong() * 1000 * 60,
+            if (shortBreakMinutesText.isBlank()) 0 else shortBreakMinutesText.toLong() * 1000 * 60,
+            if (longBreakMinutesText.isBlank()) 0 else longBreakMinutesText.toLong() * 1000 * 60
+        )
+    }
 
     fun onAlarmSoundClick(position: Int) {
         settingsGateway.setAlarmSound(AlarmSound.entries[position])

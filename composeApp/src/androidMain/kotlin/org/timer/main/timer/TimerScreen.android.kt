@@ -1,44 +1,16 @@
 package org.timer.main.timer
 
-import android.app.AlarmManager
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.provider.Settings
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import android.app.*
+import android.content.*
+import android.os.*
+import android.provider.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.*
 import dev.icerock.moko.permissions.*
 import dev.icerock.moko.permissions.compose.*
 import dev.icerock.moko.permissions.notifications.*
-import kotlinx.coroutines.launch
-
-private fun canScheduleExactAlarms(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-        return alarmManager?.canScheduleExactAlarms() ?: false
-    }
-    return true
-}
-
-private fun openExactAlarmSettings(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).also { intent ->
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            // It's good practice to check if an activity can handle the intent
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
-            } else {
-                // Log or handle the case where the settings screen cannot be opened
-            }
-        }
-    }
-}
+import kotlinx.coroutines.*
 
 @Composable
 actual fun AskNotificationPermission() {
@@ -72,7 +44,9 @@ actual fun AskNotificationPermission() {
                     refreshPermissionState()
                 }
             }
-            else -> { /* Granted or DeniedAlways (after request) handled by other effect */ }
+
+            else -> { /* Granted or DeniedAlways (after request) handled by other effect */
+            }
         }
     }
 
@@ -84,7 +58,10 @@ actual fun AskNotificationPermission() {
         if (permissionState == PermissionState.Granted) {
             if (!exactAlarmCheckAttemptedForCurrentGrant) {
                 exactAlarmCheckAttemptedForCurrentGrant = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !canScheduleExactAlarms(context)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !canScheduleExactAlarms(
+                        context
+                    )
+                ) {
                     showExactAlarmDialog = true
                 }
             }
@@ -114,5 +91,27 @@ actual fun AskNotificationPermission() {
                 }
             }
         )
+    }
+}
+
+private fun canScheduleExactAlarms(context: Context): Boolean {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+        return alarmManager?.canScheduleExactAlarms() ?: false
+    }
+    return true
+}
+
+private fun openExactAlarmSettings(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).also { intent ->
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // It's good practice to check if an activity can handle the intent
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+            } else {
+                // Log or handle the case where the settings screen cannot be opened
+            }
+        }
     }
 }

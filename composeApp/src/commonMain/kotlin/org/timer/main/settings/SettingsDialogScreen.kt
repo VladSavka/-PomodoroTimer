@@ -1,7 +1,6 @@
 package org.timer.main.settings
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -138,6 +137,7 @@ fun Content(
         }
     }
 }
+
 @Composable
 private fun TimerSettingsContent(
     items: List<String>,
@@ -166,7 +166,8 @@ private fun TimerSettingsContent(
                         OutlinedTextField(
                             value = viewState.pomodoroMinutes,
                             onValueChange = {
-                                if (it.isEmpty() || it.isDigits()) viewModel.updatePomodoroMinutes(it)
+                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
+                                    viewModel.updatePomodoroMinutes(it)
                             },
                             label = { Text("Focus time") },
                             singleLine = true,
@@ -184,9 +185,8 @@ private fun TimerSettingsContent(
                         OutlinedTextField(
                             value = viewState.shortBreakMinutes,
                             onValueChange = {
-                                if (it.isEmpty() || it.isDigits()) viewModel.updateShortBreakMinutes(
-                                    it
-                                )
+                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
+                                    viewModel.updateShortBreakMinutes(it)
                             },
                             label = { Text("Short break") },
                             singleLine = true,
@@ -204,9 +204,8 @@ private fun TimerSettingsContent(
                         OutlinedTextField(
                             value = viewState.longBreakMinutes,
                             onValueChange = {
-                                if (it.isEmpty() || it.isDigits()) viewModel.updateLongBreakMinutes(
-                                    it
-                                )
+                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
+                                    viewModel.updateLongBreakMinutes(it)
                             },
                             label = { Text("Long break") },
                             singleLine = true,
@@ -324,7 +323,7 @@ private fun AlarmSoundContent(
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
                                 contentDescription = "Expand alarm sound options",
-                                 tint = if (isSmallScreen) Color.White else Color.Black
+                                tint = if (isSmallScreen) Color.White else Color.Black
                             )
                         }
                     }

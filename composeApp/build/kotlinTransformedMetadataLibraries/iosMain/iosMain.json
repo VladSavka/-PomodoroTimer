@@ -1,0 +1,32 @@
+[
+  {
+    "moduleId": "module dev.icerock.moko:permissions-compose:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-compose-0.19.1-iosMain-YdL94Q.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.icerock.moko:permissions-compose:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-compose-0.19.1-commonMain-cHbDbg.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.icerock.moko:permissions-notifications:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-notifications-0.19.1-iosMain-adfdag.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.icerock.moko:permissions-notifications:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-notifications-0.19.1-commonMain-hPoFrg.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.icerock.moko:permissions:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-0.19.1-iosMain-S6sAPg.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.icerock.moko:permissions:0.19.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-0.19.1-commonMain-Nr427g.klib",
+    "sourceSetName": "commonMain"
+  }
+]

@@ -1,0 +1,153 @@
+{
+  "projectStructure": {
+    "formatVersion": "0.3.3",
+    "isPublishedAsRoot": "true",
+    "variants": [
+      {
+        "name": "iosArm64ApiElements",
+        "sourceSet": [
+          "iosMain",
+          "appleMain",
+          "nativeMain",
+          "commonMain"
+        ]
+      },
+      {
+        "name": "iosSimulatorArm64ApiElements",
+        "sourceSet": [
+          "iosMain",
+          "appleMain",
+          "nativeMain",
+          "commonMain"
+        ]
+      },
+      {
+        "name": "iosX64ApiElements",
+        "sourceSet": [
+          "iosMain",
+          "appleMain",
+          "nativeMain",
+          "commonMain"
+        ]
+      },
+      {
+        "name": "wasmJsApiElements",
+        "sourceSet": [
+          "commonMain"
+        ]
+      },
+      {
+        "name": "wasmJsRuntimeElements",
+        "sourceSet": [
+          "commonMain"
+        ]
+      }
+    ],
+    "sourceSets": [
+      {
+        "name": "appleMain",
+        "dependsOn": [
+          "nativeMain"
+        ],
+        "moduleDependency": [
+          "com.diamondedge:logging",
+          "org.jetbrains.kotlin:kotlin-stdlib",
+          "org.jetbrains.compose.runtime:runtime",
+          "org.jetbrains.compose.foundation:foundation",
+          "org.jetbrains.compose.material3:material3",
+          "org.jetbrains.compose.ui:ui",
+          "org.jetbrains.compose.components:components-resources",
+          "org.jetbrains.compose.components:components-ui-tooling-preview",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel",
+          "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose",
+          "org.jetbrains.kotlinx:kotlinx-datetime",
+          "org.jetbrains.androidx.navigation:navigation-compose",
+          "io.insert-koin:koin-core",
+          "io.insert-koin:koin-compose",
+          "io.insert-koin:koin-compose-viewmodel",
+          "io.insert-koin:koin-compose-viewmodel-navigation",
+          "org.jetbrains.kotlinx:kotlinx-serialization-json",
+          "com.russhwolf:multiplatform-settings-no-arg",
+          "com.russhwolf:multiplatform-settings-serialization"
+        ],
+        "sourceSetCInteropMetadataDirectory": "appleMain-cinterop",
+        "binaryLayout": "klib",
+        "hostSpecific": "true"
+      },
+      {
+        "name": "commonMain",
+        "dependsOn": [],
+        "moduleDependency": [
+          "com.diamondedge:logging",
+          "org.jetbrains.kotlin:kotlin-stdlib"
+        ],
+        "binaryLayout": "klib"
+      },
+      {
+        "name": "iosMain",
+        "dependsOn": [
+          "appleMain"
+        ],
+        "moduleDependency": [
+          "com.diamondedge:logging",
+          "org.jetbrains.kotlin:kotlin-stdlib",
+          "org.jetbrains.compose.runtime:runtime",
+          "org.jetbrains.compose.foundation:foundation",
+          "org.jetbrains.compose.material3:material3",
+          "org.jetbrains.compose.ui:ui",
+          "org.jetbrains.compose.components:components-resources",
+          "org.jetbrains.compose.components:components-ui-tooling-preview",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel",
+          "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose",
+          "org.jetbrains.kotlinx:kotlinx-datetime",
+          "org.jetbrains.androidx.navigation:navigation-compose",
+          "io.insert-koin:koin-core",
+          "io.insert-koin:koin-compose",
+          "io.insert-koin:koin-compose-viewmodel",
+          "io.insert-koin:koin-compose-viewmodel-navigation",
+          "org.jetbrains.kotlinx:kotlinx-serialization-json",
+          "com.russhwolf:multiplatform-settings-no-arg",
+          "com.russhwolf:multiplatform-settings-serialization",
+          "dev.icerock.moko:permissions-compose",
+          "dev.icerock.moko:permissions-notifications"
+        ],
+        "sourceSetCInteropMetadataDirectory": "iosMain-cinterop",
+        "binaryLayout": "klib",
+        "hostSpecific": "true"
+      },
+      {
+        "name": "nativeMain",
+        "dependsOn": [
+          "commonMain"
+        ],
+        "moduleDependency": [
+          "com.diamondedge:logging",
+          "org.jetbrains.kotlin:kotlin-stdlib",
+          "org.jetbrains.compose.runtime:runtime",
+          "org.jetbrains.compose.foundation:foundation",
+          "org.jetbrains.compose.material3:material3",
+          "org.jetbrains.compose.ui:ui",
+          "org.jetbrains.compose.components:components-resources",
+          "org.jetbrains.compose.components:components-ui-tooling-preview",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel",
+          "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose",
+          "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose",
+          "org.jetbrains.kotlinx:kotlinx-datetime",
+          "org.jetbrains.androidx.navigation:navigation-compose",
+          "io.insert-koin:koin-core",
+          "io.insert-koin:koin-compose",
+          "io.insert-koin:koin-compose-viewmodel",
+          "io.insert-koin:koin-compose-viewmodel-navigation",
+          "org.jetbrains.kotlinx:kotlinx-serialization-json",
+          "com.russhwolf:multiplatform-settings-no-arg",
+          "com.russhwolf:multiplatform-settings-serialization"
+        ],
+        "sourceSetCInteropMetadataDirectory": "nativeMain-cinterop",
+        "binaryLayout": "klib",
+        "hostSpecific": "true"
+      }
+    ]
+  }
+}

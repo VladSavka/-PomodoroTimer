@@ -202,6 +202,7 @@ class TimerViewModel(
         val scheduleDate = Clock.System.now().toEpochMilliseconds() + currentTimerMillis
         val alarmSound = settings.getAlarmSound().value
         mobileAlarm.schedule(scheduleDate, alarmSound, title, body)
+        mobileAlarm.showLiveActivity(currentTimerMillis)
     }
 
     fun onShortBreakStartClick() {

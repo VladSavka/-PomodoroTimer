@@ -1,0 +1,487 @@
+[
+  {
+    "moduleId": "module com.diamondedge:logging:2.0.3",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/com.diamondedge-logging-2.0.3-iosMain-Fal3cQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-uikitMain-bWTFyg.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-darwinMain-bWTFyg.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-posixMain-9pDeVQ.klib",
+    "sourceSetName": "posixMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-nativeMain-9pDeVQ.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-jsNativeMain-9pDeVQ.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.runtime:runtime:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.runtime-runtime-1.7.0-jbMain-9pDeVQ.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-1.7.0-uikitMain-qEodUw.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-1.7.0-darwinMain-qEodUw.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-1.7.0-nativeMain-qEodUw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-1.7.0-jsNativeMain-Z4pWpg.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-1.7.0-skikoMain-Z4pWpg.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material3:material3:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material3-material3-1.7.0-darwinMain-Kuw-mA.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material3:material3:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material3-material3-1.7.0-nativeMain-Kuw-mA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material3:material3:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material3-material3-1.7.0-jsNativeMain-HpF0Ww.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material3:material3:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material3-material3-1.7.0-skikoMain-HpF0Ww.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material3:material3:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material3-material3-1.7.0-nonJvmMain-HpF0Ww.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-1.7.0-uikitMain-yJ1uLw.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-1.7.0-darwinMain-yJ1uLw.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-1.7.0-nativeMain-yJ1uLw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-1.7.0-jsNativeMain-byxhLA.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-1.7.0-skikoMain-byxhLA.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.components:components-resources:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.components-components-resources-1.7.0-iosMain-mlvQUA.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.components:components-resources:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.components-components-resources-1.7.0-nativeMain-mlvQUA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.components:components-resources:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.components-components-resources-1.7.0-blockingMain-Tn2Qyw.klib",
+    "sourceSetName": "blockingMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.components:components-resources:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.components-components-resources-1.7.0-skikoMain-Tn2Qyw.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-viewmodel-2.8.4-nativeMain-I44vqw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-viewmodel-2.8.4-nonJvmMain-I44vqw.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-runtime-compose-2.8.4-nonAndroidMain-eB6IaQ.klib",
+    "sourceSetName": "nonAndroidMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-viewmodel-compose-2.8.3-nativeMain-BUGNNA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-viewmodel-compose-2.8.3-jbMain-JkV53A.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-datetime:0.6.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-datetime-0.6.2-darwinMain-O4UcJA.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-datetime:0.6.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-datetime-0.6.2-tzdbOnFilesystemMain-fgfANw.klib",
+    "sourceSetName": "tzdbOnFilesystemMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-datetime:0.6.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-datetime-0.6.2-tzfileMain-fgfANw.klib",
+    "sourceSetName": "tzfileMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-datetime:0.6.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-datetime-0.6.2-nativeMain-fgfANw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-datetime:0.6.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-datetime-0.6.2-commonKotlinMain-fgfANw.klib",
+    "sourceSetName": "commonKotlinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-compose-2.8.0-alpha10-nativeMain-SWLWRA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-compose-2.8.0-alpha10-jbMain-x_0rGg.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module io.insert-koin:koin-core:4.0.3",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/io.insert-koin-koin-core-4.0.3-nativeMain-LKCCMw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-serialization-json-1.8.1-nativeMain-5O0Ftg.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module com.russhwolf:multiplatform-settings-no-arg:1.3.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/com.russhwolf-multiplatform-settings-no-arg-1.3.0-appleMain-ckY_5A.klib",
+    "sourceSetName": "appleMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-concurrency:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-concurrency-2.1.0-appleMain-oa7GPg.klib",
+    "sourceSetName": "appleMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-concurrency:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-concurrency-2.1.0-nativeMain-t1ZQYw.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-concurrency:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-concurrency-2.1.0-commonMain-t1ZQYw.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.collection-internal:collection:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.collection-internal-collection-1.7.0-jsNativeMain-5apXgA.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:atomicfu:0.23.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-atomicfu-0.23.2-nativeMain-yBS35w.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:atomicfu:0.23.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-atomicfu-0.23.2-commonMain-yBS35w.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-coroutines-core-1.8.0-nativeDarwinMain-sy5nKg.klib",
+    "sourceSetName": "nativeDarwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-coroutines-core-1.8.0-nativeMain-UxhG-g.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-coroutines-core-1.8.0-concurrentMain-UxhG-g.klib",
+    "sourceSetName": "concurrentMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.animation:animation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.animation-animation-1.7.0-nativeMain-RuOUtg.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.animation:animation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.animation-animation-1.7.0-jsNativeMain-TojQLQ.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.annotation-internal:annotation:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.annotation-internal-annotation-1.7.0-nonJvmMain-BD0V2w.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation-layout:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-layout-1.7.0-uikitMain-GYqBaA.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation-layout:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-layout-1.7.0-skikoMain-Nkt8ew.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.foundation:foundation-layout:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.foundation-foundation-layout-1.7.0-jsNativeMain-Nkt8ew.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-text:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-text-1.7.0-darwinMain-soKQsQ.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-text:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-text-1.7.0-nativeMain-soKQsQ.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-text:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-text-1.7.0-jsNativeMain-22Ga_g.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-text:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-text-1.7.0-skikoMain-22Ga_g.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-util:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-util-1.7.0-uikitMain-V6MLCQ.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-util:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-util-1.7.0-nonJvmMain-3-t5Ow.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-iosMain-SvRtdQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-uikitMain-SvRtdQ.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-darwinMain-SvRtdQ.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-nativeMain-7tIhOQ.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-nativeJsMain-7tIhOQ.klib",
+    "sourceSetName": "nativeJsMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.skiko:skiko:0.8.15",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.skiko-skiko-0.8.15-commonMain-7tIhOQ.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.animation:animation-core:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.animation-animation-core-1.7.0-uikitMain-uWuQcA.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.animation:animation-core:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.animation-animation-core-1.7.0-jsNativeMain-KAIxIA.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.animation:animation-core:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.animation-animation-core-1.7.0-jbMain-KAIxIA.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.material:material-ripple:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.material-material-ripple-1.7.0-jbMain-hYj_-Q.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-graphics:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-graphics-1.7.0-nativeMain-aqjVUg.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-graphics:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-graphics-1.7.0-skikoExcludingWebMain-nWZcXg.klib",
+    "sourceSetName": "skikoExcludingWebMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-graphics:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-graphics-1.7.0-jsNativeMain-nWZcXg.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-graphics:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-graphics-1.7.0-skikoMain-nWZcXg.klib",
+    "sourceSetName": "skikoMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-common:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-common-2.8.4-nonJvmMain-FPlmfg.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-runtime:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-runtime-2.8.4-nativeMain-P_jWsA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-runtime:2.8.4",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-runtime-2.8.4-nonJvmMain-P_jWsA.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-uikit:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-uikit-1.7.0-uikitMain-aNVDjg.klib",
+    "sourceSetName": "uikitMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-unit:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-unit-1.7.0-jsNativeMain-pR3KgA.klib",
+    "sourceSetName": "jsNativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.compose.ui:ui-unit:1.7.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.compose.ui-ui-unit-1.7.0-jbMain-pR3KgA.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.core:core-bundle:1.0.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.core-core-bundle-1.0.1-nativeMain-fXRodQ.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.core:core-bundle:1.0.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.core-core-bundle-1.0.1-jbMain-fXRodQ.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.3",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.lifecycle-lifecycle-viewmodel-savedstate-2.8.3-jbMain-nn5erw.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.savedstate:savedstate:1.2.2",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.savedstate-savedstate-1.2.2-nonJvmMain-rDkiiA.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.kotlinx-kotlinx-serialization-core-1.8.1-nativeMain--3vp9g.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-common:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-common-2.8.0-alpha10-darwinMain-QHo9ow.klib",
+    "sourceSetName": "darwinMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-common:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-common-2.8.0-alpha10-nativeMain-Lmwwsg.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-common:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-common-2.8.0-alpha10-jbMain-Lmwwsg.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-runtime:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-runtime-2.8.0-alpha10-nonJvmMain-CWmBjA.klib",
+    "sourceSetName": "nonJvmMain"
+  },
+  {
+    "moduleId": "module org.jetbrains.androidx.navigation:navigation-runtime:2.8.0-alpha10",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.jetbrains.androidx.navigation-navigation-runtime-2.8.0-alpha10-jbMain-CWmBjA.klib",
+    "sourceSetName": "jbMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-concurrent-collections:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-concurrent-collections-2.1.0-commonMain-jSCQOA.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module com.russhwolf:multiplatform-settings:1.3.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/com.russhwolf-multiplatform-settings-1.3.0-apple64Main-YvI2jQ.klib",
+    "sourceSetName": "apple64Main"
+  },
+  {
+    "moduleId": "module com.russhwolf:multiplatform-settings:1.3.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/com.russhwolf-multiplatform-settings-1.3.0-appleMain-YvI2jQ.klib",
+    "sourceSetName": "appleMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-strict:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-strict-2.1.0-nativeMain-dKdBGA.klib",
+    "sourceSetName": "nativeMain"
+  },
+  {
+    "moduleId": "module co.touchlab:stately-strict:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-strict-2.1.0-commonMain-dKdBGA.klib",
+    "sourceSetName": "commonMain"
+  }
+]

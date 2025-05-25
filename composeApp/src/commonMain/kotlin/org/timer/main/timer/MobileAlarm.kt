@@ -14,3 +14,11 @@ expect class MobileAlarm(context: Any? = null) {
 
     fun showLiveActivity(totalTimeLeftMillis: Long)
 }
+
+lateinit var startLiveActivity: (totalTimeLeftMillis: Long) -> Unit
+
+lateinit var updateLiveActivity: (totalTimeLeftMillis: Long) -> Unit
+
+lateinit var cancelLiveActivity: () -> Unit
+
+

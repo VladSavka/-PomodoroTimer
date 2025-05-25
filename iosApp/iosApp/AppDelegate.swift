@@ -28,13 +28,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let alarmId = userInfo["alarm_id"] as? String ?? "unknown"
 
         print("iOS Foreground Notification Received: ID - \(alarmId), Title - \(notification.request.content.title)")
+        GeneratedLiveActivityBridge.shared.endCurrentLiveActivity(dismissalPolicy: .immediate)
 
-        // To show the notification banner, play sound, and update badge:
         completionHandler([.banner, .sound, .badge])
-        
-        // If you want to handle it entirely in-app without a system banner:
-        // completionHandler([])
-        // Then you would trigger your custom in-app UI.
+
     }
 
     // Optional: Handle user tapping on the notification (foreground or background)
@@ -47,22 +44,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         print("iOS Notification Tapped: ID - \(alarmId)")
         // Handle the action, e.g., navigate to a specific screen based on alarmId
-        
+        GeneratedLiveActivityBridge.shared.endCurrentLiveActivity(dismissalPolicy: .immediate)
         completionHandler()
     }
 
-    // MARK: - Helper for Notification Authorization
-    func requestNotificationAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                print("iOS Notification permission granted.")
-            } else if let error = error {
-                print("iOS Notification permission error: \(error.localizedDescription)")
-            } else {
-                print("iOS Notification permission denied.")
-            }
-        }
-    }
-    
-    // If using SwiftUI App Lifecycle, you might not need the SceneDelegate methods here.
 }

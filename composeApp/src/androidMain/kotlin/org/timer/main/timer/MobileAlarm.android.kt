@@ -119,6 +119,6 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
              }
          }
      }
-    actual fun showLiveActivity(totalTimeLeftMillis: Long) {
+    actual fun startLiveActivity(totalTimeLeftMillis: Long) {
     }
 }

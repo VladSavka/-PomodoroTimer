@@ -68,25 +68,10 @@ class TimerViewModel(
         }
     }
 
-    private fun navigateToShortBreakTab() {
-        pomodoroTimer.resetTimer()
-        longBreakTimer.resetTimer()
-        shortBreakTimer.resetTimer()
-        _viewState.update {
-            it.copy(
-                selectedTabIndex = 1,
-                timerState = TimerState.ShortBreak(
-                    WorkoutVideosGateway.getWorkoutVideos().random(),
-                    WorkoutVideosGateway.getDanceAudios().random()
-                ),
-                isShortBreakStarted = true,
-            )
-        }
-    }
-
     private fun onShortBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
+            mobileAlarm.cancelLiveActivity()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -95,6 +80,7 @@ class TimerViewModel(
     private fun onLongBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
+            mobileAlarm.cancelLiveActivity()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -124,6 +110,7 @@ class TimerViewModel(
         incrementKittydoroNumber()
         if (isMobile()) {
             navigateToBreakTab()
+            mobileAlarm.cancelLiveActivity()
             _viewState.update { it.copy(navigateToActivitiesScreen = true) }
         } else {
             playAlarmUseCase.invoke(onEnded = {
@@ -138,6 +125,22 @@ class TimerViewModel(
             navigateToLongBreakTab()
         } else {
             navigateToShortBreakTab()
+        }
+    }
+
+    private fun navigateToShortBreakTab() {
+        pomodoroTimer.resetTimer()
+        longBreakTimer.resetTimer()
+        shortBreakTimer.resetTimer()
+        _viewState.update {
+            it.copy(
+                selectedTabIndex = 1,
+                timerState = TimerState.ShortBreak(
+                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getDanceAudios().random()
+                ),
+                isShortBreakStarted = true,
+            )
         }
     }
 
@@ -172,16 +175,28 @@ class TimerViewModel(
         _viewState.update { it.copy(longBreakTime = millis.formatToMMSS()) }
     }
 
-    fun onPomodoroStartClick() {
+    fun onPomodoroStartClick() = viewModelScope.launch {
         shortBreakTimer.resetTimer()
         longBreakTimer.resetTimer()
         if (!_viewState.value.isPomodoroTimerRunning) {
-            pomodoroTimer.startTimer()
+//            val timerInInitialState = settings.getTimeSettings()
+//                .first().pomodoroTime == pomodoroTimer.getCurrentMillis()
+//
+//            if (timerInInitialState) {
+                mobileAlarm.startLiveActivity(
+                    "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
+                    pomodoroTimer.getCurrentMillis()
+                )
+//            } else {
+//                mobileAlarm.resumeLiveActivity()
+//            }
+
             scheduleAlarm(
-                pomodoroTimer.getCurrentTimeMillis(),
+                pomodoroTimer.getCurrentMillis(),
                 "Kittidoro Finished!",
                 "Take a break Kitty"
             )
+            pomodoroTimer.startTimer()
         }
         if (_viewState.value.timerState !is TimerState.Pomodoro) {
             _viewState.update {
@@ -202,20 +217,29 @@ class TimerViewModel(
         val scheduleDate = Clock.System.now().toEpochMilliseconds() + currentTimerMillis
         val alarmSound = settings.getAlarmSound().value
         mobileAlarm.schedule(scheduleDate, alarmSound, title, body)
-        mobileAlarm.showLiveActivity(currentTimerMillis)
     }
 
-    fun onShortBreakStartClick() {
+    fun onShortBreakStartClick() = viewModelScope.launch {
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
-        if (!_viewState.value.isShortBreakTimerRunning) { // todo
-            shortBreakTimer.startTimer()
+        if (!_viewState.value.isShortBreakTimerRunning) {
+//            val timerInInitialState = settings.getTimeSettings()
+//                .first().shortBreakTime == shortBreakTimer.getCurrentMillis()
+//
+//            if (timerInInitialState) {
+                mobileAlarm.startLiveActivity(
+                    "Short break",
+                    shortBreakTimer.getCurrentMillis()
+                )
+//            } else {
+//                mobileAlarm.resumeLiveActivity()
+//            }
             scheduleAlarm(
-                shortBreakTimer.getCurrentTimeMillis(),
+                shortBreakTimer.getCurrentMillis(),
                 "Short break finished",
                 "Keep the eye on the ball!"
             )
-            // _viewState.update { it.copy(navigateToShortBreakActivity = true) }
+            shortBreakTimer.startTimer()
         }
         if (_viewState.value.timerState !is TimerState.ShortBreak) {
             _viewState.update {
@@ -230,17 +254,28 @@ class TimerViewModel(
         }
     }
 
-    fun onLongBreakStartClick() {
+    fun onLongBreakStartClick() = viewModelScope.launch {
         pomodoroTimer.resetTimer()
         shortBreakTimer.resetTimer()
         if (!_viewState.value.isLongBreakTimerRunning) {
-            longBreakTimer.startTimer()
+//            val timerInInitialState = settings.getTimeSettings()
+//                .first().longBreakTime == longBreakTimer.getCurrentMillis()
+//
+//            if (timerInInitialState) {
+                mobileAlarm.startLiveActivity(
+                    "Long break",
+                    longBreakTimer.getCurrentMillis()
+                )
+//            } else {
+//                mobileAlarm.resumeLiveActivity()
+//            }
+
             scheduleAlarm(
-                longBreakTimer.getCurrentTimeMillis(),
+                longBreakTimer.getCurrentMillis(),
                 "Long break finished",
                 "Keep the eye on the ball!"
             )
-            //_viewState.update { it.copy(navigateToLongBreakActivity = true) }
+            longBreakTimer.startTimer()
         }
         if (_viewState.value.timerState !is TimerState.LongBreak) {
             _viewState.update {
@@ -263,6 +298,7 @@ class TimerViewModel(
         shortBreakTimer.pauseTimer()
         longBreakTimer.pauseTimer()
         mobileAlarm.cancel()
+        mobileAlarm.cancelLiveActivity()
         initTimers()
         _viewState.update {
             it.copy(
@@ -281,6 +317,7 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         pomodoroTimer.pauseTimer()
+        pauseCurrentLiveActivity()
     }
 
     fun onShortBreakPauseClick() {
@@ -289,6 +326,7 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         shortBreakTimer.pauseTimer()
+        pauseCurrentLiveActivity()
     }
 
     fun onLongBreakPauseClick() {
@@ -297,8 +335,26 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         longBreakTimer.pauseTimer()
+        pauseCurrentLiveActivity()
     }
 
+
+    private fun pauseCurrentLiveActivity() {
+        mobileAlarm.cancelLiveActivity()
+//        when (viewState.value.timerState) {
+//            is TimerState.Pomodoro -> mobileAlarm.pauseLiveActivity(pomodoroTimer.getCurrentMillis())
+//            is TimerState.ShortBreak -> mobileAlarm.pauseLiveActivity(shortBreakTimer.getCurrentMillis())
+//            TimerState.LongBreak -> mobileAlarm.pauseLiveActivity(longBreakTimer.getCurrentMillis())
+//        }
+    }
+
+    fun onPageChanged(currentPage: Int) {
+        _viewState.update { it.copy(selectedTabIndex = currentPage) }
+    }
+
+    fun onNavigatedToActivitiesScreen() {
+        _viewState.update { it.copy(navigateToActivitiesScreen = false) }
+    }
 
     private fun Long.formatToMMSS(): String {
         val time = LocalTime.fromMillisecondOfDay(this.toInt())
@@ -318,16 +374,6 @@ class TimerViewModel(
             })
         }
     }
-
-    fun onPageChanged(currentPage: Int) {
-        _viewState.update { it.copy(selectedTabIndex = currentPage) }
-    }
-
-    fun onNavigatedToActivitiesScreen() {
-        _viewState.update { it.copy(navigateToActivitiesScreen = false) }
-
-    }
-
 
     companion object {
         val log = logging()

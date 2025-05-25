@@ -27,7 +27,7 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
             AlarmSound.WOLF -> "standard.wav"
             AlarmSound.STANDARD -> "wolf.wav"
         }
-        
+
         val content = UNMutableNotificationContent().apply {
             setUserInfo(mapOf("alarm_id" to ALARM_ID))
             setTitle(title)
@@ -61,21 +61,21 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
         println("iOS notifications (pending and delivered) cancelled for ID: $ALARM_ID")
     }
 
-    actual fun showLiveActivity(totalTimeLeftMillis: Long) {
-        println("KMP MobileAlarm: Attempting to show Live Activity.")
-        // For this example, we'll convert totalTimeLeftMillis to a simple emoji or string.
-        // You'll want more sophisticated logic here based on your app's needs.
-        val minutes = totalTimeLeftMillis / 1000 / 60
-        val emoji = if (minutes > 10) "⏳" else if (minutes > 0) "⏱️" else "🎉"
-        val activityName = "Pomodoro Session" // Or make this configurable
 
-//        // Call the Swift bridge
-//        GeneratedLiveActivityBridge.shared.startActivity(
-//            activityName = activityName,
-////            initialEmoji = emoji
-//        )
-        startLiveActivity(totalTimeLeftMillis)
-        println("KMP MobileAlarm: Called Swift to start Live Activity with name '$activityName' and emoji '$emoji'.")
+    actual fun startLiveActivity(title: String, totalTimeLeftMillis: Long) {
+        startLiveActivity.invoke(title, totalTimeLeftMillis)
+    }
+
+    actual fun pauseLiveActivity(totalTimeLeftMillis: Long) {
+        pauseLiveActivity.invoke(totalTimeLeftMillis)
+    }
+
+    actual fun resumeLiveActivity() {
+        resumeLiveActivity.invoke()
+    }
+
+    actual fun cancelLiveActivity() {
+        cancelLiveActivity.invoke()
     }
 }
 

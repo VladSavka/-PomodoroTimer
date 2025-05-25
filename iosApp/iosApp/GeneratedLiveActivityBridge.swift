@@ -1,103 +1,162 @@
 import Foundation
 import ActivityKit
-import Combine // Needed for ObservableObject
+import Combine
 
-// Ensure your ActivityAttributes struct is defined, matching your widget's needs.
-// This should be in a shared location if your widget extension also needs it,
-
-
-@available(iOS 16.1, *) // Mark class available for iOS 16.1+ due to ActivityKit
-class GeneratedLiveActivityBridge: ObservableObject { // Conform to ObservableObject for @StateObject if used, or just good practice
+@available(iOS 16.1, *)
+class GeneratedLiveActivityBridge: ObservableObject {
     
-    // Singleton instance
     static let shared = GeneratedLiveActivityBridge()
     
-    // Keep track of the currently active Live Activity started by this bridge
-    private var currentActivity: Activity<TimerWidgetsAttributes>?
+    @Published private(set) var currentActivity: Activity<TimerWidgetsAttributes>?
     
-    // Private initializer to enforce singleton usage
+    private var originalCategoryNameForResume: String?
+    private var timeRemainingAtPause: TimeInterval?
+    private var activityObservationTask: Task<Void, Error>? = nil
+
     private init() {
-        print("GeneratedLiveActivityBridge INITIALIZED (Singleton)")
-        // You could potentially load any existing activities for this app here
-        // if you needed to reconnect to them on app launch, though typically
-        // you'd start fresh or rely on system state.
+        print("GeneratedLiveActivityBridge INITIALIZED")
     }
     
     deinit {
         print("GeneratedLiveActivityBridge DEINITIALIZED")
-        // No timer to invalidate here as we removed the internal dismissalTimer
+        activityObservationTask?.cancel()
+    }
+
+    private func formatTimeInterval(_ interval: TimeInterval?) -> String {
+        guard let interval = interval, interval > 0 else { return "00:00" }
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = .pad
+        return formatter.string(from: interval) ?? "00:00"
     }
     
-    // MARK: - Public Methods
-    
-    /// Starts a new Live Activity.
-    /// Ends any existing Live Activity managed by this bridge before starting a new one.
     func startActivity(totalDurationMillis: Int64, categoryName: String) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            print("Bridge: Live Activities are not enabled in system settings.")
+            print("Bridge: Live Activities not enabled.")
             return
         }
         
-        // End any existing activity before starting a new one to avoid duplicates from this app instance
-        endExistingActivityImmediately()
+        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: false)
         
         let now = Date()
         let totalDurationSeconds = TimeInterval(totalDurationMillis) / 1000.0
         
         guard totalDurationSeconds > 0 else {
-            print("Bridge: Total duration must be positive. Cannot start activity.")
+            print("Bridge: Total duration must be positive.")
             return
         }
+        
         let targetEndDate = now.addingTimeInterval(totalDurationSeconds)
         
-        // Attributes for the Live Activity
+        self.originalCategoryNameForResume = categoryName
+        self.timeRemainingAtPause = nil
+
         let attributes = TimerWidgetsAttributes(
             startDate: now,
             endDate: targetEndDate
         )
         
-        // Initial content state for the Live Activity
-        let initialContentState = TimerWidgetsAttributes.ContentState(categoryName: categoryName)
+        let initialContentState = TimerWidgetsAttributes.ContentState(
+            categoryName: categoryName,
+            isPaused: false,
+            remainingTimeWhenPausedFormatted: nil,
+            progressWhenPaused: nil
+        )
         
-        // Stale date: When the system considers the Live Activity content outdated if not updated.
-        // Usually a bit after the expected end time.
-        let staleDate = targetEndDate.addingTimeInterval(5 * 60) // 5 minutes after it should have ended
+        let staleDate = targetEndDate.addingTimeInterval(5 * 60)
+        let activityContent = ActivityContent(state: initialContentState, staleDate: staleDate, relevanceScore: 100.0)
         
-        let activityContent = ActivityContent(state: initialContentState, staleDate: staleDate, relevanceScore: 100.0) // High relevance
+        print("Bridge: Attempting to start Live Activity. End: \(targetEndDate), Category: \(categoryName)")
         
-        print("Bridge: Attempting to start Live Activity. Expected End: \(targetEndDate), Category: \(categoryName)")
-        
-        Task { // Perform ActivityKit operations in an async Task
+        Task {
             do {
                 let activity = try Activity.request(
                     attributes: attributes,
                     content: activityContent,
-                    pushType: nil // Use .token for remote push updates, nil for local only
+                    pushType: nil
                 )
-                self.currentActivity = activity // Store the new activity
-                print("✅ Bridge: Live Activity started successfully. ID: \(activity.id)")
                 
-                // Start observing the state of this activity
+                await MainActor.run {
+                    self.currentActivity = activity
+                }
+                print("✅ Bridge: Live Activity started. ID: \(activity.id)")
                 observeActivityState(activity: activity)
-                
             } catch {
-                print("❌ Bridge: An unexpected error occurred while starting Live Activity: \(error.localizedDescription)")
+                print("❌ Bridge: Error starting Live Activity: \(error.localizedDescription)")
+                await MainActor.run {
+                    self.currentActivity = nil
+                }
+                self.originalCategoryNameForResume = nil
             }
         }
     }
     
-    /// Ends the currently tracked Live Activity.
-    /// This is typically called when the app determines the activity should end (e.g., timer finished, user action).
-    func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default) {
+    func pauseLiveActivity(totalDurationMillis: Int64) {
+        guard let activity = self.currentActivity, !activity.content.state.isPaused else {
+            // ...
+            return
+        }
+
+        let now = Date()
+        let remaining = activity.attributes.endDate.timeIntervalSince(now)
+        self.timeRemainingAtPause = max(0, remaining)
+
+        // Calculate progress
+        let totalDuration = activity.attributes.endDate.timeIntervalSince(activity.attributes.startDate)
+        var currentProgress: Double? = nil
+        if totalDuration > 0 {
+            let elapsedTime = max(0, now.timeIntervalSince(activity.attributes.startDate)) // Ensure not negative if clock skewed
+            currentProgress = min(1.0, elapsedTime / totalDuration) // Cap at 1.0
+        }
+
+        let pausedState = TimerWidgetsAttributes.ContentState(
+            categoryName: activity.content.state.categoryName,
+            isPaused: true,
+            remainingTimeWhenPausedFormatted: formatTimeInterval(self.timeRemainingAtPause),
+            progressWhenPaused: currentProgress // Set the calculated progress
+        )
+        
+        print("Bridge: Pausing activity ID \(activity.id). Remaining: \(self.timeRemainingAtPause ?? 0)s. Progress: \(currentProgress ?? -1)")
+        Task {
+            let newContent = ActivityContent(state: pausedState, staleDate: .distantFuture)
+            await activity.update(newContent)
+            print("Bridge: Activity \(activity.id) updated to paused state.")
+        }
+    }
+
+    func resumeLiveActivity() {
+        guard let pausedActivity = self.currentActivity,
+              pausedActivity.content.state.isPaused,
+              let timeRemaining = self.timeRemainingAtPause,
+              let categoryName = self.originalCategoryNameForResume
+        else {
+            print("Bridge: No paused activity to resume or missing state.")
+            return
+        }
+
+        print("Bridge: Resuming. Time remaining: \(timeRemaining)s for category: \(categoryName)")
+        
+        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: false)
+        
+        let remainingMillis = Int64(timeRemaining * 1000.0)
+        startActivity(totalDurationMillis: remainingMillis, categoryName: categoryName)
+        print("Bridge: New activity started for resume.")
+    }
+    
+    func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default, clearInternalState: Bool = true) {
         guard let activityToEnd = self.currentActivity else {
             print("Bridge: No currently tracked Live Activity to end.")
-            // As a fallback, you could try to find *any* activity from this app,
-            // but it's cleaner if currentActivity is reliably managed.
-            if let firstAvailableActivity = Activity<TimerWidgetsAttributes>.activities.first {
-                print("Bridge: No tracked activity, but found an existing one (\(firstAvailableActivity.id)). Ending it.")
+            if Activity<TimerWidgetsAttributes>.activities.isEmpty == false {
+                print("Bridge: No tracked activity, but attempting to end all activities for this app type.")
                 Task {
-                    await firstAvailableActivity.end(nil, dismissalPolicy: dismissalPolicy)
+                    for activity in Activity<TimerWidgetsAttributes>.activities {
+                        await activity.end(nil, dismissalPolicy: dismissalPolicy)
+                    }
                 }
+            }
+            if clearInternalState {
+                 clearAllInternalState()
             }
             return
         }
@@ -105,61 +164,62 @@ class GeneratedLiveActivityBridge: ObservableObject { // Conform to ObservableOb
         print("Bridge: Attempting to end Live Activity ID: \(activityToEnd.id) with policy: \(dismissalPolicy)")
         Task {
             await activityToEnd.end(nil, dismissalPolicy: dismissalPolicy)
-            // The observation loop should set self.currentActivity = nil when it gets the .dismissed or .ended state.
-            // However, you can also set it to nil here if you want to be more immediate,
-            // but be mindful if the observation task is also trying to modify it.
-            // For simplicity, we let the observer handle clearing self.currentActivity.
             print("Bridge: End request sent for activity ID: \(activityToEnd.id).")
         }
+        
+        if clearInternalState {
+            clearAllInternalState(clearCurrentActivity: false)
+        }
     }
     
-    /// Ends the Live Activity due to a direct user cancellation from the app's UI.
     func endActivityByUserCancel() {
         print("Bridge: User initiated cancel. Ending Live Activity immediately.")
-        endCurrentLiveActivity(dismissalPolicy: .immediate) // Use immediate dismissal for user actions
+        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: true)
     }
     
-    // MARK: - Private Helper Methods
-    
-    /// Ends any existing Live Activity that this bridge instance is currently tracking.
-    private func endExistingActivityImmediately() {
-        if let activity = self.currentActivity {
-            print("Bridge: Ending existing tracked Live Activity (ID: \(activity.id)) before starting a new one.")
-            Task {
-                await activity.end(nil, dismissalPolicy: .immediate) // End immediately
-                // self.currentActivity will be set to nil by the observer or if the end is synchronous.
+    private func clearAllInternalState(clearCurrentActivity: Bool = true) {
+        if clearCurrentActivity {
+            if Thread.isMainThread {
+                self.currentActivity = nil
+            } else {
+                DispatchQueue.main.async {
+                    self.currentActivity = nil
+                }
             }
         }
-        // Consider also iterating Activity<TimerWidgetsAttributes>.activities if there's a chance
-        // currentActivity became nil but an activity from this app still exists.
-        // For most simple cases, managing self.currentActivity is sufficient.
+        self.originalCategoryNameForResume = nil
+        self.timeRemainingAtPause = nil
+        self.activityObservationTask?.cancel()
+        self.activityObservationTask = nil
+        print("Bridge: Internal state cleared.")
     }
     
-    /// Observes the state changes of a Live Activity.
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {
-        Task {
+        activityObservationTask?.cancel()
+
+        activityObservationTask = Task {
             for await stateUpdate in activity.activityStateUpdates {
                 print("ℹ️ Bridge: Activity \(activity.id) state changed to: \(stateUpdate)")
                 if stateUpdate == .dismissed || stateUpdate == .ended {
-                    // If the activity being observed is the one we are currently tracking, clear our reference.
                     if self.currentActivity?.id == activity.id {
-                        print("ℹ️ Bridge: Monitored activity \(activity.id) is now \(stateUpdate). Clearing local reference.")
-                        self.currentActivity = nil
+                        print("ℹ️ Bridge: Monitored activity \(activity.id) is now \(stateUpdate). Clearing all state.")
+                        await MainActor.run {
+                            self.clearAllInternalState(clearCurrentActivity: true)
+                        }
                     } else {
-                        print("ℹ️ Bridge: Activity \(activity.id) (not current) is now \(stateUpdate).")
+                        print("ℹ️ Bridge: Activity \(activity.id) (not current) is now \(stateUpdate). This might be an old observation.")
                     }
+                    // Once an activity is dismissed or ended, break the loop for this observation task.
+                    break
                 }
             }
-            // This point is reached when the observation stream naturally concludes
-            // (e.g., activity is definitively finished and no more updates will come).
-            print("ℹ️ Bridge: Observation loop finished for activity \(activity.id). It's likely permanently ended/dismissed.")
-            // Ensure currentActivity is nil if this was the one being tracked and somehow wasn't cleared.
-            if self.currentActivity?.id == activity.id {
-                self.currentActivity = nil
+            print("ℹ️ Bridge: Observation loop finished for activity \(activity.id).")
+            // Final check to ensure state is cleared if this was the current activity
+            if self.currentActivity?.id == activity.id && (activity.activityState == .dismissed || activity.activityState == .ended) {
+                 await MainActor.run {
+                    self.clearAllInternalState(clearCurrentActivity: true)
+                }
             }
         }
     }
 }
-    // You could add an update method here if your Live Activity's ContentState needs to change
-    // func updateLiveActivity(newCategoryName: String) {
-    //     guard let activity

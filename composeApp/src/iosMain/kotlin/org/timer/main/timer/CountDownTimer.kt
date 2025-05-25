@@ -82,5 +82,5 @@ actual class CountDownTimer actual constructor(
         return currentMillis <= 0
     }
 
-    actual fun getCurrentTimeMillis(): Long = currentMillis
+    actual fun getCurrentMillis(): Long = currentMillis
 }

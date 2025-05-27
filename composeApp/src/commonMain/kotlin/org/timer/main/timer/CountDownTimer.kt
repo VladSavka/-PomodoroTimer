@@ -16,6 +16,6 @@ expect class CountDownTimer(
     fun pauseTimer()
     fun resetTimer()
     fun isFinished(): Boolean
-    fun getCurrentMillis(): Long
+    fun getCurrentTimeMillis(): Long
 }
 

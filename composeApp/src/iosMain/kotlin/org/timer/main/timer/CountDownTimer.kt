@@ -41,13 +41,13 @@ actual class CountDownTimer actual constructor(
         val timePass = ((currentTimeMillis - startMoment).toDouble() / 1000).toLong() * 1000
         currentMillis = totalMillis - timePass
 
-        if (currentMillis <= 0) {
+        if (getCurrentTimeMillis <= 0) {
             // If the countdown is complete, call the finish method
             onTick(0)
             onTimerFinish(timer)
             return
         } else {
-            onTick(currentMillis)
+            onTick(getCurrentTimeMillis)
         }
     }
 
@@ -64,7 +64,7 @@ actual class CountDownTimer actual constructor(
 
     actual fun pauseTimer() {
         iosTimer?.invalidate()
-        totalMillis = currentMillis
+        totalMillis = getCurrentTimeMillis
         isTimerRunning = false
         isRunning(false)
     }
@@ -79,8 +79,8 @@ actual class CountDownTimer actual constructor(
     }
 
     actual fun isFinished(): Boolean {
-        return currentMillis <= 0
+        return getCurrentTimeMillis <= 0
     }
 
-    actual fun getCurrentMillis(): Long = currentMillis
+    actual fun getCurrentTimeMillis(): Long = getCurrentTimeMillis
 }

@@ -39,21 +39,21 @@ actual class CountDownTimer actual constructor(
         val timePass = ((Clock.System.now().toEpochMilliseconds() - startMoment).toDouble() / 1000).toLong() * 1000
         currentMillis = totalMillis - timePass
 
-        if (currentMillis <= 0) {
+        if (getCurrentTimeMillis <= 0) {
             document.title = 0L.formatToMMSS()
             onTick.invoke(0)
             onFinish.invoke()
             isRunning.invoke(false)
             worker?.terminate()
         } else {
-            document.title = currentMillis.formatToMMSS()
-            onTick.invoke(currentMillis)
+            document.title = getCurrentTimeMillis.formatToMMSS()
+            onTick.invoke(getCurrentTimeMillis)
         }
     }
 
     actual fun pauseTimer() {
         isRunning.invoke(false)
-        totalMillis = currentMillis
+        totalMillis = getCurrentTimeMillis
         worker?.terminate()
     }
 
@@ -67,7 +67,7 @@ actual class CountDownTimer actual constructor(
     }
 
     actual fun isFinished() : Boolean{
-        return currentMillis <= 0L
+        return getCurrentTimeMillis <= 0L
     }
 
     private fun Long.formatToMMSS(): String {
@@ -89,7 +89,7 @@ actual class CountDownTimer actual constructor(
         }
     }
 
-    actual fun getCurrentMillis(): Long = currentMillis
+    actual fun getCurrentTimeMillis(): Long = getCurrentTimeMillis
 
 }
 

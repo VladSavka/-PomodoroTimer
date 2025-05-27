@@ -12,13 +12,9 @@ expect class MobileAlarm(context: Any? = null) {
         body: String
     )
 
-    fun startLiveActivity(title: String, totalTimeLeftMillis: Long)
+    fun startLiveNotification(title: String, totalTimeLeftMillis: Long)
 
-    fun pauseLiveActivity(totalTimeLeftMillis: Long)
-
-    fun resumeLiveActivity()
-
-    fun cancelLiveActivity()
+    fun stopLiveNotification()
 }
 
 lateinit var startLiveActivity: (title: String, totalTimeLeftMillis: Long) -> Unit

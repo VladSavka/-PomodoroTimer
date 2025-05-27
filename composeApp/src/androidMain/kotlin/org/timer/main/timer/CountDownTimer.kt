@@ -1,5 +1,9 @@
 package org.timer.main.timer
 
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+
 actual class CountDownTimer actual constructor(
     actual var totalMillis: Long,
     actual val onTick: (Long) -> Unit,
@@ -8,47 +12,86 @@ actual class CountDownTimer actual constructor(
 ) {
     actual var currentMillis: Long = totalMillis
 
-    private var countDownTimer: android.os.CountDownTimer? = null
-    private var isTimerRunning = false
+    private var targetTimeMillis: Long = 0L
+    private var isHandlerTicking = false
 
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val tickRunnable: Runnable = object : Runnable {
+        override fun run() {
+            if (!isHandlerTicking) {
+                return
+            }
+
+            val millisLeft = targetTimeMillis - SystemClock.elapsedRealtime()
+
+            if (millisLeft > 0) {
+                currentMillis = millisLeft
+                onTick(currentMillis)
+                handler.postDelayed(this, 1000L)
+            } else {
+                currentMillis = 0
+                onTick(0)
+                isHandlerTicking = false
+                isRunning(false)
+                this@CountDownTimer.onFinish()
+            }
+        }
+    }
 
     actual fun startTimer() {
-        if (isTimerRunning) return // Prevent starting if already running
-        isTimerRunning = true
-        isRunning(true)
-        countDownTimer =
-            object : android.os.CountDownTimer(currentMillis, 1000) { // Tick every 1 second
-                override fun onTick(millisUntilFinished: Long) {
-                    currentMillis = millisUntilFinished
-                    this@CountDownTimer.onTick(millisUntilFinished)
-                }
+        if (currentMillis <= 0) {
+            currentMillis = totalMillis
+        }
 
-                override fun onFinish() {
-                    isTimerRunning = false
-                    isRunning(false)
-                    currentMillis = 0
-                    this@CountDownTimer.onFinish()
-                }
-            }.start()
+        targetTimeMillis = SystemClock.elapsedRealtime() + currentMillis
+
+        if (!isHandlerTicking) {
+            isHandlerTicking = true
+            isRunning(true)
+            handler.removeCallbacks(tickRunnable)
+            handler.post(tickRunnable)
+        } else {
+            onTick(currentMillis)
+            isRunning(true)
+        }
     }
 
     actual fun pauseTimer() {
-        countDownTimer?.cancel()
-        isTimerRunning = false
+        if (!isHandlerTicking) return
+
+        isHandlerTicking = false
         isRunning(false)
+        handler.removeCallbacks(tickRunnable)
+
+        val millisLeft = targetTimeMillis - SystemClock.elapsedRealtime()
+        currentMillis = if (millisLeft > 0) millisLeft else 0
+        onTick(currentMillis)
     }
 
     actual fun resetTimer() {
-        countDownTimer?.cancel()
-        isTimerRunning = false
+        isHandlerTicking = false
         isRunning(false)
+        handler.removeCallbacks(tickRunnable)
+
         currentMillis = totalMillis
-        onTick(totalMillis) // Update UI with initial value
+        targetTimeMillis = 0L
+        onTick(totalMillis)
     }
 
     actual fun isFinished(): Boolean {
+        if (targetTimeMillis > 0 && !isHandlerTicking) {
+            return (targetTimeMillis - SystemClock.elapsedRealtime()) <= 0
+        }
         return currentMillis <= 0
     }
 
-    actual fun getCurrentMillis(): Long = currentMillis
+    actual fun getCurrentTimeMillis(): Long {
+        if (isHandlerTicking && targetTimeMillis > 0) {
+            val millisLeft = targetTimeMillis - SystemClock.elapsedRealtime()
+            currentMillis = if (millisLeft > 0) millisLeft else 0
+            return currentMillis
+        }
+        return currentMillis
+    }
 }

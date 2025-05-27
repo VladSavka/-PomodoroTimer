@@ -71,7 +71,7 @@ class TimerViewModel(
     private fun onShortBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
-            mobileAlarm.cancelLiveActivity()
+            mobileAlarm.stopLiveNotification()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -80,7 +80,7 @@ class TimerViewModel(
     private fun onLongBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
-            mobileAlarm.cancelLiveActivity()
+            mobileAlarm.stopLiveNotification()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -110,7 +110,7 @@ class TimerViewModel(
         incrementKittydoroNumber()
         if (isMobile()) {
             navigateToBreakTab()
-            mobileAlarm.cancelLiveActivity()
+            mobileAlarm.stopLiveNotification()
             _viewState.update { it.copy(navigateToActivitiesScreen = true) }
         } else {
             playAlarmUseCase.invoke(onEnded = {
@@ -183,16 +183,16 @@ class TimerViewModel(
 //                .first().pomodoroTime == pomodoroTimer.getCurrentMillis()
 //
 //            if (timerInInitialState) {
-                mobileAlarm.startLiveActivity(
+                mobileAlarm.startLiveNotification(
                     "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
-                    pomodoroTimer.getCurrentMillis()
+                    pomodoroTimer.getCurrentTimeMillis()
                 )
 //            } else {
 //                mobileAlarm.resumeLiveActivity()
 //            }
 
             scheduleAlarm(
-                pomodoroTimer.getCurrentMillis(),
+                pomodoroTimer.getCurrentTimeMillis(),
                 "Kittidoro Finished!",
                 "Take a break Kitty"
             )
@@ -227,15 +227,15 @@ class TimerViewModel(
 //                .first().shortBreakTime == shortBreakTimer.getCurrentMillis()
 //
 //            if (timerInInitialState) {
-                mobileAlarm.startLiveActivity(
+                mobileAlarm.startLiveNotification(
                     "Short break",
-                    shortBreakTimer.getCurrentMillis()
+                    shortBreakTimer.getCurrentTimeMillis()
                 )
 //            } else {
 //                mobileAlarm.resumeLiveActivity()
 //            }
             scheduleAlarm(
-                shortBreakTimer.getCurrentMillis(),
+                shortBreakTimer.getCurrentTimeMillis(),
                 "Short break finished",
                 "Keep the eye on the ball!"
             )
@@ -262,16 +262,16 @@ class TimerViewModel(
 //                .first().longBreakTime == longBreakTimer.getCurrentMillis()
 //
 //            if (timerInInitialState) {
-                mobileAlarm.startLiveActivity(
+                mobileAlarm.startLiveNotification(
                     "Long break",
-                    longBreakTimer.getCurrentMillis()
+                    longBreakTimer.getCurrentTimeMillis()
                 )
 //            } else {
 //                mobileAlarm.resumeLiveActivity()
 //            }
 
             scheduleAlarm(
-                longBreakTimer.getCurrentMillis(),
+                longBreakTimer.getCurrentTimeMillis(),
                 "Long break finished",
                 "Keep the eye on the ball!"
             )
@@ -298,7 +298,7 @@ class TimerViewModel(
         shortBreakTimer.pauseTimer()
         longBreakTimer.pauseTimer()
         mobileAlarm.cancel()
-        mobileAlarm.cancelLiveActivity()
+        mobileAlarm.stopLiveNotification()
         initTimers()
         _viewState.update {
             it.copy(
@@ -340,7 +340,7 @@ class TimerViewModel(
 
 
     private fun pauseCurrentLiveActivity() {
-        mobileAlarm.cancelLiveActivity()
+        mobileAlarm.stopLiveNotification()
 //        when (viewState.value.timerState) {
 //            is TimerState.Pomodoro -> mobileAlarm.pauseLiveActivity(pomodoroTimer.getCurrentMillis())
 //            is TimerState.ShortBreak -> mobileAlarm.pauseLiveActivity(shortBreakTimer.getCurrentMillis())

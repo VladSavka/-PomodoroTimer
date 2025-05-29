@@ -15,8 +15,6 @@ data class TimerViewState(
         WorkoutVideosGateway.getDanceAudios().random()
     ),
     val selectedTabIndex: Int = 0,
-    val isShortBreakStarted: Boolean = false,
-    val isLongBreakStarted: Boolean = false,
     val navigateToShortBreakActivity: Boolean = false,
     val navigateToLongBreakActivity: Boolean = false,
     val navigateToActivitiesScreen: Boolean = false,

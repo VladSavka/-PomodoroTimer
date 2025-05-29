@@ -103,10 +103,9 @@ class TimerViewModel(
         }
     }
 
-    var timerJob: Job? = null
+    private var timerJob: Job? = null
 
     private fun onPomodoroFinish() {
-        log.debug { "onFinish" }
         incrementKittydoroNumber()
         if (isMobile()) {
             navigateToBreakTab()
@@ -139,7 +138,6 @@ class TimerViewModel(
                     WorkoutVideosGateway.getWorkoutVideos().random(),
                     WorkoutVideosGateway.getDanceAudios().random()
                 ),
-                isShortBreakStarted = true,
             )
         }
     }
@@ -163,7 +161,6 @@ class TimerViewModel(
     }
 
     private fun onPomodoroTick(millis: Long) {
-        log.debug { "onPomodoroTick " + millis.formatToMMSS() }
         _viewState.update { it.copy(pomodoroTime = millis.formatToMMSS()) }
     }
 
@@ -179,17 +176,10 @@ class TimerViewModel(
         shortBreakTimer.resetTimer()
         longBreakTimer.resetTimer()
         if (!_viewState.value.isPomodoroTimerRunning) {
-//            val timerInInitialState = settings.getTimeSettings()
-//                .first().pomodoroTime == pomodoroTimer.getCurrentMillis()
-//
-//            if (timerInInitialState) {
-                mobileAlarm.startLiveNotification(
-                    "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
-                    pomodoroTimer.getCurrentTimeMillis()
-                )
-//            } else {
-//                mobileAlarm.resumeLiveActivity()
-//            }
+            mobileAlarm.startLiveNotification(
+                "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
+                pomodoroTimer.getCurrentTimeMillis()
+            )
 
             scheduleAlarm(
                 pomodoroTimer.getCurrentTimeMillis(),
@@ -212,7 +202,6 @@ class TimerViewModel(
     }
 
     private fun scheduleAlarm(currentTimerMillis: Long, title: String, body: String) {
-        log.debug { "scheduleAlarm " + currentTimerMillis }
         mobileAlarm.cancel()
         val scheduleDate = Clock.System.now().toEpochMilliseconds() + currentTimerMillis
         val alarmSound = settings.getAlarmSound().value
@@ -223,17 +212,10 @@ class TimerViewModel(
         pomodoroTimer.resetTimer()
         longBreakTimer.resetTimer()
         if (!_viewState.value.isShortBreakTimerRunning) {
-//            val timerInInitialState = settings.getTimeSettings()
-//                .first().shortBreakTime == shortBreakTimer.getCurrentMillis()
-//
-//            if (timerInInitialState) {
-                mobileAlarm.startLiveNotification(
-                    "Short break",
-                    shortBreakTimer.getCurrentTimeMillis()
-                )
-//            } else {
-//                mobileAlarm.resumeLiveActivity()
-//            }
+            mobileAlarm.startLiveNotification(
+                "Short break",
+                shortBreakTimer.getCurrentTimeMillis()
+            )
             scheduleAlarm(
                 shortBreakTimer.getCurrentTimeMillis(),
                 "Short break finished",
@@ -258,17 +240,10 @@ class TimerViewModel(
         pomodoroTimer.resetTimer()
         shortBreakTimer.resetTimer()
         if (!_viewState.value.isLongBreakTimerRunning) {
-//            val timerInInitialState = settings.getTimeSettings()
-//                .first().longBreakTime == longBreakTimer.getCurrentMillis()
-//
-//            if (timerInInitialState) {
-                mobileAlarm.startLiveNotification(
-                    "Long break",
-                    longBreakTimer.getCurrentTimeMillis()
-                )
-//            } else {
-//                mobileAlarm.resumeLiveActivity()
-//            }
+            mobileAlarm.startLiveNotification(
+                "Long break",
+                longBreakTimer.getCurrentTimeMillis()
+            )
 
             scheduleAlarm(
                 longBreakTimer.getCurrentTimeMillis(),
@@ -341,11 +316,6 @@ class TimerViewModel(
 
     private fun pauseCurrentLiveActivity() {
         mobileAlarm.stopLiveNotification()
-//        when (viewState.value.timerState) {
-//            is TimerState.Pomodoro -> mobileAlarm.pauseLiveActivity(pomodoroTimer.getCurrentMillis())
-//            is TimerState.ShortBreak -> mobileAlarm.pauseLiveActivity(shortBreakTimer.getCurrentMillis())
-//            TimerState.LongBreak -> mobileAlarm.pauseLiveActivity(longBreakTimer.getCurrentMillis())
-//        }
     }
 
     fun onPageChanged(currentPage: Int) {

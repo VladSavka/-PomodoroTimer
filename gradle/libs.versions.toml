@@ -16,6 +16,7 @@ astroplayerCore = "0.1.0"
 compose-multiplatform = "1.7.0"
 composeMultiplatformMediaPlayer = "1.0.33"
 composeMultiplatformMediaPlayerVersion = "1.0.38"
+constraintlayoutCompose = "1.1.1"
 core = "12.1.1"
 junit = "4.13.2"
 koinCore = "4.0.3"
@@ -36,6 +37,7 @@ alarmee = "1.6.1"
 [libraries]
 alarmee = { group = "io.github.tweener", name = "alarmee", version.ref = "alarmee" }
 androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptiveNavigation" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 astroplayer-core = { module = "com.example.astroplayer:astroplayer-core", version.ref = "astroplayerCore" }
 compose-multiplatform-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayer" }
 compose-multiplatform-media-player-v1038 = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayerVersion" }

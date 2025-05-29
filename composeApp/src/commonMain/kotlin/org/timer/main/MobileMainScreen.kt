@@ -48,9 +48,6 @@ fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
                 composable(MainRouts.Activities.destanation) {
                     BreakActivityScreen(timerViewModel)
                 }
-                composable(MainRouts.Projects.destanation) {
-                    ProjectsScreen()
-                }
                 composable(MainRouts.Settings.destanation) {
                     SettingsDialogScreen(isDialogVisible = {})
                 }
@@ -65,7 +62,6 @@ fun BottomBar(navController: NavHostController) {
         val screens = listOf(
             MainRouts.Home,
             MainRouts.Activities,
-            MainRouts.Projects,
             MainRouts.Settings,
         )
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -132,6 +128,5 @@ sealed class MainRouts(
 ) {
     data object Home : MainRouts("timer", "Timer", Res.drawable.home)
     data object Activities : MainRouts("activities", "Activities", Res.drawable.run)
-    data object Projects : MainRouts("projects", "Projects", Res.drawable.checklist)
     data object Settings : MainRouts("settings", "Settings", Res.drawable.settings)
 }

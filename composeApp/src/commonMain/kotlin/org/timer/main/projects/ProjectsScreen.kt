@@ -96,25 +96,6 @@ fun ProjectsScreen(
                 label = "shadowElevation"
             )
 
-            if (remeberWindowInfo().isSmallScreen()) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = shadowElevation,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 8.dp),
-                        text = "Projects",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
-
             if (viewState.projects.isEmpty()) {
                 Box(
                     modifier = Modifier

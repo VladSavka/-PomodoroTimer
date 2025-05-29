@@ -3,9 +3,7 @@ package org.timer.main.timer
 import org.timer.main.domain.settings.*
 
 actual class MobileAlarm actual constructor(actual val context: Any?) {
-
     actual fun cancel() {
-        //no-op
     }
 
     actual fun schedule(
@@ -14,9 +12,13 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
         title: String,
         body: String
     ) {
-        //no-op
     }
 
-    actual fun startLiveNotification(totalTimeLeftMillis: Long) {
+    actual fun startLiveNotification(title: String, totalTimeLeftMillis: Long) {
     }
+
+    actual fun stopLiveNotification() {
+    }
+
+
 }

@@ -73,10 +73,9 @@ private fun CollapsedTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(COLLAPSED_TOP_BAR_HEIGHT)
-                .padding(horizontal = 16.dp), // Use horizontal padding for consistent spacing
-            contentAlignment = Alignment.CenterStart // Align content to the start for the title/time
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
-            // Content for when the bar is NOT collapsed (Expanded View)
             AnimatedVisibility(
                 visible = !isCollapsed,
                 modifier = Modifier.align(Alignment.Center)
@@ -91,7 +90,6 @@ private fun CollapsedTopBar(
                 )
             }
 
-            // Content for when the bar IS collapsed
             AnimatedVisibility(visible = isCollapsed) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -464,7 +462,6 @@ fun ProjectsScreen(
                     )
                 ) {
                     TimerPager(timerViewModel, timerViewState)
-                    Spacer(modifier = Modifier.size(8.dp))
                     EmptyState()
                 }
 

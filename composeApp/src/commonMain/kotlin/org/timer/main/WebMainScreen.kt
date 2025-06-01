@@ -15,6 +15,7 @@ import org.timer.main.breakactivity.*
 fun WebMainScreen(
     viewModel: TimerViewModel = koinViewModel(),
 ) {
+
     Row {
         Card(
             modifier = Modifier
@@ -37,7 +38,8 @@ fun WebMainScreen(
                 ProjectsScreen(
                     modifier = Modifier
                         .fillMaxHeight(1f)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    timerViewModel = viewModel,
                 )
             }
         }

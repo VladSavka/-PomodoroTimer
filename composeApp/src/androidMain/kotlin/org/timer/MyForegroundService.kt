@@ -148,7 +148,7 @@ class MyForegroundService : Service() {
             val currentProgress = (totalDurationMillis - timeLeftInMillis).toInt()
             builder.setProgress(totalDurationMillis.toInt(), currentProgress, false)
             builder.setContentTitle(title + ": " + formatTimeLeft(timeLeftInMillis))
-
+            builder.setShowWhen(false)
             if (isFinished) {
                 // Optionally change title or text when finished
                 builder.setContentTitle("Timer Finished!")

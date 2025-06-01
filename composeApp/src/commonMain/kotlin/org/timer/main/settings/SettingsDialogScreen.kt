@@ -145,13 +145,19 @@ private fun TimerSettingsContent(
     viewState: SettingsViewState,
     isSmallScreen: Boolean
 ) {
+    val textFieldScale = 0.8f
+
     items.forEachIndexed { index, text ->
-        Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.height(36.dp).padding(horizontal = 8.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(36.dp)
+                .padding(horizontal = 8.dp)
                 .fillMaxWidth()
                 .clickable {
                     viewModel.onPresetClick(index)
-                }) {
+                }
+        ) {
             RadioButtonWithText(
                 index,
                 viewState.selectedPresetPosition,
@@ -161,47 +167,63 @@ private fun TimerSettingsContent(
         }
         if (index == items.size - 1) {
             MaterialTheme(if (isSmallScreen) darkScheme else lightScheme) {
-                Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Column(modifier = Modifier.width(150.dp)) {
+                Column(modifier = Modifier.padding(horizontal = 0.dp)) {
+                    // --- Pomodoro Minutes ---
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         OutlinedTextField(
+                            modifier = Modifier
+                                .scale(textFieldScale)
+                                .width(150.dp), // Original width before scaling applied internally
                             value = viewState.pomodoroMinutes,
                             onValueChange = {
                                 if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
                                     viewModel.updatePomodoroMinutes(it)
                             },
-                            label = { Text("Focus time") },
+                            label = { Text("Focus time")},
                             singleLine = true,
                             enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewState.showPomodoroError,
-                            supportingText = {
-                                if (viewState.showPomodoroError) {
-                                    Text(text = "Please enter a valid number")
-                                }
-                            }
+                            isError = viewState.showPomodoroError, // Still useful for theming
+                            supportingText = null, // No supporting text below
+                            trailingIcon = null // No icon
                         )
+                        if (viewState.showPomodoroError) {
+                            ErrorText()
+                        }
                     }
-                    Column(modifier = Modifier.width(150.dp)) {
+
+                    // --- Short Break Minutes ---
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
+                            modifier = Modifier
+                                .scale(textFieldScale)
+                                .width(150.dp),
                             value = viewState.shortBreakMinutes,
                             onValueChange = {
                                 if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
                                     viewModel.updateShortBreakMinutes(it)
                             },
-                            label = { Text("Short break") },
+                            label = { Text("Short break")},
                             singleLine = true,
                             enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = viewState.showShortBreakError,
-                            supportingText = {
-                                if (viewState.showShortBreakError) {
-                                    Text(text = "Please enter a valid number")
-                                }
-                            },
+                            supportingText = null,
+                            trailingIcon = null
                         )
+                        if (viewState.showShortBreakError) {
+                            ErrorText()
+                        }
                     }
-                    Column(modifier = Modifier.width(150.dp)) {
+
+                    // --- Long Break Minutes ---
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
+                            modifier = Modifier
+                                .scale(textFieldScale)
+                                .width(150.dp),
                             value = viewState.longBreakMinutes,
                             onValueChange = {
                                 if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
@@ -212,17 +234,27 @@ private fun TimerSettingsContent(
                             enabled = viewState.selectedPresetPosition == items.size - 1,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             isError = viewState.showLongBreakError,
-                            supportingText = {
-                                if (viewState.showLongBreakError) {
-                                    Text(text = "Please enter a valid number")
-                                }
-                            }
+                            supportingText = null,
+                            trailingIcon = null
                         )
+                        if (viewState.showLongBreakError) {
+                            ErrorText()
+                        }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun ErrorText() {
+    Text(
+        text = "Please enter a valid number",
+        color = MaterialTheme.colorScheme.error,
+        fontSize = 12.sp,
+        modifier = Modifier.padding(start = 2.dp)
+    )
 }
 
 private fun String.isDigits() = matches(Regex("^\\d+\$"))

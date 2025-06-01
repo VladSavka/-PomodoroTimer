@@ -1,5 +1,6 @@
 package org.timer.main.projects
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
@@ -26,14 +27,24 @@ import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
+import org.timer.main.WindowInfo
 import org.timer.main.domain.project.*
+import org.timer.main.timer.*
 
+val COLLAPSED_TOP_BAR_HEIGHT = 74.dp
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
     modifier: Modifier = Modifier,
     viewModel: ProjectsViewModel = koinViewModel(),
+    timerViewModel: TimerViewModel,
+    windowInfo: WindowInfo = remeberWindowInfo()
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    val timerViewState by timerViewModel.viewState.collectAsStateWithLifecycle()
+
     var showDialog by remember { mutableStateOf(false) }
     var prevSize by remember { mutableStateOf(viewState.projects.size) }
     val lazyListState = rememberLazyListState()
@@ -61,6 +72,15 @@ fun ProjectsScreen(
         rememberDragDropState(lazyListState) { fromIndex, toIndex ->
             viewModel.onProjectsDrugAndDrop(fromIndex, toIndex)
         }
+    val density = LocalDensity.current
+    val isToolbarCollapsed: Boolean by remember {
+        val scrollOffsetThresholdInPx = with(density) { 150.dp.toPx() }
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > scrollOffsetThresholdInPx
+        }
+    }
+
+
 
     Scaffold(
         modifier = modifier,
@@ -77,47 +97,64 @@ fun ProjectsScreen(
                 Icon(Icons.Filled.Add, "Add Project")
             }
         },
+        topBar = {
+            if (windowInfo.isSmallScreen()) {
+                CollapsedTopBar(
+                    isCollapsed = isToolbarCollapsed,
+                    viewState = timerViewState,
+                    viewModel = timerViewModel,
+                    lazyListState = lazyListState,
+                )
+            }
+        },
         floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-            // The Column itself doesn't need a background modifier now,
-            // as it will be on top of the Scaffold's background.
         ) {
-            val isScrolled = remember {
-                derivedStateOf {
-                    lazyListState.firstVisibleItemIndex > 0 || lazyListState.firstVisibleItemScrollOffset > 0
-                }
-            }
-            val shadowElevation by animateDpAsState(
-                targetValue = if (isScrolled.value) 4.dp else 0.dp,
-                label = "shadowElevation"
-            )
 
             if (viewState.projects.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "Your project list is empty.\n Add your first project using button below.",
-                        color = MaterialTheme.colorScheme.onPrimary
+                Column(
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                        start = 16.dp,
+                        bottom = 16.dp,
+                        end = 16.dp
                     )
+                ) {
+                    if (windowInfo.isSmallScreen()) {
+                        TimerPager(timerViewModel, timerViewState)
+                        Spacer(modifier = Modifier.size(8.dp))
+                        ProjectsTitle()
+                    }
+                    EmptyState()
                 }
+
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .dragContainer(dragDropState)
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp, top = 8.dp),
+                        .dragContainer(dragDropState),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp,
+                        top = 8.dp
+                    ),
                     state = lazyListState,
                 ) {
+                    if (windowInfo.isSmallScreen()) {
+                        item {
+                            TimerPager(timerViewModel, timerViewState)
+                            Spacer(modifier = Modifier.size(8.dp))
+                            ProjectsTitle()
+                            Spacer(modifier = Modifier.size(8.dp))
+                        }
+                    }
+
                     itemsIndexed(
                         viewState.projects,
                         key = { _, item -> item.id }) { index, item ->
@@ -202,6 +239,92 @@ fun ProjectsScreen(
                     Text("Dismiss")
                 }
             }
+        )
+    }
+}
+
+
+@Composable
+private fun CollapsedTopBar(
+    modifier: Modifier = Modifier,
+    isCollapsed: Boolean,
+    viewState: TimerViewState,
+    viewModel: TimerViewModel,
+    lazyListState: LazyListState
+) {
+    val shadowElevation by animateDpAsState(
+        targetValue = if (isCollapsed) 4.dp else 0.dp,
+        label = "topBarShadowAnimation"
+    )
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = shadowElevation),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(COLLAPSED_TOP_BAR_HEIGHT)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            AnimatedVisibility(
+                visible = !isCollapsed,
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                TimerTitle()
+            }
+
+            AnimatedVisibility(visible = isCollapsed) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween // Pushes items to ends
+                ) {
+                    // Timer Type and Time (takes available space, pushing button to the end)
+                    val title = when (viewState.selectedTabIndex) {
+                        0 -> "Kittydoro ${viewState.pomodoroTime}"
+                        1 -> "Short Break ${viewState.shortBreakTime}"
+                        2 -> "Long Break ${viewState.longBreakTime}"
+                        else -> throw IllegalArgumentException()
+                    }
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp)) // Space between text and button
+
+                    when (viewState.selectedTabIndex) {
+                        0 -> KittydoroStartPauseButton(viewState, viewModel, lazyListState)
+                        1 -> ShortBreakStartPauseButton(viewState, viewModel, lazyListState)
+                        2 -> LongBreakStartPauseButton(viewState, viewModel, lazyListState)
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+
+        Text(
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.Center),
+            text = "Your project list is empty.\n Add your first project using button below.",
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -638,3 +761,17 @@ private fun Header(
         }
     }
 }
+
+
+@Composable
+fun ProjectsTitle() {
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = "Projects",
+        fontSize = 28.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onPrimary
+    )
+}
+

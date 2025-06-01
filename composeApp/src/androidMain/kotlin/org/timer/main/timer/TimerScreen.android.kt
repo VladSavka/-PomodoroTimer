@@ -7,6 +7,7 @@ import android.provider.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.*
+import com.diamondedge.logging.*
 import dev.icerock.moko.permissions.*
 import dev.icerock.moko.permissions.compose.*
 import dev.icerock.moko.permissions.notifications.*
@@ -42,6 +43,8 @@ actual fun AskNotificationPermission() {
                     refreshPermissionState()
                 } catch (deniedAlwaysException: DeniedAlwaysException) {
                     refreshPermissionState()
+                } catch (exception: RequestCanceledException) {
+                    logging().w(exception) {"Permission request was canceled"}
                 }
             }
 

@@ -18,6 +18,7 @@ composeMultiplatformMediaPlayer = "1.0.33"
 composeMultiplatformMediaPlayerVersion = "1.0.38"
 constraintlayoutCompose = "1.1.1"
 core = "12.1.1"
+desugar_jdk_libs = "2.1.5"
 junit = "4.13.2"
 koinCore = "4.0.3"
 kotlin = "2.1.0"
@@ -42,6 +43,7 @@ astroplayer-core = { module = "com.example.astroplayer:astroplayer-core", versio
 compose-multiplatform-media-player = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayer" }
 compose-multiplatform-media-player-v1038 = { module = "network.chaintech:compose-multiplatform-media-player", version.ref = "composeMultiplatformMediaPlayerVersion" }
 core = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCore" }
 koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koinCore" }

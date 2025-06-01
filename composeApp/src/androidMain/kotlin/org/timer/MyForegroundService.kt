@@ -7,6 +7,7 @@ import android.content.pm.*
 import android.os.*
 import android.util.*
 import androidx.core.app.*
+import java.util.*
 import java.util.concurrent.*
 
 class MyForegroundService : Service() {
@@ -169,9 +170,9 @@ class MyForegroundService : Service() {
         val hours = TimeUnit.MILLISECONDS.toHours(millis)
 
         return if (hours > 0) {
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            String.format(Locale.getDefault(),"%02d:%02d:%02d", hours, minutes, seconds)
         } else {
-            String.format("%02d:%02d", minutes, seconds)
+            String.format(Locale.getDefault(),"%02d:%02d", minutes, seconds)
         }
     }
 

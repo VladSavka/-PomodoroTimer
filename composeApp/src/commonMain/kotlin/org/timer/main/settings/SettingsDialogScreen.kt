@@ -23,6 +23,11 @@ import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.ui.theme.*
 import pomodorotimer.composeapp.generated.resources.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp // Import .sp directly
 
 @Composable
 fun SettingsDialogScreen(
@@ -138,6 +143,8 @@ fun Content(
     }
 }
 
+
+
 @Composable
 private fun TimerSettingsContent(
     items: List<String>,
@@ -146,6 +153,12 @@ private fun TimerSettingsContent(
     isSmallScreen: Boolean
 ) {
     val textFieldScale = 0.8f
+    val rowSpacing = 0.dp
+    val unscaledTextFieldHeight = 56.dp
+    val unscaledErrorTextLineHeight = 16.sp.toDp()
+    val buffer = 4.dp
+    val maxRowHeight = (unscaledTextFieldHeight * textFieldScale) + (unscaledErrorTextLineHeight * textFieldScale) + buffer
+    val minRowHeight = (unscaledTextFieldHeight * textFieldScale) // Let's try without the extra 2.dp first
 
     items.forEachIndexed { index, text ->
         Row(
@@ -154,108 +167,99 @@ private fun TimerSettingsContent(
                 .height(36.dp)
                 .padding(horizontal = 8.dp)
                 .fillMaxWidth()
-                .clickable {
-                    viewModel.onPresetClick(index)
-                }
         ) {
             RadioButtonWithText(
-                index,
-                viewState.selectedPresetPosition,
-                text,
-                isSmallScreen
+                index = index,
+                selectedItemIndex = viewState.selectedPresetPosition,
+                text = text,
+                isSmallScreen = isSmallScreen,
+                onClick = { viewModel.onPresetClick(index) }
             )
         }
+
         if (index == items.size - 1) {
             MaterialTheme(if (isSmallScreen) darkScheme else lightScheme) {
-                Column(modifier = Modifier.padding(horizontal = 0.dp)) {
-                    // --- Pomodoro Minutes ---
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .scale(textFieldScale)
-                                .width(150.dp), // Original width before scaling applied internally
-                            value = viewState.pomodoroMinutes,
-                            onValueChange = {
-                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
-                                    viewModel.updatePomodoroMinutes(it)
-                            },
-                            label = { Text("Focus time")},
-                            singleLine = true,
-                            enabled = viewState.selectedPresetPosition == items.size - 1,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewState.showPomodoroError, // Still useful for theming
-                            supportingText = null, // No supporting text below
-                            trailingIcon = null // No icon
-                        )
-                        if (viewState.showPomodoroError) {
-                            ErrorText()
-                        }
-                    }
+                Column(
+                    modifier = Modifier.padding(horizontal = 0.dp),
+                    verticalArrangement = Arrangement.spacedBy(rowSpacing) // This should be 0.dp
+                ) {
+                    SettingRow(
+                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                        textFieldValue = viewState.pomodoroMinutes,
+                        onTextFieldValueChange = { viewModel.updatePomodoroMinutes(it) },
+                        label = "Focus time",
+                        showError = viewState.showPomodoroError,
+                        textFieldScale = textFieldScale,
+                        isEnabled = viewState.selectedPresetPosition == items.size - 1
+                    )
 
-                    // --- Short Break Minutes ---
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .scale(textFieldScale)
-                                .width(150.dp),
-                            value = viewState.shortBreakMinutes,
-                            onValueChange = {
-                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
-                                    viewModel.updateShortBreakMinutes(it)
-                            },
-                            label = { Text("Short break")},
-                            singleLine = true,
-                            enabled = viewState.selectedPresetPosition == items.size - 1,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewState.showShortBreakError,
-                            supportingText = null,
-                            trailingIcon = null
-                        )
-                        if (viewState.showShortBreakError) {
-                            ErrorText()
-                        }
-                    }
+                    SettingRow(
+                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                        textFieldValue = viewState.shortBreakMinutes,
+                        onTextFieldValueChange = { viewModel.updateShortBreakMinutes(it) },
+                        label = "Short break",
+                        showError = viewState.showShortBreakError,
+                        textFieldScale = textFieldScale,
+                        isEnabled = viewState.selectedPresetPosition == items.size - 1
+                    )
 
-                    // --- Long Break Minutes ---
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .scale(textFieldScale)
-                                .width(150.dp),
-                            value = viewState.longBreakMinutes,
-                            onValueChange = {
-                                if (it.length <= 3 && (it.isEmpty() || it.isDigits()))
-                                    viewModel.updateLongBreakMinutes(it)
-                            },
-                            label = { Text("Long break") },
-                            singleLine = true,
-                            enabled = viewState.selectedPresetPosition == items.size - 1,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewState.showLongBreakError,
-                            supportingText = null,
-                            trailingIcon = null
-                        )
-                        if (viewState.showLongBreakError) {
-                            ErrorText()
-                        }
-                    }
+                    SettingRow(
+                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                        textFieldValue = viewState.longBreakMinutes,
+                        onTextFieldValueChange = { viewModel.updateLongBreakMinutes(it) },
+                        label = "Long break",
+                        showError = viewState.showLongBreakError,
+                        textFieldScale = textFieldScale,
+                        isEnabled = viewState.selectedPresetPosition == items.size - 1
+                    )
                 }
             }
         }
     }
 }
 
+
 @Composable
-private fun ErrorText() {
-    Text(
-        text = "Please enter a valid number",
-        color = MaterialTheme.colorScheme.error,
-        fontSize = 12.sp,
-        modifier = Modifier.padding(start = 2.dp)
-    )
+private fun SettingRow(
+    modifier: Modifier = Modifier, // This modifier will carry the heightIn constraint
+    textFieldValue: String,
+    onTextFieldValueChange: (String) -> Unit,
+    label: String,
+    showError: Boolean,
+    textFieldScale: Float,
+    isEnabled: Boolean
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            modifier = Modifier
+                .scale(textFieldScale)
+                .width(150.dp),
+            value = textFieldValue,
+            onValueChange = {
+                if (it.length <= 3 && (it.isEmpty() || it.isDigits())) {
+                    onTextFieldValueChange(it)
+                }
+            },
+            label = { Text(label) },
+            singleLine = true,
+            enabled = isEnabled,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = showError,
+            supportingText = null,
+            trailingIcon = null,
+            textStyle = MaterialTheme.typography.bodyMedium
+        )
+        if (showError) {
+            ErrorText()
+        }
+    }
 }
+
+@Composable
+fun TextUnit.toDp(): Dp = with(LocalDensity.current) { this@toDp.toDp() }
 
 private fun String.isDigits() = matches(Regex("^\\d+\$"))
 
@@ -264,18 +268,31 @@ private fun RadioButtonWithText(
     index: Int,
     selectedItemIndex: Int,
     text: String,
-    isSmallScreen: Boolean
+    isSmallScreen: Boolean,
+    onClick: () -> Unit
 ) {
-    MaterialTheme(colorScheme = if (isSmallScreen) darkScheme else lightScheme) {
-        RadioButton(
-            selected = (index == selectedItemIndex),
-            onClick = null
+    Row(Modifier.clickable(onClick = onClick)) {
+        MaterialTheme(colorScheme = if (isSmallScreen) darkScheme else lightScheme) {
+            RadioButton(
+                selected = (index == selectedItemIndex),
+                onClick = null
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = text,
+            color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
         )
     }
-    Spacer(modifier = Modifier.width(8.dp))
+}
+
+@Composable
+private fun ErrorText(modifier: Modifier = Modifier, text: String = "Please enter a valid number") {
     Text(
         text = text,
-        color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
+        color = MaterialTheme.colorScheme.error,
+        fontSize = 12.sp,
+        modifier = modifier.padding(start = 4.dp)
     )
 }
 

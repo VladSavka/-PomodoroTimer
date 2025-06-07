@@ -39,14 +39,14 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		F50A40BD2DE0D06B00B9EDB8 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
 				F50A40B82DE0D06B00B9EDB8 /* TimerWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -82,7 +82,6 @@
 		F50A40C32DE0D69D00B9EDB8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				PlainLinearProgressViewStyle.swift,
 				TimerWidgetsLiveActivity.swift,
 			);
 			target = 7555FF7A242A565900829871 /* iosApp */;

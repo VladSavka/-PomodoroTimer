@@ -1,18 +1,12 @@
 import UIKit
 import UserNotifications // Import UserNotifications
 
-// If using SwiftUI App Lifecycle, ensure this AppDelegate is connected
-// in your @main App struct using @UIApplicationDelegateAdaptor(AppDelegate.self)
-
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate { // Conform to UNUserNotificationCenterDelegate
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        // Set the notification center delegate
         UNUserNotificationCenter.current().delegate = self
         
-//        // Request notification authorization from the user
-//        requestNotificationAuthorization()
         
         return true
     }

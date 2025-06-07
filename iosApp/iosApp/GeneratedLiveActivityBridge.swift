@@ -12,16 +12,12 @@ class GeneratedLiveActivityBridge: ObservableObject {
     private var originalCategoryNameForResume: String?
     private var timeRemainingAtPause: TimeInterval?
     private var activityObservationTask: Task<Void, Error>? = nil
-
-    private init() {
-        print("GeneratedLiveActivityBridge INITIALIZED")
-    }
+    
     
     deinit {
-        print("GeneratedLiveActivityBridge DEINITIALIZED")
         activityObservationTask?.cancel()
     }
-
+    
     private func formatTimeInterval(_ interval: TimeInterval?) -> String {
         guard let interval = interval, interval > 0 else { return "00:00" }
         let formatter = DateComponentsFormatter()
@@ -51,17 +47,14 @@ class GeneratedLiveActivityBridge: ObservableObject {
         
         self.originalCategoryNameForResume = categoryName
         self.timeRemainingAtPause = nil
-
+        
         let attributes = TimerWidgetsAttributes(
             startDate: now,
             endDate: targetEndDate
         )
         
         let initialContentState = TimerWidgetsAttributes.ContentState(
-            categoryName: categoryName,
-            isPaused: false,
-            remainingTimeWhenPausedFormatted: nil,
-            progressWhenPaused: nil
+            categoryName: categoryName
         )
         
         let staleDate = targetEndDate.addingTimeInterval(5 * 60)
@@ -92,57 +85,6 @@ class GeneratedLiveActivityBridge: ObservableObject {
         }
     }
     
-    func pauseLiveActivity(totalDurationMillis: Int64) {
-        guard let activity = self.currentActivity, !activity.content.state.isPaused else {
-            // ...
-            return
-        }
-
-        let now = Date()
-        let remaining = activity.attributes.endDate.timeIntervalSince(now)
-        self.timeRemainingAtPause = max(0, remaining)
-
-        // Calculate progress
-        let totalDuration = activity.attributes.endDate.timeIntervalSince(activity.attributes.startDate)
-        var currentProgress: Double? = nil
-        if totalDuration > 0 {
-            let elapsedTime = max(0, now.timeIntervalSince(activity.attributes.startDate)) // Ensure not negative if clock skewed
-            currentProgress = min(1.0, elapsedTime / totalDuration) // Cap at 1.0
-        }
-
-        let pausedState = TimerWidgetsAttributes.ContentState(
-            categoryName: activity.content.state.categoryName,
-            isPaused: true,
-            remainingTimeWhenPausedFormatted: formatTimeInterval(self.timeRemainingAtPause),
-            progressWhenPaused: currentProgress // Set the calculated progress
-        )
-        
-        print("Bridge: Pausing activity ID \(activity.id). Remaining: \(self.timeRemainingAtPause ?? 0)s. Progress: \(currentProgress ?? -1)")
-        Task {
-            let newContent = ActivityContent(state: pausedState, staleDate: .distantFuture)
-            await activity.update(newContent)
-            print("Bridge: Activity \(activity.id) updated to paused state.")
-        }
-    }
-
-    func resumeLiveActivity() {
-        guard let pausedActivity = self.currentActivity,
-              pausedActivity.content.state.isPaused,
-              let timeRemaining = self.timeRemainingAtPause,
-              let categoryName = self.originalCategoryNameForResume
-        else {
-            print("Bridge: No paused activity to resume or missing state.")
-            return
-        }
-
-        print("Bridge: Resuming. Time remaining: \(timeRemaining)s for category: \(categoryName)")
-        
-        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: false)
-        
-        let remainingMillis = Int64(timeRemaining * 1000.0)
-        startActivity(totalDurationMillis: remainingMillis, categoryName: categoryName)
-        print("Bridge: New activity started for resume.")
-    }
     
     func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default, clearInternalState: Bool = true) {
         guard let activityToEnd = self.currentActivity else {
@@ -156,7 +98,7 @@ class GeneratedLiveActivityBridge: ObservableObject {
                 }
             }
             if clearInternalState {
-                 clearAllInternalState()
+                clearAllInternalState()
             }
             return
         }
@@ -196,7 +138,7 @@ class GeneratedLiveActivityBridge: ObservableObject {
     
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {
         activityObservationTask?.cancel()
-
+        
         activityObservationTask = Task {
             for await stateUpdate in activity.activityStateUpdates {
                 print("ℹ️ Bridge: Activity \(activity.id) state changed to: \(stateUpdate)")
@@ -216,7 +158,7 @@ class GeneratedLiveActivityBridge: ObservableObject {
             print("ℹ️ Bridge: Observation loop finished for activity \(activity.id).")
             // Final check to ensure state is cleared if this was the current activity
             if self.currentActivity?.id == activity.id && (activity.activityState == .dismissed || activity.activityState == .ended) {
-                 await MainActor.run {
+                await MainActor.run {
                     self.clearAllInternalState(clearCurrentActivity: true)
                 }
             }

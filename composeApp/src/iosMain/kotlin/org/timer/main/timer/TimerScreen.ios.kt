@@ -22,10 +22,10 @@ actual fun AskNotificationPermission() {
                     println("Permission denied")
                 } catch (deniedAlwaysException: DeniedAlwaysException) {
                     println("Permission denied permenantly")
+                } catch (exception: Exception) {
+                    println("Notification permission failed" + exception)
                 }
             }
-
-
         }
     }
 }

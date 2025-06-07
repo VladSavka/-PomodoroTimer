@@ -12,16 +12,7 @@ struct iOSApp: App {
         MobileAlarmKt.startLiveActivity = { title, timeLeftInMillis in
             GeneratedLiveActivityBridge.shared.startActivity(totalDurationMillis: timeLeftInMillis.int64Value, categoryName: title)
         }
-        
-        MobileAlarmKt.pauseLiveActivity = { timeLeftInMillis in
-            GeneratedLiveActivityBridge.shared.pauseLiveActivity(totalDurationMillis: timeLeftInMillis.int64Value)
-            
-        }
-        
-        MobileAlarmKt.resumeLiveActivity = {
-            GeneratedLiveActivityBridge.shared.resumeLiveActivity()
-        }
-        
+   
         MobileAlarmKt.cancelLiveActivity = {
             GeneratedLiveActivityBridge.shared.endActivityByUserCancel()
         }

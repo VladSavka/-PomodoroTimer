@@ -1,166 +1,166 @@
 import Foundation
 import ActivityKit
 import Combine
+import SwiftUI
 
-@available(iOS 16.1, *)
+@available(iOS 16.2, *)
 class GeneratedLiveActivityBridge: ObservableObject {
-    
+
     static let shared = GeneratedLiveActivityBridge()
-    
+
     @Published private(set) var currentActivity: Activity<TimerWidgetsAttributes>?
-    
-    private var originalCategoryNameForResume: String?
-    private var timeRemainingAtPause: TimeInterval?
+    @Published private(set) var currentActivityPushToken: String?
+
     private var activityObservationTask: Task<Void, Error>? = nil
-    
-    
+    private var pushTokenObservationTask: Task<Void, Never>? = nil
+
     deinit {
         activityObservationTask?.cancel()
+        pushTokenObservationTask?.cancel()
     }
-    
-    private func formatTimeInterval(_ interval: TimeInterval?) -> String {
-        guard let interval = interval, interval > 0 else { return "00:00" }
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = .pad
-        return formatter.string(from: interval) ?? "00:00"
-    }
-    
-    func startActivity(totalDurationMillis: Int64, categoryName: String) {
+
+    func startActivity(categoryName: String, isBreak: Bool, totalDurationMillis: Int64) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            print("Bridge: Live Activities not enabled.")
             return
         }
-        
-        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: false)
-        
+
+        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalStateForNewActivity: true)
+
         let now = Date()
         let totalDurationSeconds = TimeInterval(totalDurationMillis) / 1000.0
-        
+
         guard totalDurationSeconds > 0 else {
-            print("Bridge: Total duration must be positive.")
             return
         }
-        
+
         let targetEndDate = now.addingTimeInterval(totalDurationSeconds)
-        
-        self.originalCategoryNameForResume = categoryName
-        self.timeRemainingAtPause = nil
-        
+
         let attributes = TimerWidgetsAttributes(
             startDate: now,
             endDate: targetEndDate
         )
-        
+
         let initialContentState = TimerWidgetsAttributes.ContentState(
-            categoryName: categoryName
+            displayText: categoryName,
+            isFinished: false
         )
-        
-        let staleDate = targetEndDate.addingTimeInterval(5 * 60)
-        let activityContent = ActivityContent(state: initialContentState, staleDate: staleDate, relevanceScore: 100.0)
-        
-        print("Bridge: Attempting to start Live Activity. End: \(targetEndDate), Category: \(categoryName)")
-        
+
+        let staleDate = Calendar.current.date(byAdding: .hour, value: 4, to: targetEndDate) ?? targetEndDate.addingTimeInterval(4 * 60 * 60)
+        let relevanceScore = 100.0
+
+        let activityContent = ActivityContent(
+            state: initialContentState,
+            staleDate: staleDate,
+            relevanceScore: relevanceScore
+        )
+
         Task {
             do {
-                let activity = try Activity.request(
+                let activity = try Activity<TimerWidgetsAttributes>.request(
                     attributes: attributes,
                     content: activityContent,
-                    pushType: nil
+                    pushType: .token
                 )
-                
+
                 await MainActor.run {
                     self.currentActivity = activity
+                    self.currentActivityPushToken = nil
                 }
-                print("✅ Bridge: Live Activity started. ID: \(activity.id)")
+                
                 observeActivityState(activity: activity)
+                observePushToken(for: activity)
+
+                // ACTION REQUIRED: Send targetEndDate and activity.id to your server.
+                // The currentActivityPushToken will be sent when observePushToken gets it.
+
             } catch {
-                print("❌ Bridge: Error starting Live Activity: \(error.localizedDescription)")
                 await MainActor.run {
                     self.currentActivity = nil
+                    self.currentActivityPushToken = nil
                 }
-                self.originalCategoryNameForResume = nil
             }
         }
     }
-    
-    
-    func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default, clearInternalState: Bool = true) {
+
+    private func observePushToken(for activity: Activity<TimerWidgetsAttributes>) {
+        pushTokenObservationTask?.cancel()
+        pushTokenObservationTask = Task {
+            for await pushTokenData in activity.pushTokenUpdates {
+                let pushTokenString = pushTokenData.map { String(format: "%02x", $0) }.joined()
+                await MainActor.run {
+                    self.currentActivityPushToken = pushTokenString
+                }
+                // ACTION REQUIRED: Send this pushTokenString to your server.
+                print("--------------------------------------------------------------------")
+                          print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString)")
+                          print("--------------------------------------------------------------------")
+                          print("(Activity ID: \(activity.id))") //
+            }
+        }
+    }
+
+    func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default, clearInternalStateForNewActivity: Bool = false) {
+        if clearInternalStateForNewActivity {
+            activityObservationTask?.cancel()
+            pushTokenObservationTask?.cancel()
+            activityObservationTask = nil
+            pushTokenObservationTask = nil
+        }
+
         guard let activityToEnd = self.currentActivity else {
-            print("Bridge: No currently tracked Live Activity to end.")
             if Activity<TimerWidgetsAttributes>.activities.isEmpty == false {
-                print("Bridge: No tracked activity, but attempting to end all activities for this app type.")
                 Task {
                     for activity in Activity<TimerWidgetsAttributes>.activities {
                         await activity.end(nil, dismissalPolicy: dismissalPolicy)
                     }
                 }
             }
-            if clearInternalState {
-                clearAllInternalState()
+            if clearInternalStateForNewActivity {
+                 if Thread.isMainThread { self.currentActivity = nil; self.currentActivityPushToken = nil }
+                 else { DispatchQueue.main.async { self.currentActivity = nil; self.currentActivityPushToken = nil } }
             }
             return
         }
-        
-        print("Bridge: Attempting to end Live Activity ID: \(activityToEnd.id) with policy: \(dismissalPolicy)")
+
         Task {
             await activityToEnd.end(nil, dismissalPolicy: dismissalPolicy)
-            print("Bridge: End request sent for activity ID: \(activityToEnd.id).")
-        }
-        
-        if clearInternalState {
-            clearAllInternalState(clearCurrentActivity: false)
         }
     }
-    
+
     func endActivityByUserCancel() {
-        print("Bridge: User initiated cancel. Ending Live Activity immediately.")
-        endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalState: true)
+        endCurrentLiveActivity(dismissalPolicy: .immediate)
     }
-    
-    private func clearAllInternalState(clearCurrentActivity: Bool = true) {
-        if clearCurrentActivity {
-            if Thread.isMainThread {
+
+    private func clearTrackedActivityReferences() {
+        if Thread.isMainThread {
+            self.currentActivity = nil
+            self.currentActivityPushToken = nil
+        } else {
+            DispatchQueue.main.async {
                 self.currentActivity = nil
-            } else {
-                DispatchQueue.main.async {
-                    self.currentActivity = nil
-                }
+                self.currentActivityPushToken = nil
             }
         }
-        self.originalCategoryNameForResume = nil
-        self.timeRemainingAtPause = nil
         self.activityObservationTask?.cancel()
+        self.pushTokenObservationTask?.cancel()
         self.activityObservationTask = nil
-        print("Bridge: Internal state cleared.")
+        self.pushTokenObservationTask = nil
     }
-    
+
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {
         activityObservationTask?.cancel()
-        
+
         activityObservationTask = Task {
             for await stateUpdate in activity.activityStateUpdates {
-                print("ℹ️ Bridge: Activity \(activity.id) state changed to: \(stateUpdate)")
                 if stateUpdate == .dismissed || stateUpdate == .ended {
                     if self.currentActivity?.id == activity.id {
-                        print("ℹ️ Bridge: Monitored activity \(activity.id) is now \(stateUpdate). Clearing all state.")
-                        await MainActor.run {
-                            self.clearAllInternalState(clearCurrentActivity: true)
-                        }
-                    } else {
-                        print("ℹ️ Bridge: Activity \(activity.id) (not current) is now \(stateUpdate). This might be an old observation.")
+                        clearTrackedActivityReferences()
                     }
-                    // Once an activity is dismissed or ended, break the loop for this observation task.
                     break
                 }
             }
-            print("ℹ️ Bridge: Observation loop finished for activity \(activity.id).")
-            // Final check to ensure state is cleared if this was the current activity
             if self.currentActivity?.id == activity.id && (activity.activityState == .dismissed || activity.activityState == .ended) {
-                await MainActor.run {
-                    self.clearAllInternalState(clearCurrentActivity: true)
-                }
+                 clearTrackedActivityReferences()
             }
         }
     }

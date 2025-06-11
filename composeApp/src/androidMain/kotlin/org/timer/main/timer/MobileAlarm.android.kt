@@ -81,7 +81,7 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
         }
     }
 
-    actual fun startLiveNotification(title: String, totalTimeLeftMillis: Long) {
+    actual fun startLiveNotification(title: String, isBreak: Boolean, totalTimeLeftMillis: Long) {
         Intent(androidContext, MyForegroundService::class.java).also {
             it.action = MyForegroundService.ACTION_START
             it.putExtra("title", title)

@@ -178,6 +178,7 @@ class TimerViewModel(
         if (!_viewState.value.isPomodoroTimerRunning) {
             mobileAlarm.startLiveNotification(
                 "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
+                false,
                 pomodoroTimer.getCurrentTimeMillis()
             )
 
@@ -214,7 +215,9 @@ class TimerViewModel(
         if (!_viewState.value.isShortBreakTimerRunning) {
             mobileAlarm.startLiveNotification(
                 "Short break",
+                true,
                 shortBreakTimer.getCurrentTimeMillis()
+
             )
             scheduleAlarm(
                 shortBreakTimer.getCurrentTimeMillis(),
@@ -242,6 +245,7 @@ class TimerViewModel(
         if (!_viewState.value.isLongBreakTimerRunning) {
             mobileAlarm.startLiveNotification(
                 "Long break",
+                true,
                 longBreakTimer.getCurrentTimeMillis()
             )
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseMessaging
 import ComposeApp
 
 @main
@@ -9,8 +10,12 @@ struct iOSApp: App {
     init() {
         print("iOSApp init: Setting up Kotlin lambdas.")
 
-        MobileAlarmKt.startLiveActivity = { title, timeLeftInMillis in
-            GeneratedLiveActivityBridge.shared.startActivity(totalDurationMillis: timeLeftInMillis.int64Value, categoryName: title)
+        MobileAlarmKt.startLiveActivity = { title, isBreak, timeLeftInMillis in
+            GeneratedLiveActivityBridge.shared.startActivity(
+                categoryName: title,
+                isBreak: isBreak.boolValue,
+                totalDurationMillis: timeLeftInMillis.int64Value
+            )
         }
    
         MobileAlarmKt.cancelLiveActivity = {

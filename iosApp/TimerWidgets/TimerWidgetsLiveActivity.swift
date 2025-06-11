@@ -5,7 +5,8 @@ import SwiftUI
 
 public struct TimerWidgetsAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
-        var categoryName: String
+        var displayText: String
+        var isFinished: Bool
     }
     
     var startDate: Date
@@ -34,25 +35,32 @@ struct TimerWidgetsLiveActivity: Widget {
                         .frame(width: 60, height: 60)
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(context.state.categoryName)
-                            .font(.body)
-                            .foregroundStyle(.white)
-                            .bold()
-                        
-                        Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
-                            .font(.title)
-                            .foregroundStyle(.white)
-                            .bold()
-                            .monospacedDigit()
-                        
-                        
-                        
-                        ProgressView(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: false)
-                            .progressViewStyle(LinearProgressViewStyle())
-                            .tint(.white)
-                            .frame(height: 10, alignment: .top)
-                            .clipped()
-                        
+                        if context.state.isFinished {
+                            Text(context.state.displayText) // Should be "Finished"
+                                .font(.title) // Or your desired font for "Finished"
+                                .foregroundStyle(.green) // Example: Green for finished
+                                .bold()
+                        } else {
+                            Text(context.state.displayText)
+                                .font(.body)
+                                .foregroundStyle(.white)
+                                .bold()
+                            
+                            Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
+                                .font(.title)
+                                .foregroundStyle(.white)
+                                .bold()
+                                .monospacedDigit()
+                            
+                            
+                            
+                            ProgressView(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: false)
+                                .progressViewStyle(LinearProgressViewStyle())
+                                .tint(.white)
+                                .frame(height: 10, alignment: .top)
+                                .clipped()
+                            
+                        }
                     }
                     Spacer()
                 }
@@ -70,39 +78,51 @@ struct TimerWidgetsLiveActivity: Widget {
                         .foregroundColor(.cyan)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
-                        .font(.title2.bold().monospacedDigit())
-                        .foregroundColor(.cyan)
-                        .frame(width: 80)
+                    if context.state.isFinished {
+                                           Text("🎉") // Example for finished state in compact island
+                                               .font(.title2.bold())
+                                               .foregroundColor(.green)
+                                       } else {
+                                           Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
+                                               .font(.title2.bold().monospacedDigit())
+                                               .foregroundColor(.cyan)
+                                               .frame(width: 80)
+                                       }
                 }
                 DynamicIslandExpandedRegion(.center) {
-                    Text(context.state.categoryName)
-                        .font(.headline)
-                        .lineLimit(1)
-                        .foregroundColor(.primary)
+                    Text(context.state.displayText) // Will show categoryName or "Finished"
+                                           .font(.headline)
+                                           .lineLimit(1)
+                                           .foregroundColor(context.state.isFinished ? .green : .primary)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    ProgressView(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: false)
-                        .progressViewStyle(LinearProgressViewStyle())
-                        .tint(.cyan)
-                        .frame(height: 8, alignment: .top)
-                        .clipped()
-                    
+                    if !context.state.isFinished {
+                        ProgressView(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: false)
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .tint(.cyan)
+                            .frame(height: 8, alignment: .top)
+                            .clipped()
+                    }
                 }
             } compactLeading: {
-                
-                Image(systemName: "timer")
-                    .foregroundColor(.cyan)
-                    .padding([.leading], 2)
-                
+                Image(systemName: context.state.isFinished ? "checkmark.circle.fill" : "timer")
+                                   .foregroundColor(context.state.isFinished ? .green : .cyan)
+                                   .padding([.leading], 2)
             } compactTrailing: {
-                Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
-                    .font(.caption.monospacedDigit())
-                    .foregroundColor(.cyan)
-                    .frame(width: 45)
-                    .padding([.trailing], 2)
+                if context.state.isFinished {
+                                  Text("Done")
+                                      .font(.caption)
+                                      .foregroundColor(.green)
+                              } else {
+                                  Text(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: true, showsHours: false)
+                                      .font(.caption.monospacedDigit())
+                                      .foregroundColor(.cyan)
+                                      .frame(width: 45)
+                                      .padding([.trailing], 2)
+                              }
             } minimal: {
-                Image(systemName: "timer.square").foregroundColor(.cyan)
+                Image(systemName: context.state.isFinished ? "checkmark.circle.fill" : "timer.square")
+                                    .foregroundColor(context.state.isFinished ? .green : .cyan)
             }
             .widgetURL(URL(string: "kittidoro://openTimer"))
             .keylineTint(Color.cyan)

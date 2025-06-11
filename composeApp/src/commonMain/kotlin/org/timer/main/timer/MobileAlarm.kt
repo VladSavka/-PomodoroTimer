@@ -12,16 +12,12 @@ expect class MobileAlarm(context: Any? = null) {
         body: String
     )
 
-    fun startLiveNotification(title: String, totalTimeLeftMillis: Long)
+    fun startLiveNotification(title: String, isBreak: Boolean, totalTimeLeftMillis: Long)
 
     fun stopLiveNotification()
 }
 
-lateinit var startLiveActivity: (title: String, totalTimeLeftMillis: Long) -> Unit
-
-lateinit var pauseLiveActivity: (totalTimeLeftMillis: Long) -> Unit
-
-lateinit var resumeLiveActivity: () -> Unit
+lateinit var startLiveActivity: (title: String, isBreak: Boolean, totalTimeLeftMillis: Long) -> Unit
 
 lateinit var cancelLiveActivity: () -> Unit
 

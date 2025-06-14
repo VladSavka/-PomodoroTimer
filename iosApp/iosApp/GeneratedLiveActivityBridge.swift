@@ -13,6 +13,8 @@ class GeneratedLiveActivityBridge: ObservableObject {
 
     private var activityObservationTask: Task<Void, Error>? = nil
     private var pushTokenObservationTask: Task<Void, Never>? = nil
+    private let liveActivityScheduler = LiveActivityScheduler()
+    private var currentActivityTargetEndDate: Date?
 
     deinit {
         activityObservationTask?.cancel()
@@ -34,10 +36,11 @@ class GeneratedLiveActivityBridge: ObservableObject {
         }
 
         let targetEndDate = now.addingTimeInterval(totalDurationSeconds)
-
+        self.currentActivityTargetEndDate = targetEndDate
         let attributes = TimerWidgetsAttributes(
             startDate: now,
-            endDate: targetEndDate
+            endDate: targetEndDate,
+            isBreak: isBreak
         )
 
         let initialContentState = TimerWidgetsAttributes.ContentState(
@@ -77,6 +80,8 @@ class GeneratedLiveActivityBridge: ObservableObject {
                 await MainActor.run {
                     self.currentActivity = nil
                     self.currentActivityPushToken = nil
+                    self.currentActivityTargetEndDate = nil
+
                 }
             }
         }
@@ -94,7 +99,23 @@ class GeneratedLiveActivityBridge: ObservableObject {
                 print("--------------------------------------------------------------------")
                           print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString)")
                           print("--------------------------------------------------------------------")
-                          print("(Activity ID: \(activity.id))") //
+                          print("(Activity ID: \(activity.id))")
+                // --- INTEGRATION POINT ---
+                          // Ensure we have a target end date for the current activity
+                guard let targetEndDate = self.currentActivityTargetEndDate, self.currentActivity?.id == activity.id else {
+                                   print("⚠️ Missing target end date or activity mismatch when trying to schedule update for token: \(pushTokenString)")
+                                   continue // Skip scheduling if data is inconsistent
+                               }
+
+
+                          print("📲 Calling LiveActivityScheduler to schedule update for token: \(pushTokenString) at \(targetEndDate)")
+                          // Call your scheduler
+                          self.liveActivityScheduler.scheduleActivityUpdate(
+                              liveActivityPushToken: pushTokenString,
+                              endTime: targetEndDate
+                          )
+                        //   --- END INTEGRATION POINT ---
+                
             }
         }
     }
@@ -105,6 +126,7 @@ class GeneratedLiveActivityBridge: ObservableObject {
             pushTokenObservationTask?.cancel()
             activityObservationTask = nil
             pushTokenObservationTask = nil
+            currentActivityTargetEndDate = nil
         }
 
         guard let activityToEnd = self.currentActivity else {
@@ -145,6 +167,8 @@ class GeneratedLiveActivityBridge: ObservableObject {
         self.pushTokenObservationTask?.cancel()
         self.activityObservationTask = nil
         self.pushTokenObservationTask = nil
+        self.currentActivityTargetEndDate = nil
+
     }
 
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {

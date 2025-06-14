@@ -66,7 +66,7 @@ fun BreakActivityScreen(
                 Item(
                     "3", "Home chores", listOf(
                         SubItem("3.1", "Take out trash"),
-                        SubItem("3.2", "Вo the dishes,"),
+                        SubItem("3.2", "Do the dishes"),
                         SubItem("3.3", "Make THAT space tidy"),
                         SubItem("3.4", "Do the laundry")
                     )

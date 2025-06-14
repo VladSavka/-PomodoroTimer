@@ -11,6 +11,7 @@ public struct TimerWidgetsAttributes: ActivityAttributes {
     
     var startDate: Date
     var endDate: Date
+    var isBreak:Bool
 }
 
 struct TimerWidgetsLiveActivity: Widget {
@@ -36,9 +37,10 @@ struct TimerWidgetsLiveActivity: Widget {
                     
                     VStack(alignment: .leading, spacing: 8) {
                         if context.state.isFinished {
-                            Text(context.state.displayText) // Should be "Finished"
-                                .font(.title) // Or your desired font for "Finished"
-                                .foregroundStyle(.green) // Example: Green for finished
+                            var displayText = context.attributes.isBreak ? "Time to work. Start Pomodoro": "Choose your break activity";
+                            Text(displayText)
+                                .font(.title)
+                                .foregroundStyle(.green)
                                 .bold()
                         } else {
                             Text(context.state.displayText)

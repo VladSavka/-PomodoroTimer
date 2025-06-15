@@ -71,7 +71,6 @@ class TimerViewModel(
     private fun onShortBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
-            mobileAlarm.stopLiveNotification()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -80,7 +79,6 @@ class TimerViewModel(
     private fun onLongBreakFinish() {
         if (isMobile()) {
             navigateToPomodoroTab()
-            mobileAlarm.stopLiveNotification()
         } else {
             playAlarmUseCase.invoke(onEnded = ::navigateToPomodoroTab)
         }
@@ -109,7 +107,6 @@ class TimerViewModel(
         incrementKittydoroNumber()
         if (isMobile()) {
             navigateToBreakTab()
-            mobileAlarm.stopLiveNotification()
             _viewState.update { it.copy(navigateToActivitiesScreen = true) }
         } else {
             playAlarmUseCase.invoke(onEnded = {
@@ -179,7 +176,8 @@ class TimerViewModel(
             mobileAlarm.startLiveNotification(
                 "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
                 false,
-                pomodoroTimer.getCurrentTimeMillis()
+                pomodoroTimer.getCurrentTimeMillis(),
+                settings.getAlarmSound().value
             )
 
             scheduleAlarm(
@@ -216,8 +214,8 @@ class TimerViewModel(
             mobileAlarm.startLiveNotification(
                 "Short break",
                 true,
-                shortBreakTimer.getCurrentTimeMillis()
-
+                shortBreakTimer.getCurrentTimeMillis(),
+                settings.getAlarmSound().value
             )
             scheduleAlarm(
                 shortBreakTimer.getCurrentTimeMillis(),
@@ -246,7 +244,8 @@ class TimerViewModel(
             mobileAlarm.startLiveNotification(
                 "Long break",
                 true,
-                longBreakTimer.getCurrentTimeMillis()
+                longBreakTimer.getCurrentTimeMillis(),
+                settings.getAlarmSound().value
             )
 
             scheduleAlarm(
@@ -296,7 +295,7 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         pomodoroTimer.pauseTimer()
-        pauseCurrentLiveActivity()
+        mobileAlarm.stopLiveNotification()
     }
 
     fun onShortBreakPauseClick() {
@@ -305,7 +304,7 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         shortBreakTimer.pauseTimer()
-        pauseCurrentLiveActivity()
+        mobileAlarm.stopLiveNotification()
     }
 
     fun onLongBreakPauseClick() {
@@ -314,13 +313,11 @@ class TimerViewModel(
         }
         mobileAlarm.cancel()
         longBreakTimer.pauseTimer()
-        pauseCurrentLiveActivity()
-    }
-
-
-    private fun pauseCurrentLiveActivity() {
         mobileAlarm.stopLiveNotification()
     }
+
+
+
 
     fun onPageChanged(currentPage: Int) {
         _viewState.update { it.copy(selectedTabIndex = currentPage) }

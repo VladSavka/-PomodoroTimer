@@ -10,11 +10,12 @@ struct iOSApp: App {
     init() {
         print("iOSApp init: Setting up Kotlin lambdas.")
 
-        MobileAlarmKt.startLiveActivity = { title, isBreak, timeLeftInMillis in
+        MobileAlarmKt.startLiveActivity = { title, isBreak, timeLeftInMillis, soundFileName in
             GeneratedLiveActivityBridge.shared.startActivity(
                 categoryName: title,
                 isBreak: isBreak.boolValue,
-                totalDurationMillis: timeLeftInMillis.int64Value
+                totalDurationMillis: timeLeftInMillis.int64Value,
+                soundFileName: soundFileName
             )
         }
    

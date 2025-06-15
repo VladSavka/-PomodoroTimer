@@ -8,7 +8,8 @@ class LiveActivityScheduler { // Or wherever this logic resides
     
     func scheduleActivityUpdate(
         liveActivityPushToken: String,
-        endTime: Date // The exact UTC time for the update
+        endTime: Date,
+        soundFileName: String
     ) {
         // 1. Get the FCM Device Token
         Messaging.messaging().token { fcmToken, error in
@@ -25,14 +26,16 @@ class LiveActivityScheduler { // Or wherever this logic resides
             print("📱 Fetched FCM Token: \(deviceFCMToken)")
             self.callSchedulerFunction(liveActivityPushToken: liveActivityPushToken,
                                        deviceFCMToken: deviceFCMToken,
-                                       endTime: endTime)
+                                       endTime: endTime,
+                                       soundFileName: soundFileName)
         }
     }
 
     private func callSchedulerFunction(
         liveActivityPushToken: String,
         deviceFCMToken: String,
-        endTime: Date
+        endTime: Date,
+        soundFileName: String
     ) {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -41,7 +44,8 @@ class LiveActivityScheduler { // Or wherever this logic resides
         let requestData: [String: Any] = [
             "liveActivityPushToken": liveActivityPushToken,
             "updateTimeISO": updateTimeISO,
-            "deviceFCMToken" : deviceFCMToken
+            "deviceFCMToken" : deviceFCMToken,
+            "soundFileName" : soundFileName
         ]
         
         

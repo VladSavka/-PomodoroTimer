@@ -5,187 +5,256 @@ import SwiftUI
 
 @available(iOS 16.2, *)
 class GeneratedLiveActivityBridge: ObservableObject {
-
+    
     static let shared = GeneratedLiveActivityBridge()
-
+    
     @Published private(set) var currentActivity: Activity<TimerWidgetsAttributes>?
     @Published private(set) var currentActivityPushToken: String?
-
-    private var activityObservationTask: Task<Void, Error>? = nil
+    
+    private var activityObservationTask: Task<Void, Never>? = nil
     private var pushTokenObservationTask: Task<Void, Never>? = nil
     private let liveActivityScheduler = LiveActivityScheduler()
     private var currentActivityTargetEndDate: Date?
-
+    
     deinit {
         activityObservationTask?.cancel()
         pushTokenObservationTask?.cancel()
     }
-
-    func startActivity(categoryName: String, isBreak: Bool, totalDurationMillis: Int64) {
+    
+    func startActivity(categoryName: String, isBreak: Bool, totalDurationMillis: Int64, soundFileName: String) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            print("Live Activities are not enabled.")
             return
         }
-
+        
         endCurrentLiveActivity(dismissalPolicy: .immediate, clearInternalStateForNewActivity: true)
-
+        print("Previous activity processing ended, preparing to start new one.")
+        
         let now = Date()
         let totalDurationSeconds = TimeInterval(totalDurationMillis) / 1000.0
-
+        
         guard totalDurationSeconds > 0 else {
+            print("Total duration is not positive, cannot start activity.")
             return
         }
-
-        let targetEndDate = now.addingTimeInterval(totalDurationSeconds)
-        self.currentActivityTargetEndDate = targetEndDate
+        
+        let activitySpecificTargetEndDate = now.addingTimeInterval(totalDurationSeconds)
+        
         let attributes = TimerWidgetsAttributes(
             startDate: now,
-            endDate: targetEndDate,
+            endDate: activitySpecificTargetEndDate,
             isBreak: isBreak
         )
-
+        
         let initialContentState = TimerWidgetsAttributes.ContentState(
             displayText: categoryName,
             isFinished: false
         )
-
-        let staleDate = Calendar.current.date(byAdding: .hour, value: 4, to: targetEndDate) ?? targetEndDate.addingTimeInterval(4 * 60 * 60)
+        
+        let staleDate = Calendar.current.date(byAdding: .hour, value: 4, to: activitySpecificTargetEndDate) ?? activitySpecificTargetEndDate.addingTimeInterval(4 * 60 * 60)
         let relevanceScore = 100.0
-
+        
         let activityContent = ActivityContent(
             state: initialContentState,
             staleDate: staleDate,
             relevanceScore: relevanceScore
         )
-
+        
         Task {
             do {
-                let activity = try Activity<TimerWidgetsAttributes>.request(
+                let newActivity = try Activity<TimerWidgetsAttributes>.request(
                     attributes: attributes,
                     content: activityContent,
                     pushType: .token
                 )
-
+                print("Live Activity requested with ID: \(newActivity.id), Target End Date for this activity: \(activitySpecificTargetEndDate)")
+                
                 await MainActor.run {
-                    self.currentActivity = activity
+                    self.currentActivity = newActivity
                     self.currentActivityPushToken = nil
+                    self.currentActivityTargetEndDate = activitySpecificTargetEndDate
                 }
                 
-                observeActivityState(activity: activity)
-                observePushToken(for: activity)
-
-                // ACTION REQUIRED: Send targetEndDate and activity.id to your server.
-                // The currentActivityPushToken will be sent when observePushToken gets it.
-
+                observeActivityState(activity: newActivity)
+                observePushToken(for: newActivity,
+                                 associatedTargetEndDate: activitySpecificTargetEndDate,
+                                 soundFileName: soundFileName)
+                
+                print("ACTION REQUIRED (startActivity): Send targetEndDate (\(activitySpecificTargetEndDate)) and activity.id (\(newActivity.id)) to your server.")
+                
             } catch {
+                print("Error requesting Live Activity: \(error.localizedDescription)")
                 await MainActor.run {
                     self.currentActivity = nil
                     self.currentActivityPushToken = nil
                     self.currentActivityTargetEndDate = nil
-
                 }
             }
         }
     }
-
-    private func observePushToken(for activity: Activity<TimerWidgetsAttributes>) {
-        pushTokenObservationTask?.cancel()
-        pushTokenObservationTask = Task {
-            for await pushTokenData in activity.pushTokenUpdates {
+    
+    private func observePushToken(for activity: Activity<TimerWidgetsAttributes>, associatedTargetEndDate: Date, soundFileName:String) {
+        if self.currentActivity?.id == activity.id {
+            self.pushTokenObservationTask?.cancel()
+            self.pushTokenObservationTask = Task {
+                await processPushTokenStream(for: activity, associatedTargetEndDate: associatedTargetEndDate,soundFileName: soundFileName)
+            }
+        } else {
+            Task {
+                print("Observing push token for activity \(activity.id) which is not currently self.currentActivity (\(String(describing: self.currentActivity?.id))). This task is independent of the global pushTokenObservationTask.")
+                await processPushTokenStream(for: activity, associatedTargetEndDate: associatedTargetEndDate,soundFileName:soundFileName)
+            }
+        }
+    }
+    
+    private func processPushTokenStream(for activity: Activity<TimerWidgetsAttributes>, associatedTargetEndDate: Date, soundFileName: String) async {
+        print("processPushTokenStream: Starting to observe push token for activity \(activity.id)")
+        do {
+            for try await pushTokenData in activity.pushTokenUpdates {
                 let pushTokenString = pushTokenData.map { String(format: "%02x", $0) }.joined()
-                await MainActor.run {
-                    self.currentActivityPushToken = pushTokenString
-                }
-                // ACTION REQUIRED: Send this pushTokenString to your server.
-                print("--------------------------------------------------------------------")
-                          print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString)")
-                          print("--------------------------------------------------------------------")
-                          print("(Activity ID: \(activity.id))")
-                // --- INTEGRATION POINT ---
-                          // Ensure we have a target end date for the current activity
-                guard let targetEndDate = self.currentActivityTargetEndDate, self.currentActivity?.id == activity.id else {
-                                   print("⚠️ Missing target end date or activity mismatch when trying to schedule update for token: \(pushTokenString)")
-                                   continue // Skip scheduling if data is inconsistent
-                               }
-
-
-                          print("📲 Calling LiveActivityScheduler to schedule update for token: \(pushTokenString) at \(targetEndDate)")
-                          // Call your scheduler
-                          self.liveActivityScheduler.scheduleActivityUpdate(
-                              liveActivityPushToken: pushTokenString,
-                              endTime: targetEndDate
-                          )
-                        //   --- END INTEGRATION POINT ---
                 
+                await MainActor.run {
+                    if self.currentActivity?.id == activity.id {
+                        self.currentActivityPushToken = pushTokenString
+                    }
+                }
+                
+                print("--------------------------------------------------------------------")
+                print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString) for activity ID \(activity.id)")
+                print("--------------------------------------------------------------------")
+                
+                guard self.currentActivity?.id == activity.id else {
+                    print("⚠️ Activity mismatch during push token processing. Current activity is \(String(describing: self.currentActivity?.id)), but token is for \(activity.id). Skipping server schedule for this token.")
+                    continue
+                }
+                
+                print("📲 Calling LiveActivityScheduler to schedule server update for token: \(pushTokenString) at \(associatedTargetEndDate) (for activity \(activity.id))")
+                self.liveActivityScheduler.scheduleActivityUpdate(
+                    liveActivityPushToken: pushTokenString,
+                    endTime: associatedTargetEndDate,
+                    soundFileName: soundFileName
+                )
+            }
+        } catch {
+            if Task.isCancelled {
+                print("processPushTokenStream: Push token observation for \(activity.id) was cancelled.")
+            } else {
+                print("processPushTokenStream: Error observing push token updates for activity \(activity.id): \(error.localizedDescription)")
             }
         }
+        print("processPushTokenStream: Finished observing push token for activity \(activity.id)")
     }
-
+    
     func endCurrentLiveActivity(dismissalPolicy: ActivityUIDismissalPolicy = .default, clearInternalStateForNewActivity: Bool = false) {
         if clearInternalStateForNewActivity {
+            print("endCurrentLiveActivity: Clearing internal state for new activity.")
             activityObservationTask?.cancel()
             pushTokenObservationTask?.cancel()
             activityObservationTask = nil
             pushTokenObservationTask = nil
-            currentActivityTargetEndDate = nil
+            if Thread.isMainThread { self.currentActivityTargetEndDate = nil }
+            else { DispatchQueue.main.async { self.currentActivityTargetEndDate = nil } }
         }
-
+        
         guard let activityToEnd = self.currentActivity else {
+            print("endCurrentLiveActivity: No 'self.currentActivity' to end. Checking system activities.")
             if Activity<TimerWidgetsAttributes>.activities.isEmpty == false {
                 Task {
-                    for activity in Activity<TimerWidgetsAttributes>.activities {
-                        await activity.end(nil, dismissalPolicy: dismissalPolicy)
+                    print("endCurrentLiveActivity: Ending all system activities of type TimerWidgetsAttributes.")
+                    for activityInSystem in Activity<TimerWidgetsAttributes>.activities {
+                        await activityInSystem.end(nil, dismissalPolicy: dismissalPolicy)
                     }
                 }
             }
             if clearInternalStateForNewActivity {
-                 if Thread.isMainThread { self.currentActivity = nil; self.currentActivityPushToken = nil }
-                 else { DispatchQueue.main.async { self.currentActivity = nil; self.currentActivityPushToken = nil } }
+                if Thread.isMainThread {
+                    self.currentActivity = nil
+                    self.currentActivityPushToken = nil
+                } else { DispatchQueue.main.async {
+                    self.currentActivity = nil
+                    self.currentActivityPushToken = nil
+                }}
             }
             return
         }
-
+        
+        print("endCurrentLiveActivity: Ending activity with ID \(activityToEnd.id).")
         Task {
             await activityToEnd.end(nil, dismissalPolicy: dismissalPolicy)
         }
     }
-
+    
     func endActivityByUserCancel() {
+        print("endActivityByUserCancel called.")
         endCurrentLiveActivity(dismissalPolicy: .immediate)
     }
 
     private func clearTrackedActivityReferences() {
+        print("clearTrackedActivityReferences: Clearing all tracked references for current activity.")
         if Thread.isMainThread {
             self.currentActivity = nil
             self.currentActivityPushToken = nil
+            self.currentActivityTargetEndDate = nil
         } else {
             DispatchQueue.main.async {
                 self.currentActivity = nil
                 self.currentActivityPushToken = nil
+                self.currentActivityTargetEndDate = nil
             }
         }
+        // Cancel observation tasks that were associated with the now-cleared currentActivity
         self.activityObservationTask?.cancel()
-        self.pushTokenObservationTask?.cancel()
+        self.pushTokenObservationTask?.cancel() // Also cancel the push token task for the cleared activity
         self.activityObservationTask = nil
         self.pushTokenObservationTask = nil
-        self.currentActivityTargetEndDate = nil
-
     }
 
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {
-        activityObservationTask?.cancel()
-
-        activityObservationTask = Task {
-            for await stateUpdate in activity.activityStateUpdates {
-                if stateUpdate == .dismissed || stateUpdate == .ended {
-                    if self.currentActivity?.id == activity.id {
-                        clearTrackedActivityReferences()
-                    }
-                    break
-                }
+        // This task is specifically for the 'activity' passed as a parameter.
+        // If self.activityObservationTask is meant to be singular for the *current* global activity:
+        if self.currentActivity?.id == activity.id {
+            self.activityObservationTask?.cancel() // Cancel previous global task
+            self.activityObservationTask = Task { // Assign new global task
+                await processActivityStateStream(for: activity)
             }
-            if self.currentActivity?.id == activity.id && (activity.activityState == .dismissed || activity.activityState == .ended) {
-                 clearTrackedActivityReferences()
+        } else {
+            // If the activity passed isn't the current one, perhaps just run a local task for it
+            // without assigning to self.activityObservationTask.
+            Task { // Local task, doesn't overwrite self.activityObservationTask
+                 print("Observing activity state for activity \(activity.id) which is not currently self.currentActivity (\(String(describing: self.currentActivity?.id))). This task is independent of the global activityObservationTask.")
+                 await processActivityStateStream(for: activity)
             }
         }
     }
+
+    // Helper function to process the activity state stream
+    private func processActivityStateStream(for activity: Activity<TimerWidgetsAttributes>) async {
+          print("processActivityStateStream: Starting to observe activity state for \(activity.id)")
+          // activity.activityStateUpdates is an AsyncStream<ActivityState>
+          // It does not throw, so a do-catch for the stream itself is not strictly necessary
+          // unless operations within the loop could throw.
+          for await currentActivityState in activity.activityStateUpdates { // Renamed stateUpdate to currentActivityState for clarity
+              print("Activity \(activity.id) state update: \(currentActivityState)") // currentActivityState is directly the ActivityState enum
+              
+              if currentActivityState == .dismissed || currentActivityState == .ended {
+                  print("Activity \(activity.id) is \(currentActivityState).")
+                  
+                  if self.currentActivity?.id == activity.id {
+                      print("Clearing tracked references because the current activity (\(activity.id)) has \(currentActivityState).")
+                      clearTrackedActivityReferences()
+                  } else {
+                      print("Activity \(activity.id) is \(currentActivityState), but it was not the 'self.currentActivity' (\(String(describing: self.currentActivity?.id))). No global references cleared by this event.")
+                  }
+                  break // Stop observing this activity's state as it's terminally ended/dismissed
+              }
+          }
+          // Check if the task was cancelled, which could also terminate the loop
+          if Task.isCancelled {
+              print("processActivityStateStream: Activity state observation for \(activity.id) was cancelled.")
+          }
+          print("processActivityStateStream: Finished observing activity state for \(activity.id)")
+      }
 }
+    
+
+    

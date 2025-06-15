@@ -19,7 +19,7 @@
 		F53B4AA02DDA3482003E5156 /* cat.wav in Resources */ = {isa = PBXBuildFile; fileRef = F53B4A9F2DDA3482003E5156 /* cat.wav */; };
 		F56658CA2DF9B000009FF2CA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = F56658C92DF9B000009FF2CA /* FirebaseCore */; };
 		F56658CC2DF9B000009FF2CA /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = F56658CB2DF9B000009FF2CA /* FirebaseFunctions */; };
-		F56658CE2DF9B000009FF2CA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = F56658CD2DF9B000009FF2CA /* FirebaseMessaging */; };
+		F56658CE2DF9B000009FF2CA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = F56658CD2DF9B000009FF2CA /* FirebaseMessaging */; settings = {ATTRIBUTES = (Required, ); }; };
 		F57BC8002DF9B6110037CD17 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = F57BC7FF2DF9B6110037CD17 /* FirebaseFunctions */; };
 		F57BC8012DF9B6440037CD17 /* LiveActivityScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5AED5272DF9A0AD00699B16 /* LiveActivityScheduler.swift */; };
 		F57BC8032DF9B6660037CD17 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = F57BC8022DF9B6660037CD17 /* FirebaseMessaging */; };
@@ -94,6 +94,7 @@
 		F50A40C32DE0D69D00B9EDB8 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Assets.xcassets,
 				TimerWidgetsLiveActivity.swift,
 			);
 			target = 7555FF7A242A565900829871 /* iosApp */;

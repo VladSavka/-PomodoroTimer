@@ -31,7 +31,7 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
         val content = UNMutableNotificationContent().apply {
             setUserInfo(mapOf("alarm_id" to ALARM_ID))
             setTitle(title)
-            setBody(body)
+
             setSound(UNNotificationSound.soundNamed(soundFileName))
         }
 
@@ -46,13 +46,13 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
             trigger = trigger
         )
 
-        notificationCenter.addNotificationRequest(request) { error ->
-            if (error != null) {
-                println("Error scheduling iOS notification for ID $ALARM_ID: ${error.localizedDescription}")
-            } else {
-                println("iOS notification scheduled successfully for ID $ALARM_ID at $localDateTime")
-            }
-        }
+//        notificationCenter.addNotificationRequest(request) { error ->
+//            if (error != null) {
+//                println("Error scheduling iOS notification for ID $ALARM_ID: ${error.localizedDescription}")
+//            } else {
+//                println("iOS notification scheduled successfully for ID $ALARM_ID at $localDateTime")
+//            }
+//        }
     }
 
     actual fun cancel() {
@@ -62,8 +62,22 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
     }
 
 
-    actual fun startLiveNotification(title: String, isBreak: Boolean, totalTimeLeftMillis: Long) {
-        startLiveActivity.invoke(title, isBreak, totalTimeLeftMillis)
+    actual fun startLiveNotification(
+        title: String,
+        isBreak: Boolean,
+        totalTimeLeftMillis: Long,
+        alarmSound: AlarmSound
+    ) {
+        val soundFileName = when (alarmSound) {
+            AlarmSound.CAT -> "cat.wav"
+            AlarmSound.BIRD -> "bird.wav"
+            AlarmSound.BUFFALO -> "buffalo.wav"
+            AlarmSound.DOG -> "dog.wav"
+            AlarmSound.WOLF -> "standard.wav"
+            AlarmSound.STANDARD -> "wolf.wav"
+        }
+
+        startLiveActivity.invoke(title, isBreak, totalTimeLeftMillis,soundFileName)
     }
 
     actual fun stopLiveNotification() {

@@ -29,7 +29,7 @@ struct TimerWidgetsLiveActivity: Widget {
         ActivityConfiguration(for: TimerWidgetsAttributes.self) { context in
             VStack {
                 HStack(spacing: 15) {
-                    Image(systemName: "clock.fill")
+                    Image("clock")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(Color.blue)
@@ -40,7 +40,7 @@ struct TimerWidgetsLiveActivity: Widget {
                             var displayText = context.attributes.isBreak ? "Time to work. Start Pomodoro": "Choose your break activity";
                             Text(displayText)
                                 .font(.title)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(.white)
                                 .bold()
                         } else {
                             Text(context.state.displayText)

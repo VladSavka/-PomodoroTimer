@@ -4,7 +4,7 @@ import kotlinx.datetime.*
 import org.timer.main.domain.settings.*
 import platform.UserNotifications.*
 
-private const val ALARM_ID = "KittidoroAlarmID"
+private const val ALARM_ID = "AlarmID"
 
 actual class MobileAlarm actual constructor(actual val context: Any?) {
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()

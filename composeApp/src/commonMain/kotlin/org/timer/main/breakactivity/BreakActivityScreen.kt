@@ -136,7 +136,7 @@ fun BreakActivityScreen(
                     viewModel.onActivitySelected("")
                     if (windowInfo.isSmallScreen()) {
                         Title(
-                            text = "Pomodoro timer",
+                            text = "Short break time",
                             showBackButton = viewState.showBackButton,
                             onBackClick = { viewModel.onBackClick() },
                             currentTime = timerViewState.shortBreakTime

@@ -29,17 +29,20 @@ struct TimerWidgetsLiveActivity: Widget {
         ActivityConfiguration(for: TimerWidgetsAttributes.self) { context in
             VStack {
                 HStack(spacing: 15) {
-                    Image("clock")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .foregroundColor(Color.blue)
-                        .frame(width: 60, height: 60)
-                    
+                    ZStack {
+                        Image("clock")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(5)
+                    }
+                    .frame(width: 60, height: 60)
+                    .background(Color.white)
+                    .clipShape(Circle())
                     VStack(alignment: .leading, spacing: 8) {
                         if context.state.isFinished {
-                            var displayText = context.attributes.isBreak ? "Time to work. Start Pomodoro": "Choose your break activity";
+                            var displayText = context.attributes.isBreak ? "Meow! Time for another Kittidoro session!": "Break time! Pick a move and go!";
                             Text(displayText)
-                                .font(.title)
+                                .font(.headline)
                                 .foregroundStyle(.white)
                                 .bold()
                         } else {

@@ -1,7 +1,6 @@
 package org.timer.main.projects
 
 import androidx.lifecycle.*
-import com.diamondedge.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.timer.main.domain.project.*
@@ -18,9 +17,8 @@ class ProjectsViewModel(
     private val updateProjectNameUseCase: UpdateProjectNameUseCase,
     private val updateTaskDescriptionUseCase: UpdateTaskDescriptionUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val moveTaskToTheEndOfListTaskUseCase: MoveTaskToTheEndOfListUseCase
-
-
+    private val moveTaskToTheEndOfListTaskUseCase: MoveTaskToTheEndOfListUseCase,
+    private val deleteAllDoneTasksUseCase: DeleteAllDoneTasksUseCase
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
@@ -33,6 +31,13 @@ class ProjectsViewModel(
             }
             .launchIn(viewModelScope)
     }
+
+    private fun Project.toPresentableProject(): PresentableProject =
+        PresentableProject(
+            this.id,
+            this.name,
+            this.tasks
+        )
 
     fun onProjectTitleUpdate(title: String) {
         _viewState.update { it.copy(projectName = title) }
@@ -76,19 +81,12 @@ class ProjectsViewModel(
             updateTaskDescriptionUseCase(projectId, taskId, desc)
         }
 
-    companion object {
-        val log = logging()
-    }
-
-    private fun Project.toPresentableProject(): PresentableProject =
-        PresentableProject(
-            this.id,
-            this.name,
-            this.tasks
-        )
-
     fun onDeleteTaskClick(projectId: Long, taskId: Long) = viewModelScope.launch {
         deleteTaskUseCase(projectId, taskId)
+    }
+
+    fun onDeleteAllDoneTasksClick(projectId: Long) = viewModelScope.launch {
+        deleteAllDoneTasksUseCase(projectId)
     }
 }
 

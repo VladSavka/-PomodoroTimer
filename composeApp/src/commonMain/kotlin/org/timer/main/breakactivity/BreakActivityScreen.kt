@@ -95,19 +95,18 @@ fun BreakActivityScreen(
             when (timerViewState.timerState) {
                 is TimerState.ShortBreak -> {
                     Title(
+                        text= "Short break time",
                         showBackButton = viewState.showBackButton,
                         onBackClick = { viewModel.onBackClick() },
                         currentTime = timerViewState.shortBreakTime
                     )
                     if (windowInfo.isSmallScreen()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        SegmentedButton(
+                        ToggleBreakTypeButton(
                             selectedBreakType = timerViewState.timerState,
-                            onButtonSelected = {
-                                when (it) {
-                                    0 -> timerViewModel.onShortBreakStartClick()
-                                    1 -> timerViewModel.onLongBreakStartClick()
-                                }
+                            isShortBreakSelected = {
+                                if (it) timerViewModel.onShortBreakStartClick()
+                                else timerViewModel.onLongBreakStartClick()
                             }
                         )
                     }
@@ -116,19 +115,18 @@ fun BreakActivityScreen(
                 is TimerState.LongBreak -> {
                     viewModel.onActivitySelected("")
                     Title(
+                        text = "Long break time",
                         showBackButton = viewState.showBackButton,
                         onBackClick = { viewModel.onBackClick() },
                         currentTime = timerViewState.longBreakTime
                     )
                     if (windowInfo.isSmallScreen()) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        SegmentedButton(
+                        ToggleBreakTypeButton(
                             selectedBreakType = timerViewState.timerState,
-                            onButtonSelected = {
-                                when (it) {
-                                    0 -> timerViewModel.onShortBreakStartClick()
-                                    1 -> timerViewModel.onLongBreakStartClick()
-                                }
+                            isShortBreakSelected = {
+                                if (it) timerViewModel.onShortBreakStartClick()
+                                else timerViewModel.onLongBreakStartClick()
                             },
                         )
                     }
@@ -138,18 +136,17 @@ fun BreakActivityScreen(
                     viewModel.onActivitySelected("")
                     if (windowInfo.isSmallScreen()) {
                         Title(
+                            text = "Pomodoro timer",
                             showBackButton = viewState.showBackButton,
                             onBackClick = { viewModel.onBackClick() },
                             currentTime = timerViewState.shortBreakTime
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        SegmentedButton(
+                        ToggleBreakTypeButton(
                             selectedBreakType = timerViewState.timerState,
-                            onButtonSelected = {
-                                when (it) {
-                                    0 -> timerViewModel.onShortBreakStartClick()
-                                    1 -> timerViewModel.onLongBreakStartClick()
-                                }
+                            isShortBreakSelected = {
+                                if (it) timerViewModel.onShortBreakStartClick()
+                                else timerViewModel.onLongBreakStartClick()
                             }
                         )
                     }
@@ -233,6 +230,7 @@ fun BreakActivityScreen(
 
 @Composable
 fun Title(
+    text: String,
     showBackButton: Boolean,
     onBackClick: () -> Unit,
     currentTime: String,
@@ -261,7 +259,7 @@ fun Title(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Break time",
+                text = text,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
@@ -282,35 +280,40 @@ fun Title(
 }
 
 @Composable
-fun SegmentedButton(
+fun ToggleBreakTypeButton(
     selectedBreakType: TimerState,
-    onButtonSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    isShortBreakSelected: (Boolean) -> Unit,
 ) {
-    val options = listOf("Short", "Long")
-    val index = when (selectedBreakType) {
-        TimerState.LongBreak -> 1
-        is TimerState.Pomodoro -> 0
-        is TimerState.ShortBreak -> 0
-    }
-    var selectedIndex by remember { mutableStateOf(index) }
-
-    SingleChoiceSegmentedButtonRow(modifier = modifier) {
-        options.forEachIndexed { index, text ->
-            SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                onClick = {
-                    selectedIndex = index
-                    onButtonSelected(index)
-                },
-                selected = selectedIndex == index,
-            ) {
-                Text(
-                    text = text,
-                    fontWeight = FontWeight.Medium
-                )
+    var isLongSelected by remember(selectedBreakType) {
+        mutableStateOf(
+            when (selectedBreakType) {
+                TimerState.LongBreak -> true
+                is TimerState.Pomodoro -> false
+                is TimerState.ShortBreak -> false
             }
-        }
+        )
+    }
+
+    val buttonText = if (isLongSelected) "Short break" else "Long break"
+
+    Button(
+        onClick = {
+            isLongSelected = !isLongSelected
+            if (isLongSelected) {
+                isShortBreakSelected(false)
+            } else {
+                isShortBreakSelected(true)
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+    ) {
+        Text(
+            text = buttonText,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

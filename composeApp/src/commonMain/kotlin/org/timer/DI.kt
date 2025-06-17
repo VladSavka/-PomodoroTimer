@@ -36,6 +36,7 @@ fun appModule() = module {
     factoryOf(::MoveTaskToTheEndOfListUseCase)
     factoryOf(::PlayAlarmUseCase)
     factoryOf(::CancelAlarmUseCase)
+    factoryOf(::DeleteAllDoneTasksUseCase)
 }
 
 expect fun platformSpecificModule(): Module

@@ -174,7 +174,7 @@ class TimerViewModel(
         longBreakTimer.resetTimer()
         if (!_viewState.value.isPomodoroTimerRunning) {
             mobileAlarm.startLiveNotification(
-                "Kittidoro " + (viewState.value.kittyDoroNumber + 1),
+                "Tomato " + (viewState.value.kittyDoroNumber + 1),
                 false,
                 pomodoroTimer.getCurrentTimeMillis(),
                 settings.getAlarmSound().value

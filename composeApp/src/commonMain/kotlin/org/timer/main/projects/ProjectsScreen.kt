@@ -197,7 +197,11 @@ fun ProjectsScreen(
                                 },
                                 onDeleteTaskClick = { projectId, taskId ->
                                     viewModel.onDeleteTaskClick(projectId, taskId)
+                                },
+                                onDeleteAllDoneTasksClick = { projectId ->
+                                    viewModel.onDeleteAllDoneTasksClick(projectId)
                                 }
+
                             )
                             Spacer(modifier = Modifier.size(8.dp))
                         }
@@ -342,6 +346,7 @@ fun ProjectItem(
     onSubmitEditProjectName: (Long, String) -> Unit,
     onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
     onDeleteTaskClick: (Long, Long) -> Unit,
+    onDeleteAllDoneTasksClick: (Long) -> Unit,
 ) {
     var showAddTaskFooter by remember { mutableStateOf(project.tasks.isEmpty()) }
     var hasRequestedFocus by remember { mutableStateOf(true) } // New state variable
@@ -377,12 +382,13 @@ fun ProjectItem(
         Column(modifier = Modifier.padding(16.dp)) {
             Header(
                 project = project,
-                onDeletProjectClick = { onDeleteClick(project.id) },
+                onDeleteProjectClick = { onDeleteClick(project.id) },
                 onAddTaskClick = {
                     showAddTaskFooter = true
-                    hasRequestedFocus = false // Reset the flag when the footer is shown
+                    hasRequestedFocus = false
                 },
-                onSubmitEditProjectName = onSubmitEditProjectName
+                onSubmitEditProjectName = onSubmitEditProjectName,
+                onDeleteAllDoneTasksClick = { onDeleteAllDoneTasksClick(project.id) }
             )
             HorizontalDivider()
             LazyColumn(
@@ -628,9 +634,10 @@ fun TaskItem(
 @Composable
 private fun Header(
     project: PresentableProject,
-    onDeletProjectClick: () -> Unit,
+    onDeleteProjectClick: () -> Unit,
     onAddTaskClick: () -> Unit,
     onSubmitEditProjectName: (Long, String) -> Unit,
+    onDeleteAllDoneTasksClick: () -> Unit,
 ) {
     var textFieldValue by remember {
         mutableStateOf(TextFieldValue(project.name, TextRange(project.name.length)))
@@ -750,9 +757,17 @@ private fun Header(
                     )
                     HorizontalDivider()
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text("Delete project") },
                         onClick = {
-                            onDeletProjectClick()
+                            onDeleteProjectClick()
+                            isMenuExpanded = false
+                        }
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text("Delete all done tasks") },
+                        onClick = {
+                            onDeleteAllDoneTasksClick()
                             isMenuExpanded = false
                         }
                     )

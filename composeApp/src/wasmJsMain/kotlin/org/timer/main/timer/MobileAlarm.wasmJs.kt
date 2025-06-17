@@ -12,8 +12,13 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
         body: String
     ) {}
 
-    actual fun startLiveNotification(title: String, isBreak: Boolean, totalTimeLeftMillis: Long) {}
-
     actual fun stopLiveNotification() {}
+    actual fun startLiveNotification(
+        title: String,
+        isBreak: Boolean,
+        totalTimeLeftMillis: Long,
+        alarmSound: AlarmSound
+    ) {
+    }
 
 }

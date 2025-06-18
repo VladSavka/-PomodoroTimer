@@ -45,7 +45,7 @@ expect fun AskNotificationPermission()
 fun TimerTitle() {
     Text(
         modifier = Modifier.fillMaxWidth(),
-        text = "Kittydoro timer",
+        text = "TomatoPaws timer",
         fontSize = 28.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,

@@ -3,7 +3,7 @@ import FirebaseFunctions
 import FirebaseMessaging
 
 class LiveActivityScheduler { // Or wherever this logic resides
-
+    
     lazy var functions = Functions.functions(region: "us-central1")
     
     func scheduleActivityUpdate(
@@ -11,18 +11,17 @@ class LiveActivityScheduler { // Or wherever this logic resides
         endTime: Date,
         soundFileName: String
     ) {
-        // 1. Get the FCM Device Token
         Messaging.messaging().token { fcmToken, error in
             if let error = error {
                 print("🛑 Error fetching FCM registration token: \(error)")
                 return
             }
-
+            
             guard let deviceFCMToken = fcmToken else {
                 print("🛑 FCM registration token is nil.")
                 return
             }
-
+            
             print("📱 Fetched FCM Token: \(deviceFCMToken)")
             self.callSchedulerFunction(liveActivityPushToken: liveActivityPushToken,
                                        deviceFCMToken: deviceFCMToken,
@@ -30,7 +29,7 @@ class LiveActivityScheduler { // Or wherever this logic resides
                                        soundFileName: soundFileName)
         }
     }
-
+    
     private func callSchedulerFunction(
         liveActivityPushToken: String,
         deviceFCMToken: String,
@@ -67,10 +66,6 @@ class LiveActivityScheduler { // Or wherever this logic resides
             
             if let data = result?.data as? [String: Any] {
                 print("✅ LiveActivityScheduler: 'scheduleLiveActivityUpdate' successful. Response data: \(data)")
-                // Example: Accessing specific fields from the response
-                // if let successMessage = data["message"] as? String {
-                //     print("   Message from function: \(successMessage)")
-                // }
             } else {
                 print("⚠️ LiveActivityScheduler: 'scheduleLiveActivityUpdate' returned no data or unexpected data format. Result: \(String(describing: result?.data))")
             }

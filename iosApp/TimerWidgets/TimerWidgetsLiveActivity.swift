@@ -29,13 +29,14 @@ struct TimerWidgetsLiveActivity: Widget {
         ActivityConfiguration(for: TimerWidgetsAttributes.self) { context in
             VStack {
                 HStack(spacing: 15) {
+                    let size: CGFloat = 80
                     ZStack {
                         Image("clock")
                             .resizable()
                             .scaledToFit()
                             .padding(5)
                     }
-                    .frame(width: 60, height: 60)
+                    .frame(width: size, height: size)
                     .background(Color.white)
                     .clipShape(Circle())
                     VStack(alignment: .leading, spacing: 8) {
@@ -56,8 +57,6 @@ struct TimerWidgetsLiveActivity: Widget {
                                 .foregroundStyle(.white)
                                 .bold()
                                 .monospacedDigit()
-                            
-                            
                             
                             ProgressView(timerInterval: context.attributes.startDate...context.attributes.endDate, countsDown: false)
                                 .progressViewStyle(LinearProgressViewStyle())
@@ -95,7 +94,7 @@ struct TimerWidgetsLiveActivity: Widget {
                                        }
                 }
                 DynamicIslandExpandedRegion(.center) {
-                    Text(context.state.displayText) // Will show categoryName or "Finished"
+                    Text(context.state.displayText)
                                            .font(.headline)
                                            .lineLimit(1)
                                            .foregroundColor(context.state.isFinished ? .green : .primary)

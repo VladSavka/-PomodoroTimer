@@ -109,38 +109,30 @@ class GeneratedLiveActivityBridge: ObservableObject {
     
     private func processPushTokenStream(for activity: Activity<TimerWidgetsAttributes>, associatedTargetEndDate: Date, soundFileName: String) async {
         print("processPushTokenStream: Starting to observe push token for activity \(activity.id)")
-        do {
-            for try await pushTokenData in activity.pushTokenUpdates {
-                let pushTokenString = pushTokenData.map { String(format: "%02x", $0) }.joined()
-                
-                await MainActor.run {
-                    if self.currentActivity?.id == activity.id {
-                        self.currentActivityPushToken = pushTokenString
-                    }
+        
+        for try await pushTokenData in activity.pushTokenUpdates {
+            let pushTokenString = pushTokenData.map { String(format: "%02x", $0) }.joined()
+            
+            await MainActor.run {
+                if self.currentActivity?.id == activity.id {
+                    self.currentActivityPushToken = pushTokenString
                 }
-                
-                print("--------------------------------------------------------------------")
-                print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString) for activity ID \(activity.id)")
-                print("--------------------------------------------------------------------")
-                
-                guard self.currentActivity?.id == activity.id else {
-                    print("⚠️ Activity mismatch during push token processing. Current activity is \(String(describing: self.currentActivity?.id)), but token is for \(activity.id). Skipping server schedule for this token.")
-                    continue
-                }
-                
-                print("📲 Calling LiveActivityScheduler to schedule server update for token: \(pushTokenString) at \(associatedTargetEndDate) (for activity \(activity.id))")
-                self.liveActivityScheduler.scheduleActivityUpdate(
-                    liveActivityPushToken: pushTokenString,
-                    endTime: associatedTargetEndDate,
-                    soundFileName: soundFileName
-                )
             }
-        } catch {
-            if Task.isCancelled {
-                print("processPushTokenStream: Push token observation for \(activity.id) was cancelled.")
-            } else {
-                print("processPushTokenStream: Error observing push token updates for activity \(activity.id): \(error.localizedDescription)")
+            print("--------------------------------------------------------------------")
+            print("✅ LIVE ACTIVITY APNs PUSH TOKEN: \(pushTokenString) for activity ID \(activity.id)")
+            print("--------------------------------------------------------------------")
+            
+            guard self.currentActivity?.id == activity.id else {
+                print("⚠️ Activity mismatch during push token processing. Current activity is \(String(describing: self.currentActivity?.id)), but token is for \(activity.id). Skipping server schedule for this token.")
+                continue
             }
+            
+            print("📲 Calling LiveActivityScheduler to schedule server update for token: \(pushTokenString) at \(associatedTargetEndDate) (for activity \(activity.id))")
+            self.liveActivityScheduler.scheduleActivityUpdate(
+                liveActivityPushToken: pushTokenString,
+                endTime: associatedTargetEndDate,
+                soundFileName: soundFileName
+            )
         }
         print("processPushTokenStream: Finished observing push token for activity \(activity.id)")
     }
@@ -188,7 +180,7 @@ class GeneratedLiveActivityBridge: ObservableObject {
         print("endActivityByUserCancel called.")
         endCurrentLiveActivity(dismissalPolicy: .immediate)
     }
-
+    
     private func clearTrackedActivityReferences() {
         print("clearTrackedActivityReferences: Clearing all tracked references for current activity.")
         if Thread.isMainThread {
@@ -208,53 +200,44 @@ class GeneratedLiveActivityBridge: ObservableObject {
         self.activityObservationTask = nil
         self.pushTokenObservationTask = nil
     }
-
+    
     private func observeActivityState(activity: Activity<TimerWidgetsAttributes>) {
-        // This task is specifically for the 'activity' passed as a parameter.
-        // If self.activityObservationTask is meant to be singular for the *current* global activity:
         if self.currentActivity?.id == activity.id {
             self.activityObservationTask?.cancel() // Cancel previous global task
             self.activityObservationTask = Task { // Assign new global task
                 await processActivityStateStream(for: activity)
             }
         } else {
-            // If the activity passed isn't the current one, perhaps just run a local task for it
-            // without assigning to self.activityObservationTask.
             Task { // Local task, doesn't overwrite self.activityObservationTask
-                 print("Observing activity state for activity \(activity.id) which is not currently self.currentActivity (\(String(describing: self.currentActivity?.id))). This task is independent of the global activityObservationTask.")
-                 await processActivityStateStream(for: activity)
+                print("Observing activity state for activity \(activity.id) which is not currently self.currentActivity (\(String(describing: self.currentActivity?.id))). This task is independent of the global activityObservationTask.")
+                await processActivityStateStream(for: activity)
             }
         }
     }
-
-    // Helper function to process the activity state stream
+    
     private func processActivityStateStream(for activity: Activity<TimerWidgetsAttributes>) async {
-          print("processActivityStateStream: Starting to observe activity state for \(activity.id)")
-          // activity.activityStateUpdates is an AsyncStream<ActivityState>
-          // It does not throw, so a do-catch for the stream itself is not strictly necessary
-          // unless operations within the loop could throw.
-          for await currentActivityState in activity.activityStateUpdates { // Renamed stateUpdate to currentActivityState for clarity
-              print("Activity \(activity.id) state update: \(currentActivityState)") // currentActivityState is directly the ActivityState enum
-              
-              if currentActivityState == .dismissed || currentActivityState == .ended {
-                  print("Activity \(activity.id) is \(currentActivityState).")
-                  
-                  if self.currentActivity?.id == activity.id {
-                      print("Clearing tracked references because the current activity (\(activity.id)) has \(currentActivityState).")
-                      clearTrackedActivityReferences()
-                  } else {
-                      print("Activity \(activity.id) is \(currentActivityState), but it was not the 'self.currentActivity' (\(String(describing: self.currentActivity?.id))). No global references cleared by this event.")
-                  }
-                  break // Stop observing this activity's state as it's terminally ended/dismissed
-              }
-          }
-          // Check if the task was cancelled, which could also terminate the loop
-          if Task.isCancelled {
-              print("processActivityStateStream: Activity state observation for \(activity.id) was cancelled.")
-          }
-          print("processActivityStateStream: Finished observing activity state for \(activity.id)")
-      }
+        print("processActivityStateStream: Starting to observe activity state for \(activity.id)")
+        for await currentActivityState in activity.activityStateUpdates {
+            print("Activity \(activity.id) state update: \(currentActivityState)")
+            
+            if currentActivityState == .dismissed || currentActivityState == .ended {
+                print("Activity \(activity.id) is \(currentActivityState).")
+                
+                if self.currentActivity?.id == activity.id {
+                    print("Clearing tracked references because the current activity (\(activity.id)) has \(currentActivityState).")
+                    clearTrackedActivityReferences()
+                } else {
+                    print("Activity \(activity.id) is \(currentActivityState), but it was not the 'self.currentActivity' (\(String(describing: self.currentActivity?.id))). No global references cleared by this event.")
+                }
+                break // Stop observing this activity's state as it's terminally ended/dismissed
+            }
+        }
+        if Task.isCancelled {
+            print("processActivityStateStream: Activity state observation for \(activity.id) was cancelled.")
+        }
+        print("processActivityStateStream: Finished observing activity state for \(activity.id)")
+    }
 }
-    
 
-    
+
+

@@ -8,8 +8,6 @@ struct iOSApp: App {
     let liveActivityBridge = GeneratedLiveActivityBridge.shared 
     
     init() {
-        print("iOSApp init: Setting up Kotlin lambdas.")
-
         MobileAlarmKt.startLiveActivity = { title, isBreak, timeLeftInMillis, soundFileName in
             GeneratedLiveActivityBridge.shared.startActivity(
                 categoryName: title,

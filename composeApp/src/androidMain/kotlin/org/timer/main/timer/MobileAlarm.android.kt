@@ -86,6 +86,7 @@ actual class MobileAlarm actual constructor(actual val context: Any?) {
             it.action = MyForegroundService.ACTION_START
             it.putExtra("title", title)
             it.putExtra("totalTimeLeftMillis", totalTimeLeftMillis)
+            it.putExtra("isBreak", isBreak)
             androidContext.startService(it)
         }
     }

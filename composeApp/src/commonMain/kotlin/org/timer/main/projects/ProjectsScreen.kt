@@ -198,8 +198,8 @@ fun ProjectsScreen(
                                 onDeleteTaskClick = { projectId, taskId ->
                                     viewModel.onDeleteTaskClick(projectId, taskId)
                                 },
-                                onDeleteAllDoneTasksClick = { projectId ->
-                                    viewModel.onDeleteAllDoneTasksClick(projectId)
+                                onDeleteDoneTasksClick = { projectId ->
+                                    viewModel.onDeleteDoneTasksClick(projectId)
                                 }
 
                             )
@@ -346,7 +346,7 @@ fun ProjectItem(
     onSubmitEditProjectName: (Long, String) -> Unit,
     onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
     onDeleteTaskClick: (Long, Long) -> Unit,
-    onDeleteAllDoneTasksClick: (Long) -> Unit,
+    onDeleteDoneTasksClick: (Long) -> Unit,
 ) {
     var showAddTaskFooter by remember { mutableStateOf(project.tasks.isEmpty()) }
     var hasRequestedFocus by remember { mutableStateOf(true) } // New state variable
@@ -388,7 +388,7 @@ fun ProjectItem(
                     hasRequestedFocus = false
                 },
                 onSubmitEditProjectName = onSubmitEditProjectName,
-                onDeleteAllDoneTasksClick = { onDeleteAllDoneTasksClick(project.id) }
+                onDeleteDoneTasksClick = { onDeleteDoneTasksClick(project.id) }
             )
             HorizontalDivider()
             LazyColumn(
@@ -637,7 +637,7 @@ private fun Header(
     onDeleteProjectClick: () -> Unit,
     onAddTaskClick: () -> Unit,
     onSubmitEditProjectName: (Long, String) -> Unit,
-    onDeleteAllDoneTasksClick: () -> Unit,
+    onDeleteDoneTasksClick: () -> Unit,
 ) {
     var textFieldValue by remember {
         mutableStateOf(TextFieldValue(project.name, TextRange(project.name.length)))
@@ -765,9 +765,9 @@ private fun Header(
                     )
                     HorizontalDivider()
                     DropdownMenuItem(
-                        text = { Text("Delete all done tasks") },
+                        text = { Text("Delete ticked tasks") },
                         onClick = {
-                            onDeleteAllDoneTasksClick()
+                            onDeleteDoneTasksClick()
                             isMenuExpanded = false
                         }
                     )

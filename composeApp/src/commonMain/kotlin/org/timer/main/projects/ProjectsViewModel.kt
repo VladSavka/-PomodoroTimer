@@ -18,7 +18,7 @@ class ProjectsViewModel(
     private val updateTaskDescriptionUseCase: UpdateTaskDescriptionUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val moveTaskToTheEndOfListTaskUseCase: MoveTaskToTheEndOfListUseCase,
-    private val deleteAllDoneTasksUseCase: DeleteAllDoneTasksUseCase
+    private val deleteDoneTasksUseCase: DeleteAllDoneTasksUseCase
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(ProjectsViewState())
     val viewState: StateFlow<ProjectsViewState> = _viewState.asStateFlow()
@@ -85,8 +85,8 @@ class ProjectsViewModel(
         deleteTaskUseCase(projectId, taskId)
     }
 
-    fun onDeleteAllDoneTasksClick(projectId: Long) = viewModelScope.launch {
-        deleteAllDoneTasksUseCase(projectId)
+    fun onDeleteDoneTasksClick(projectId: Long) = viewModelScope.launch {
+        deleteDoneTasksUseCase(projectId)
     }
 }
 

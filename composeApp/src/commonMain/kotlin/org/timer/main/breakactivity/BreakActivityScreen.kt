@@ -95,7 +95,7 @@ fun BreakActivityScreen(
             when (timerViewState.timerState) {
                 is TimerState.ShortBreak -> {
                     Title(
-                        text= "Short break time",
+                        text= "Short break",
                         showBackButton = viewState.showBackButton,
                         onBackClick = { viewModel.onBackClick() },
                         currentTime = timerViewState.shortBreakTime
@@ -115,7 +115,7 @@ fun BreakActivityScreen(
                 is TimerState.LongBreak -> {
                     viewModel.onActivitySelected("")
                     Title(
-                        text = "Long break time",
+                        text = "Long break",
                         showBackButton = viewState.showBackButton,
                         onBackClick = { viewModel.onBackClick() },
                         currentTime = timerViewState.longBreakTime
@@ -136,7 +136,7 @@ fun BreakActivityScreen(
                     viewModel.onActivitySelected("")
                     if (windowInfo.isSmallScreen()) {
                         Title(
-                            text = "Short break time",
+                            text = "Short break",
                             showBackButton = viewState.showBackButton,
                             onBackClick = { viewModel.onBackClick() },
                             currentTime = timerViewState.shortBreakTime
@@ -305,9 +305,13 @@ fun ToggleBreakTypeButton(
                 isShortBreakSelected(true)
             }
         },
+        contentPadding = PaddingValues(
+            start = 12.dp,
+            end = 12.dp,
+        ),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            containerColor = MaterialTheme.colorScheme.onPrimary,
+            contentColor = MaterialTheme.colorScheme.primary
         ),
     ) {
         Text(

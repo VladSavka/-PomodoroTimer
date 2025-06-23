@@ -1,13 +1,19 @@
 package org.timer.main.breakactivity
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
@@ -16,6 +22,7 @@ import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
+import androidx.compose.ui.graphics.Color.Companion as Color1
 
 @Composable
 fun BreakActivityScreen(
@@ -47,40 +54,6 @@ fun BreakActivityScreen(
             }
         }
 
-        val items = remember {
-            listOf(
-                Item(
-                    "1",
-                    "Physical activity",
-                    listOf(
-                        SubItem("1.1", "Posture"),
-                        SubItem("1.2", "ABC"),
-                        SubItem("1.3", "Straightening"),
-                        SubItem("1.4", "Take a walk")
-                    )
-                ),
-                Item(
-                    "2",
-                    "Silly dance"
-                ),
-                Item(
-                    "3", "Home chores", listOf(
-                        SubItem("3.1", "Take out trash"),
-                        SubItem("3.2", "Do the dishes"),
-                        SubItem("3.3", "Make THAT space tidy"),
-                        SubItem("3.4", "Do the laundry")
-                    )
-                ),
-                Item(
-                    "4", "Take care of yourself",
-                    listOf(
-                        SubItem("4.1", "Drink water"),
-                        SubItem("4.2", "Grab quick snack"),
-                        SubItem("4.3", "Make a coffee"),
-                    ),
-                )
-            )
-        }
 
         Column(
             modifier = Modifier
@@ -95,7 +68,7 @@ fun BreakActivityScreen(
             when (timerViewState.timerState) {
                 is TimerState.ShortBreak -> {
                     Title(
-                        text= "Short break",
+                        text = "Short break",
                         showBackButton = viewState.showBackButton,
                         onBackClick = { viewModel.onBackClick() },
                         currentTime = timerViewState.shortBreakTime
@@ -113,7 +86,6 @@ fun BreakActivityScreen(
                 }
 
                 is TimerState.LongBreak -> {
-                    viewModel.onActivitySelected("")
                     Title(
                         text = "Long break",
                         showBackButton = viewState.showBackButton,
@@ -133,7 +105,6 @@ fun BreakActivityScreen(
                 }
 
                 is TimerState.Pomodoro -> {
-                    viewModel.onActivitySelected("")
                     if (windowInfo.isSmallScreen()) {
                         Title(
                             text = "Short break",
@@ -153,75 +124,13 @@ fun BreakActivityScreen(
                 }
             }
 
-            if (viewState.showActivityList && (timerViewState.timerState is TimerState.ShortBreak || (timerViewState.timerState is TimerState.Pomodoro && windowInfo.isSmallScreen()))) {
+            if (timerViewState.timerState is TimerState.ShortBreak || (timerViewState.timerState is TimerState.Pomodoro && windowInfo.isSmallScreen())) {
                 Spacer(modifier = Modifier.height(8.dp))
-                TwoLevelDeepList(
-                    viewState = viewState,
-                    items = items,
-                    onFirstLevelItemClick = { viewModel.onFirstLevelItemClick(it) },
-                    onItemSelected = {
-                        viewModel.onActivitySelected(it)
-                        timerViewModel.onShortBreakStartClick()
-                    }
+                HierarchicalMenu(
+                    currentMenu = viewState.currentMenu,
+                    onClick = { viewModel.navigateTo(it) },
+                    onRandomWorkoutClick = {}
                 )
-            } else {
-                val isAudioOrVideo = when (timerViewState.timerState) {
-                    is TimerState.LongBreak -> false // LongBreakContent is not Audio/Video
-                    else -> {
-                        when (viewState.selectedActivityId) {
-                            "1.1", "1.2", "1.3" -> true // Video
-                            "2" -> true // Audio
-                            else -> false // GoForIt or other content
-                        }
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    if (!isAudioOrVideo) {
-                        Spacer(Modifier.weight(0.4f))
-                    }
-                    when (timerViewState.timerState) {
-                        is TimerState.LongBreak -> {
-                            LongBreakContent(Modifier, timerViewState) // Will use biased spacing
-                        }
-
-                        else -> {
-                            when (viewState.selectedActivityId) {
-                                "1.1", "1.2", "1.3" -> Video(
-                                    timerViewState,
-                                    showDialog.value
-                                ) // Will be centered by Arrangement.Center
-                                "1.4" -> GoForIt(
-                                    Modifier,
-                                    timerViewState
-                                ) // Will use biased spacing
-                                "2" -> Audio(
-                                    timerViewState,
-                                    showDialog.value
-                                ) // Will be centered by Arrangement.Center
-                                "3.1", "3.2", "3.3", "3.4" -> GoForIt(
-                                    Modifier,
-                                    timerViewState
-                                ) // Will use biased spacing
-                                "4.1", "4.2", "4.3" -> GoForIt(
-                                    Modifier,
-                                    timerViewState
-                                ) // Will use biased spacing
-                                else -> {
-
-                                }
-                            }
-                        }
-                    }
-                    if (!isAudioOrVideo) {
-                        Spacer(Modifier.weight(0.6f))
-                    }
-                }
             }
         }
     }
@@ -414,90 +323,184 @@ fun LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
 }
 
 @Composable
-fun TwoLevelDeepList(
-    viewState: BreakActivityViewState,
-    items: List<Item>,
+fun HierarchicalMenu(
+    currentMenu: CurrentMenu,
     modifier: Modifier = Modifier,
-    onItemSelected: (String) -> Unit,
-    onFirstLevelItemClick: (Item) -> Unit
+    onClick: (MenuItem) -> Unit,
+    onRandomWorkoutClick: () -> Unit
 ) {
-    if (!viewState.showActivityList) {
-        return
-    }
+    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        AnimatedVisibility(
+            visible = currentMenu.title != null,
+            content = {
+                currentMenu.title?.let { title ->
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onPrimary, // Or onSurface
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                    )
+                }
+            }
+        )
 
-    Column(modifier = modifier) {
-        if (viewState.selectedItem == null) {
-            // Level 1: Main list
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                items(items) { item ->
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        ),
-                        onClick = {
-                            onFirstLevelItemClick.invoke(item)
-                            if (item.subItems.isEmpty()) {
-                                onItemSelected(item.id)
-                            }
-                        }
-                    ) {
-                        ListItem(
-                            headlineContent = {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = item.title,
-                                    textAlign = TextAlign.Center
-                                )
-                            },
-                            modifier = Modifier.padding(8.dp),
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            )
-                        )
-                    }
-                }
+        if (currentMenu.type == Type.GRID) {
+            Button(
+                onClick = onRandomWorkoutClick, // Directly use the non-nullable callback
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ),
+            ) {
+                Text("Random Workout")
             }
-        } else {
-            // Level 2: Sub-items list with "Back" button
-            LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
-                items(viewState.selectedItem!!.subItems) { subItem ->
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        ),
-                        onClick = {
-                            onItemSelected(subItem.id)
-                        }
-                    ) {
-                        ListItem(
-                            headlineContent = {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = subItem.title,
-                                    textAlign = TextAlign.Center
-                                )
-                            },
-                            modifier = Modifier.padding(8.dp),
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            )
-                        )
-                    }
-                }
-            }
+        }
+
+        when (currentMenu.type) {
+            Type.LIST -> ListMenu(currentMenu, onClick)
+            Type.GRID -> GridMenu(currentMenu, onClick,
+                modifier = Modifier.padding(top = if (currentMenu.title == null) 8.dp else 0.dp)
+            )
         }
     }
 }
 
 
-// Sample data structure (replace with your actual data)
-data class Item(val id: String, val title: String, val subItems: List<SubItem> = emptyList())
-data class SubItem(val id: String, val title: String)
+@Composable
+fun ListMenu(
+    currentMenu: CurrentMenu,
+    onClick: (MenuItem) -> Unit
+) {
+    currentMenu.menuItems.forEach { item ->
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            onClick = {
+                onClick(item)
+            }
+        ) {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = item.title,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleMedium // Example style
+                    )
+                },
+                // Add supportingContent for the subtitle
+                supportingContent = item.subtitle?.let { subtitleText ->
+                    { // This lambda is required by the supportingContent parameter
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = subtitleText,
+                            textAlign = TextAlign.Center, // Or another alignment if you prefer
+                            style = MaterialTheme.typography.bodyMedium, // Example style
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.9f) // Slightly less prominent
+                        )
+                    }
+                },
+                modifier = Modifier.padding(
+                    horizontal = 16.dp, // Standard padding for ListItem content
+                    vertical = 8.dp
+                ),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    headlineColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    supportingColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun GridMenu(
+    currentMenu: CurrentMenu,
+    onClick: (MenuItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val columns = GridCells.Adaptive(220.dp) // Or GridCells.Adaptive for responsiveness
+
+    LazyVerticalGrid(
+        columns = columns,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(currentMenu.menuItems, key = { it.id }) { menuItem ->
+            GridItem(
+                menuItem = menuItem,
+                onClick = { onClick(menuItem) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun GridItem(
+    menuItem: MenuItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp) // DEBUG: Force a fixed height
+            // .heightIn(min = 180.dp) // Comment out for now
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize() // Column fills the card
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Picture Box
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f), // Let it take available space for now
+
+                contentAlignment = Alignment.Center
+            ) {
+                 Icon(
+                     imageVector = Icons.Filled.Person,
+                     contentDescription = menuItem.title,
+                     modifier = Modifier.fillMaxSize(0.8f),
+                     tint = MaterialTheme.colorScheme.onSurfaceVariant
+                 )
+            }
+
+            // Title
+            Text(
+                text = menuItem.title,
+                style = MaterialTheme.typography.titleSmall,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
+        }
+    }
+}

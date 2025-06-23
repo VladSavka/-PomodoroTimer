@@ -1,8 +1,6 @@
 package org.timer.main.breakactivity
 
 data class BreakActivityViewState(
-    val selectedActivityId: String = "",
-    val showActivityList: Boolean = true,
-    var selectedItem: Item? = null,
+    val currentMenu: CurrentMenu = CurrentMenu(menuItems = emptyList()),
     var showBackButton: Boolean = false
 )

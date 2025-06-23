@@ -11,7 +11,7 @@ data class TimerViewState(
     val isLongBreakTimerRunning: Boolean = false,
     val kittyDoroNumber: Int = 0,
     val timerState: TimerState = TimerState.Pomodoro(
-        WorkoutVideosGateway.getWorkoutVideos().random(),
+        WorkoutVideosGateway.getWorkoutVideos().random().url,
         WorkoutVideosGateway.getDanceAudios().random()
     ),
     val selectedTabIndex: Int = 0,

@@ -94,7 +94,7 @@ class TimerViewModel(
             it.copy(
                 selectedTabIndex = 0,
                 timerState = TimerState.Pomodoro(
-                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getWorkoutVideos().random().url,
                     WorkoutVideosGateway.getDanceAudios().random()
                 ),
             )
@@ -132,7 +132,7 @@ class TimerViewModel(
             it.copy(
                 selectedTabIndex = 1,
                 timerState = TimerState.ShortBreak(
-                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getWorkoutVideos().random().url,
                     WorkoutVideosGateway.getDanceAudios().random()
                 ),
             )
@@ -192,7 +192,7 @@ class TimerViewModel(
                 it.copy(
                     selectedTabIndex = 0,
                     timerState = TimerState.Pomodoro(
-                        WorkoutVideosGateway.getWorkoutVideos().random(),
+                        WorkoutVideosGateway.getWorkoutVideos().random().url,
                         WorkoutVideosGateway.getDanceAudios().random()
                     )
                 )
@@ -229,7 +229,7 @@ class TimerViewModel(
                 it.copy(
                     selectedTabIndex = 1,
                     timerState = TimerState.ShortBreak(
-                        WorkoutVideosGateway.getWorkoutVideos().random(),
+                        WorkoutVideosGateway.getWorkoutVideos().random().url,
                         WorkoutVideosGateway.getDanceAudios().random()
                     )
                 )
@@ -282,7 +282,7 @@ class TimerViewModel(
             it.copy(
                 kittyDoroNumber = 0,
                 timerState = TimerState.Pomodoro(
-                    WorkoutVideosGateway.getWorkoutVideos().random(),
+                    WorkoutVideosGateway.getWorkoutVideos().random().url,
                     WorkoutVideosGateway.getDanceAudios().random()
                 )
             )

@@ -1,11 +1,12 @@
 package org.timer.main.breakactivity
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
@@ -13,16 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
+import org.kodein.emoji.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
-import androidx.compose.ui.graphics.Color.Companion as Color1
 
 @Composable
 fun BreakActivityScreen(
@@ -325,11 +325,20 @@ fun LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
 @Composable
 fun HierarchicalMenu(
     currentMenu: CurrentMenu,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, // Keep this for external layout control if needed
     onClick: (MenuItem) -> Unit,
     onRandomWorkoutClick: () -> Unit
 ) {
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    val cornerRadius = 12.dp
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 8.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         AnimatedVisibility(
             visible = currentMenu.title != null,
             content = {
@@ -337,39 +346,93 @@ fun HierarchicalMenu(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onPrimary, // Or onSurface
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
+                            .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                     )
                 }
             }
         )
 
-        if (currentMenu.type == Type.GRID) {
-            Button(
-                onClick = onRandomWorkoutClick, // Directly use the non-nullable callback
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimary,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-            ) {
-                Text("Random Workout")
-            }
-        }
-
         when (currentMenu.type) {
             Type.LIST -> ListMenu(currentMenu, onClick)
-            Type.GRID -> GridMenu(currentMenu, onClick,
-                modifier = Modifier.padding(top = if (currentMenu.title == null) 8.dp else 0.dp)
+            Type.GRID -> GridMenu(
+                currentMenu = currentMenu,
+                onClick = onClick,
+                modifier = Modifier.padding(top = if (currentMenu.title != null) 0.dp else 8.dp),
+                onRandomWorkoutClick = onRandomWorkoutClick,
             )
+            Type.AUDIO -> AudioMenu(currentMenu, onClick)
         }
     }
 }
 
+@Composable
+fun AudioMenu(
+    currentMenu: CurrentMenu,
+    onClick: (MenuItem) -> Unit
+) {
+    currentMenu.menuItems.forEach { item ->
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 8.dp
+                ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            onClick = {
+                onClick(item)
+            }
+        ) {
+            ListItem(
+                headlineContent = {
+                    WithPlatformEmoji(item.title) { text, inlineContent ->
+                        Text(
+                            text = text,
+                            textAlign = TextAlign.Start, // Align to start for better layout with leading icon
+                            style = MaterialTheme.typography.titleMedium,
+                            inlineContent = inlineContent
+                        )
+                    }
+                },
+                supportingContent = item.subtitle?.let { subtitleText ->
+                    {
+                        Text(
+                            text = subtitleText,
+                            textAlign = TextAlign.Start, // Align to start
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.9f)
+                        )
+                    }
+                },
+                leadingContent = {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow, // Dummy icon for audio
+                        contentDescription = "Audio track", // Decorative, or provide specific description
+                        modifier = Modifier.size(40.dp), // Adjust size as needed
+                        tint = MaterialTheme.colorScheme.primary // Example tint
+                    )
+                },
+                modifier = Modifier.padding(
+                    horizontal = 16.dp,
+                    vertical = 12.dp // Slightly more vertical padding for items with icons
+                ),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer, // Match card
+                    headlineColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    supportingColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                    leadingIconColor = MaterialTheme.colorScheme.primary // Ensure icon color is set if needed
+                )
+            )
+        }
+    }
+}
 
 @Composable
 fun ListMenu(
@@ -391,12 +454,17 @@ fun ListMenu(
         ) {
             ListItem(
                 headlineContent = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.title,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleMedium // Example style
-                    )
+                    WithPlatformEmoji(item.title) { text, inlineContent ->
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = text,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleMedium, // Example style
+                            inlineContent = inlineContent
+                        )
+                    }
+
+
                 },
                 // Add supportingContent for the subtitle
                 supportingContent = item.subtitle?.let { subtitleText ->
@@ -428,9 +496,11 @@ fun ListMenu(
 fun GridMenu(
     currentMenu: CurrentMenu,
     onClick: (MenuItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRandomWorkoutClick: () -> Unit
 ) {
-    val columns = GridCells.Adaptive(220.dp) // Or GridCells.Adaptive for responsiveness
+    val numberOfColums = 2
+    val columns = GridCells.Fixed(numberOfColums) // Or GridCells.Adaptive for responsiveness
 
     LazyVerticalGrid(
         columns = columns,
@@ -440,6 +510,20 @@ fun GridMenu(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        item(
+            span = {
+                GridItemSpan(numberOfColums)
+            }
+        ) {
+            Button(
+                onClick = onRandomWorkoutClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text("Gimme random")
+            }
+        }
         items(currentMenu.menuItems, key = { it.id }) { menuItem ->
             GridItem(
                 menuItem = menuItem,
@@ -481,12 +565,12 @@ private fun GridItem(
 
                 contentAlignment = Alignment.Center
             ) {
-                 Icon(
-                     imageVector = Icons.Filled.Person,
-                     contentDescription = menuItem.title,
-                     modifier = Modifier.fillMaxSize(0.8f),
-                     tint = MaterialTheme.colorScheme.onSurfaceVariant
-                 )
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = menuItem.title,
+                    modifier = Modifier.fillMaxSize(0.8f),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
             // Title

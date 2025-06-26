@@ -8,5 +8,6 @@ data class CurrentMenu(
 
 enum class Type {
     LIST,
-    GRID
+    GRID,
+    AUDIO
 }

@@ -82,6 +82,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.multiplatform.settings.serialization)
+            implementation(libs.emoji.compose.m3)
+
             api(libs.logging)
         }
         val commonTest by getting {

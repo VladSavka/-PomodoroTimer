@@ -2,6 +2,11 @@ package org.timer.main.breakactivity
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.flow.*
+import org.kodein.emoji.*
+import org.kodein.emoji.objects.household.*
+import org.kodein.emoji.people_body.person_activity.*
+import org.kodein.emoji.people_body.person_resting.*
+import org.timer.main.domain.video.WorkoutVideosGateway.getDanceAudios
 import org.timer.main.domain.video.WorkoutVideosGateway.getWorkoutVideos
 
 class BreakActivityViewModel : ViewModel() {
@@ -23,11 +28,37 @@ class BreakActivityViewModel : ViewModel() {
 
     private val choseYourSpaceMenu = CurrentMenu(
         title = "Chose your space", menuItems = listOf(
-            MenuItem(id = "1.1.1.1", title = "Sitting", children = exercisesMenu),
-            MenuItem(id = "1.1.1.2", title = "Standing 1", children = exercisesMenu),
-            MenuItem(id = "1.1.1.2", title = "Standing 2", children = exercisesMenu),
-            MenuItem(id = "1.1.1.2", title = "Floor time", children = exercisesMenu),
+            MenuItem(
+                id = "1.1.1.1",
+                title = "${Emoji.Chair} Sitting",
+                subtitle = "For cafes, coworking spaces, or Zoom calls.",
+                children = exercisesMenu
+            ),
+            MenuItem(
+                id = "1.1.1.2",
+                title = "${Emoji.Standing} Standing. Low-Key Mode",
+                subtitle = "Can move a little but don’t want to draw attention, or a tight spot",
+                children = exercisesMenu
+            ),
+            MenuItem(
+                id = "1.1.1.3",
+                title = "${Emoji.ManDancing} Standing. Party animal",
+                subtitle = "Got a little room to groove?",
+                children = exercisesMenu
+            ),
+            MenuItem(
+                id = "1.1.1.4",
+                title = "${Emoji.Yoga} Floor Time",
+                subtitle = "Private space? Let’s get on the floor.",
+                children = exercisesMenu
+            ),
         )
+    )
+
+    private val audioMenu = CurrentMenu(
+        "Choose your tune",
+        getDanceAudios().map { MenuItem(it.id.toString(), it.title) },
+        type = Type.AUDIO
     )
 
     private val energySelectionMenu = CurrentMenu(
@@ -66,25 +97,31 @@ class BreakActivityViewModel : ViewModel() {
     )
 
 
+    private val moveYourBodyMenu = CurrentMenu(
+        menuItems = listOf(
+            MenuItem(id = "1.1", title = "Workouts", children = energySelectionMenu),
+            MenuItem(id = "1.2", title = "Dance Break", children = audioMenu),
+            MenuItem(id = "1.3", title = "Shake it out"),
+            MenuItem(id = "1.4", title = "Eye Stretch")
+        )
+    )
+
+    private val tidyUpMenu = CurrentMenu(
+        menuItems = listOf(
+            MenuItem(id = "1.1", title = "Make space tidy"),
+            MenuItem(id = "1.2", title = "Take out trash"),
+            MenuItem(id = "1.3", title = "Your idea - you know what you are doing"),
+        )
+    )
+
     private val rootMenu = CurrentMenu(
         menuItems = listOf(
             MenuItem(
                 id = "1", title = "Move Your Body",
-                children = CurrentMenu(
-                    menuItems = listOf(
-                        MenuItem(id = "1.1", title = "Workouts", children = energySelectionMenu),
-                        MenuItem(id = "1.2", title = "Dance Break", children = energySelectionMenu),
-                        MenuItem(
-                            id = "1.3",
-                            title = "Shake it out",
-                            children = energySelectionMenu
-                        ),
-                        MenuItem(id = "1.4", title = "Eye Stretch", children = energySelectionMenu)
-                    )
-                )
+                children = moveYourBodyMenu
             ),
             MenuItem(id = "2", title = "Fuel up", children = fuelUpMenu),
-            MenuItem(id = "3", title = "Tidy up"),
+            MenuItem(id = "3", title = "Tidy up", children = tidyUpMenu),
             MenuItem(id = "4", title = "Clear your mind"),
             MenuItem(id = "5", title = "Mini challenge"),
         )

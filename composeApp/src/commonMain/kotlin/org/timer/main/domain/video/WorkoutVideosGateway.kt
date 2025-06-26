@@ -1,7 +1,5 @@
 package org.timer.main.domain.video
 
-import org.timer.main.domain.*
-
 object WorkoutVideosGateway {
 
     fun getWorkoutVideos() = listOf(
@@ -19,8 +17,8 @@ object WorkoutVideosGateway {
     )
 
     fun getDanceAudios() = listOf(
-        "https://www.youtube.com/watch?v=mBXBOLG06Wc",
-        "https://www.youtube.com/watch?v=SW_iujvUAzQ",
+        Video(1, "SEVENTEEN Feat. BSS)' Official MV", "https://www.youtube.com/watch?v=mBXBOLG06Wc"),
+        Video(2, "PSY - GANGNAM STYLE (Official Music Video)", "https://www.youtube.com/watch?v=SW_iujvUAzQ"),
     )
 
 }

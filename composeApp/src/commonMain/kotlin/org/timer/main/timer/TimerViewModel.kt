@@ -95,7 +95,7 @@ class TimerViewModel(
                 selectedTabIndex = 0,
                 timerState = TimerState.Pomodoro(
                     WorkoutVideosGateway.getWorkoutVideos().random().url,
-                    WorkoutVideosGateway.getDanceAudios().random()
+                    WorkoutVideosGateway.getDanceAudios().random().url
                 ),
             )
         }
@@ -133,7 +133,7 @@ class TimerViewModel(
                 selectedTabIndex = 1,
                 timerState = TimerState.ShortBreak(
                     WorkoutVideosGateway.getWorkoutVideos().random().url,
-                    WorkoutVideosGateway.getDanceAudios().random()
+                    WorkoutVideosGateway.getDanceAudios().random().url,
                 ),
             )
         }
@@ -193,7 +193,7 @@ class TimerViewModel(
                     selectedTabIndex = 0,
                     timerState = TimerState.Pomodoro(
                         WorkoutVideosGateway.getWorkoutVideos().random().url,
-                        WorkoutVideosGateway.getDanceAudios().random()
+                        WorkoutVideosGateway.getDanceAudios().random().url,
                     )
                 )
             }
@@ -230,7 +230,7 @@ class TimerViewModel(
                     selectedTabIndex = 1,
                     timerState = TimerState.ShortBreak(
                         WorkoutVideosGateway.getWorkoutVideos().random().url,
-                        WorkoutVideosGateway.getDanceAudios().random()
+                        WorkoutVideosGateway.getDanceAudios().random().url,
                     )
                 )
             }
@@ -283,7 +283,7 @@ class TimerViewModel(
                 kittyDoroNumber = 0,
                 timerState = TimerState.Pomodoro(
                     WorkoutVideosGateway.getWorkoutVideos().random().url,
-                    WorkoutVideosGateway.getDanceAudios().random()
+                    WorkoutVideosGateway.getDanceAudios().random().url,
                 )
             )
         }

@@ -107,6 +107,7 @@ class BreakActivityViewModel : ViewModel() {
     )
 
     private val tidyUpMenu = CurrentMenu(
+        title = "Tidy up",
         menuItems = listOf(
             MenuItem(id = "1.1", title = "Make space tidy"),
             MenuItem(id = "1.2", title = "Take out trash"),
@@ -131,7 +132,7 @@ class BreakActivityViewModel : ViewModel() {
     init {
         _viewState.update {
             it.copy(
-                currentMenu = currentMenu,
+                screenContent = ScreenContent.Menu(currentMenu),
                 showBackButton = navigationStack.isNotEmpty()
             )
         }
@@ -140,24 +141,80 @@ class BreakActivityViewModel : ViewModel() {
     fun navigateTo(item: MenuItem) {
         if (item.children != null) {
             navigationStack.add(item)
+            _viewState.update {
+                it.copy(
+                    screenContent = ScreenContent.Menu(currentMenu),
+                    showBackButton = navigationStack.isNotEmpty()
+                )
+            }
         } else {
-            // Здесь можно выполнять действие, если пункт конечный
+            _viewState.update { it.copy(showBackButton = true) }
+            navigateToNextScreen(item)
+        }
+
+    }
+
+    private fun navigateToNextScreen(item: MenuItem) {
+        val screenContent = _viewState.value.screenContent
+        if (screenContent is ScreenContent.Menu) {
+            when (screenContent.currentMenu.title) {
+                "Exercises" -> {
+                    val video = getWorkoutVideos().first { it.id.toString() == item.id }
+                    _viewState.update { it.copy(screenContent = ScreenContent.VideoContent(video)) }
+                }
+
+                "Choose your tune" -> {
+                    val audio = getDanceAudios().first { it.id.toString() == item.id }
+                    _viewState.update { it.copy(screenContent = ScreenContent.AudioContent(audio)) }
+                }
+
+                "Tidy up" -> {
+                    _viewState.update { it.copy(screenContent = ScreenContent.GoForItContent) }
+                }
+
+                else -> {
+                    _viewState.update { it.copy(screenContent = ScreenContent.ToDoContent) }
+                }
+            }
+        }
+    }
+
+    fun onBackClick() {
+        if (_viewState.value.screenContent !is ScreenContent.Menu) {
+            _viewState.update {
+                it.copy(
+                    screenContent = ScreenContent.Menu(currentMenu),
+                    showBackButton = navigationStack.isNotEmpty()
+                )
+            }
+            return
+        }
+        if (navigationStack.isNotEmpty()) {
+            navigationStack.removeAt(navigationStack.lastIndex)
         }
         _viewState.update {
             it.copy(
-                currentMenu = currentMenu,
+                screenContent = ScreenContent.Menu(currentMenu),
                 showBackButton = navigationStack.isNotEmpty()
             )
         }
     }
 
-    fun onBackClick() {
-        if (navigationStack.isNotEmpty()) {
-            navigationStack.removeLast()
-        }
+    fun onRandomWorkoutClick() {
+        val video = getWorkoutVideos().random()
         _viewState.update {
             it.copy(
-                currentMenu = currentMenu,
+                screenContent = ScreenContent.VideoContent(video),
+                showBackButton = true
+            )
+        }
+    }
+
+    fun navigateToRootMenu() {
+        navigationStack.clear()
+        _viewState.update {
+            it.copy(
+                screenContent = ScreenContent.Menu(currentMenu),
                 showBackButton = navigationStack.isNotEmpty()
             )
         }

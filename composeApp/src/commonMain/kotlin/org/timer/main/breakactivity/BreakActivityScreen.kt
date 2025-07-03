@@ -2,9 +2,7 @@ package org.timer.main.breakactivity
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.*
@@ -13,7 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
@@ -21,6 +19,7 @@ import androidx.lifecycle.compose.*
 import org.kodein.emoji.compose.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
+import org.timer.main.domain.video.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
 
@@ -34,6 +33,10 @@ fun BreakActivityScreen(
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val timerViewState by timerViewModel.viewState.collectAsStateWithLifecycle()
     val showDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(timerViewState.timerState) {
+        viewModel.navigateToRootMenu()
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -102,6 +105,7 @@ fun BreakActivityScreen(
                             },
                         )
                     }
+                    ToDo()
                 }
 
                 is TimerState.Pomodoro -> {
@@ -126,11 +130,23 @@ fun BreakActivityScreen(
 
             if (timerViewState.timerState is TimerState.ShortBreak || (timerViewState.timerState is TimerState.Pomodoro && windowInfo.isSmallScreen())) {
                 Spacer(modifier = Modifier.height(8.dp))
-                HierarchicalMenu(
-                    currentMenu = viewState.currentMenu,
-                    onClick = { viewModel.navigateTo(it) },
-                    onRandomWorkoutClick = {}
-                )
+                when (val screenContent = viewState.screenContent) {
+                    is ScreenContent.AudioContent -> Audio(screenContent.audio, showDialog.value)
+                    is ScreenContent.Menu -> HierarchicalMenu(
+                        currentMenu = screenContent.currentMenu,
+                        onClick = { viewModel.navigateTo(it) },
+                        onRandomWorkoutClick = { viewModel.onRandomWorkoutClick() }
+                    )
+
+                    is ScreenContent.VideoContent -> Video(
+                        screenContent.video,
+                        showDialog.value
+                    )
+
+                    ScreenContent.GoForItContent -> GoForIt()
+                    ScreenContent.ToDoContent -> ToDo()
+                }
+
             }
         }
     }
@@ -231,81 +247,74 @@ fun ToggleBreakTypeButton(
 }
 
 @Composable
-fun Audio(viewState: TimerViewState, showDialog: Boolean) {
-    if (viewState.timerState is TimerState.ShortBreak || viewState.timerState is TimerState.Pomodoro) {
-        Column(
-            modifier = Modifier
-                .padding(top = 16.dp, bottom = 16.dp),
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Show those moves! Dance like nobody watching",
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            val audioLink = when (viewState.timerState) {
-                is TimerState.ShortBreak -> viewState.timerState.audioLink
-                is TimerState.Pomodoro -> viewState.timerState.audioLink
-                else -> ""
-            }
-            if (!showDialog) {
-                VideoPlayer(
-                    modifier = Modifier.padding(
-                        top = 8.dp,
-                        bottom = 8.dp
-                    ).fillMaxWidth()
-                        .aspectRatio(16f / 9f),
-                    url = audioLink,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun Video(viewState: TimerViewState, showDialog: Boolean) {
-    viewState.timerState.apply {
-        if (this is TimerState.ShortBreak || this is TimerState.Pomodoro) {
-            Column(
-                modifier = Modifier
-                    .padding(
-                        top = 16.dp,
-                        bottom = 16.dp
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val videoLink = when (this@apply) {
-                    is TimerState.ShortBreak -> this@apply.videoLink
-                    is TimerState.Pomodoro -> this@apply.videoLink
-                    else -> ""
-                }
-                if (!showDialog) {
-                    VideoPlayer(
-                        modifier = Modifier
-                            .padding(top = 8.dp, bottom = 8.dp)
-                            .fillMaxWidth()
-                            .aspectRatio(16f / 9f),
-                        url = videoLink,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun GoForIt(modifier: Modifier = Modifier, viewState: TimerViewState) {
-    if (viewState.timerState is TimerState.ShortBreak || viewState.timerState is TimerState.Pomodoro) {
+fun Audio(video: Video, showDialog: Boolean) {
+    Column(
+        modifier = Modifier
+            .padding(top = 16.dp, bottom = 16.dp),
+    ) {
         Text(
-            modifier = modifier.padding(16.dp),
-            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+            text = "Show those moves! Dance like nobody watching",
             fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.headlineMedium,
-            text = "Go for it!",
+            textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onPrimary
         )
+
+        if (!showDialog) {
+            VideoPlayer(
+                modifier = Modifier.padding(
+                    top = 8.dp,
+                    bottom = 8.dp
+                ).fillMaxWidth()
+                    .aspectRatio(16f / 9f),
+                url = video.url,
+            )
+        }
     }
+}
+
+@Composable
+fun Video(video: Video, showDialog: Boolean) {
+    Column(
+        modifier = Modifier
+            .padding(top = 16.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (!showDialog) {
+            VideoPlayer(
+                modifier = Modifier
+                    .padding(top = 8.dp, bottom = 8.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f),
+                url = video.url,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun GoForIt() {
+    Text(
+        modifier = Modifier.padding(16.dp),
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.SemiBold,
+        style = MaterialTheme.typography.headlineMedium,
+        text = "Go for it!",
+        color = MaterialTheme.colorScheme.onPrimary
+    )
+}
+
+@Composable
+fun ToDo() {
+    Text(
+        modifier = Modifier.padding(16.dp),
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.SemiBold,
+        style = MaterialTheme.typography.headlineMedium,
+        text = "To do. Work in progress...",
+        color = MaterialTheme.colorScheme.onPrimary
+    )
 }
 
 @Composable
@@ -364,6 +373,7 @@ fun HierarchicalMenu(
                 modifier = Modifier.padding(top = if (currentMenu.title != null) 0.dp else 8.dp),
                 onRandomWorkoutClick = onRandomWorkoutClick,
             )
+
             Type.AUDIO -> AudioMenu(currentMenu, onClick)
         }
     }

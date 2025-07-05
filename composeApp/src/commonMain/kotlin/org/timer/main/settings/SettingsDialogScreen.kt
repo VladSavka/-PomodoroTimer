@@ -23,11 +23,6 @@ import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.ui.theme.*
 import pomodorotimer.composeapp.generated.resources.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp // Import .sp directly
 
 @Composable
 fun SettingsDialogScreen(
@@ -74,6 +69,7 @@ fun SingleChoiceDialog(
                 viewModel,
                 viewState,
                 isSmallScreen,
+                isDialogVisible,
             )
 
         }
@@ -86,7 +82,8 @@ fun SingleChoiceDialog(
                     radioOptions,
                     viewModel,
                     viewState,
-                    isSmallScreen
+                    isSmallScreen,
+                    isDialogVisible
                 )
             },
             onDismissRequest = {
@@ -110,6 +107,7 @@ fun Content(
     viewModel: SettingsViewModel,
     viewState: SettingsViewState,
     isSmallScreen: Boolean,
+    isDialogVisible: (Boolean) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val keyboard = LocalSoftwareKeyboardController.current
@@ -134,15 +132,25 @@ fun Content(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState) // Use the created scrollState
-                .padding(end = 8.dp) // Add padding to the end of the column
+                .padding(end = 8.dp),
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
             AlarmSoundContent(viewState, viewModel, isSmallScreen)
+            Button(
+                onClick = {
+                    isDialogVisible(false)
+                    viewModel.onSignOutClick()
+                },
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text("Sign Out")
+            }
         }
     }
 }
-
 
 
 @Composable
@@ -157,8 +165,10 @@ private fun TimerSettingsContent(
     val unscaledTextFieldHeight = 56.dp
     val unscaledErrorTextLineHeight = 16.sp.toDp()
     val buffer = 4.dp
-    val maxRowHeight = (unscaledTextFieldHeight * textFieldScale) + (unscaledErrorTextLineHeight * textFieldScale) + buffer
-    val minRowHeight = (unscaledTextFieldHeight * textFieldScale) // Let's try without the extra 2.dp first
+    val maxRowHeight =
+        (unscaledTextFieldHeight * textFieldScale) + (unscaledErrorTextLineHeight * textFieldScale) + buffer
+    val minRowHeight =
+        (unscaledTextFieldHeight * textFieldScale) // Let's try without the extra 2.dp first
 
     items.forEachIndexed { index, text ->
         Row(

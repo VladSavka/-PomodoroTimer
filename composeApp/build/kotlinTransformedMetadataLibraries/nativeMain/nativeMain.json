@@ -475,6 +475,16 @@
     "sourceSetName": "appleMain"
   },
   {
+    "moduleId": "module org.kodein.emoji:emoji-compose:2.0.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.kodein.emoji-emoji-compose-2.0.1-skiaMain-fY5mHA.klib",
+    "sourceSetName": "skiaMain"
+  },
+  {
+    "moduleId": "module org.kodein.emoji:emoji-compose:2.0.1",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/org.kodein.emoji-emoji-compose-2.0.1-iosMain-8Vh2IA.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
     "moduleId": "module co.touchlab:stately-strict:2.1.0",
     "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/nativeMain/co.touchlab-stately-strict-2.1.0-nativeMain-dKdBGA.klib",
     "sourceSetName": "nativeMain"

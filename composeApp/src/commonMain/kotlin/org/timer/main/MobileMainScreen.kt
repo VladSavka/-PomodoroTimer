@@ -12,7 +12,6 @@ import androidx.navigation.compose.*
 import org.jetbrains.compose.resources.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.breakactivity.*
-import org.timer.main.projects.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
 import org.timer.ui.theme.*
@@ -27,7 +26,7 @@ fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
     LaunchedEffect(viewState.navigateToActivitiesScreen) {
         if (viewState.navigateToActivitiesScreen) {
             timerViewModel.onNavigatedToActivitiesScreen()
-            navigateToScreen(navController, MainRouts.Activities)
+            navigateToScreen(navController, MobileRouts.Activities)
         }
     }
 
@@ -40,15 +39,15 @@ fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
         ) {
             NavHost(
                 navController = navController,
-                startDestination = MainRouts.Home.destanation,
+                startDestination = MobileRouts.Home.destanation,
             ) {
-                composable(MainRouts.Home.destanation) {
+                composable(MobileRouts.Home.destanation) {
                     TimerScreen(viewModel = timerViewModel)
                 }
-                composable(MainRouts.Activities.destanation) {
+                composable(MobileRouts.Activities.destanation) {
                     BreakActivityScreen(timerViewModel)
                 }
-                composable(MainRouts.Settings.destanation) {
+                composable(MobileRouts.Settings.destanation) {
                     SettingsDialogScreen(isDialogVisible = {})
                 }
             }
@@ -60,9 +59,9 @@ fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
 fun BottomBar(navController: NavHostController) {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkScheme else lightScheme) {
         val screens = listOf(
-            MainRouts.Home,
-            MainRouts.Activities,
-            MainRouts.Settings,
+            MobileRouts.Home,
+            MobileRouts.Activities,
+            MobileRouts.Settings,
         )
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = backStackEntry?.destination?.route ?: ""
@@ -84,7 +83,7 @@ fun BottomBar(navController: NavHostController) {
 
 @Composable
 fun RowScope.AddItem(
-    screen: MainRouts,
+    screen: MobileRouts,
     currentDestination: String,
     navController: NavHostController
 ) {
@@ -110,7 +109,7 @@ fun RowScope.AddItem(
 
 private fun navigateToScreen(
     navController: NavHostController,
-    screen: MainRouts
+    screen: MobileRouts
 ) {
     navController.navigate(screen.destanation, {
         popUpTo(navController.graph.findStartDestination().id) {
@@ -121,12 +120,12 @@ private fun navigateToScreen(
     })
 }
 
-sealed class MainRouts(
+sealed class MobileRouts(
     val destanation: String,
     val resourceId: String? = null,
     val icon: DrawableResource? = null
 ) {
-    data object Home : MainRouts("timer", "Timer", Res.drawable.home)
-    data object Activities : MainRouts("activities", "Activities", Res.drawable.run)
-    data object Settings : MainRouts("settings", "Settings", Res.drawable.settings)
+    data object Home : MobileRouts("timer", "Timer", Res.drawable.home)
+    data object Activities : MobileRouts("activities", "Activities", Res.drawable.run)
+    data object Settings : MobileRouts("settings", "Settings", Res.drawable.settings)
 }

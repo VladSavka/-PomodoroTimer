@@ -5,17 +5,64 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.compose.*
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.*
 import org.koin.compose.viewmodel.*
+import org.timer.main.auth.*
+import org.timer.main.breakactivity.*
 import org.timer.main.projects.*
 import org.timer.main.timer.*
-import org.timer.main.breakactivity.*
 
 @ExperimentalMaterial3Api
 @Composable
 fun WebMainScreen(
     viewModel: TimerViewModel = koinViewModel(),
+    authViewModel: AuthViewModel = koinViewModel()
 ) {
+    val viewState by authViewModel.viewState.collectAsStateWithLifecycle()
 
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = WebRouts.Main.destanation,
+    ) {
+        composable(WebRouts.Login.destanation) {
+            LoginScreen()
+        }
+        composable(WebRouts.Main.destanation) {
+            MainScreen(viewModel)
+        }
+    }
+
+    LaunchedEffect(viewState.isLoggedIn) {
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+        if (viewState.isLoggedIn) {
+            if (currentRoute != WebRouts.Main.destanation) {
+                navController.navigate(WebRouts.Main.destanation) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        } else {
+            if (currentRoute != WebRouts.Login.destanation) {
+                navController.navigate(WebRouts.Login.destanation) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        }
+    }
+}
+
+
+@ExperimentalMaterial3Api
+@Composable
+private fun MainScreen(viewModel: TimerViewModel) {
     Row {
         Card(
             modifier = Modifier
@@ -55,4 +102,11 @@ fun WebMainScreen(
             BreakActivityScreen()
         }
     }
+}
+
+private sealed class WebRouts(
+    val destanation: String,
+) {
+    data object Main : WebRouts("Main")
+    data object Login : WebRouts("Login")
 }

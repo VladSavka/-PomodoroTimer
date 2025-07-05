@@ -3,13 +3,15 @@ package org.timer.main.settings
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.timer.main.domain.auth.*
 import org.timer.main.domain.settings.*
 import org.timer.main.domain.timer.*
 
 class SettingsViewModel(
     private val settingsGateway: SettingsGateway,
     private val playAlarmUseCase: PlayAlarmUseCase,
-    private val cancelAlarmUseCase: CancelAlarmUseCase
+    private val cancelAlarmUseCase: CancelAlarmUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(SettingsViewState())
     val viewState: StateFlow<SettingsViewState> = _viewState.asStateFlow()
@@ -113,4 +115,9 @@ class SettingsViewModel(
         cancelAlarmUseCase.invoke()
         playAlarmUseCase.invoke()
     }
+
+    fun onSignOutClick() = viewModelScope.launch {
+        logoutUseCase()
+    }
+
 }

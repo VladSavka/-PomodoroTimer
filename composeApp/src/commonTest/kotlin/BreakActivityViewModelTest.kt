@@ -10,7 +10,6 @@ import kotlin.test.*
 @ExperimentalCoroutinesApi
 class BreakActivityViewModelTest {
 
-
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: BreakActivityViewModel
@@ -22,7 +21,7 @@ class BreakActivityViewModelTest {
         viewModel = BreakActivityViewModel()
     }
 
-    @AfterTest // Kotlin Test equivalent of @After
+    @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
     }

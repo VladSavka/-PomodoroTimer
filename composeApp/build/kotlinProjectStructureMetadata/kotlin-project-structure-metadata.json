@@ -69,7 +69,8 @@
           "io.insert-koin:koin-compose-viewmodel-navigation",
           "org.jetbrains.kotlinx:kotlinx-serialization-json",
           "com.russhwolf:multiplatform-settings-no-arg",
-          "com.russhwolf:multiplatform-settings-serialization"
+          "com.russhwolf:multiplatform-settings-serialization",
+          "org.kodein.emoji:emoji-compose-m3"
         ],
         "sourceSetCInteropMetadataDirectory": "appleMain-cinterop",
         "binaryLayout": "klib",
@@ -110,6 +111,7 @@
           "org.jetbrains.kotlinx:kotlinx-serialization-json",
           "com.russhwolf:multiplatform-settings-no-arg",
           "com.russhwolf:multiplatform-settings-serialization",
+          "org.kodein.emoji:emoji-compose-m3",
           "dev.icerock.moko:permissions-compose",
           "dev.icerock.moko:permissions-notifications"
         ],
@@ -142,7 +144,8 @@
           "io.insert-koin:koin-compose-viewmodel-navigation",
           "org.jetbrains.kotlinx:kotlinx-serialization-json",
           "com.russhwolf:multiplatform-settings-no-arg",
-          "com.russhwolf:multiplatform-settings-serialization"
+          "com.russhwolf:multiplatform-settings-serialization",
+          "org.kodein.emoji:emoji-compose-m3"
         ],
         "sourceSetCInteropMetadataDirectory": "nativeMain-cinterop",
         "binaryLayout": "klib",

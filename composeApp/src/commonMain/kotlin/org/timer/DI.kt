@@ -23,7 +23,7 @@ fun appModule() = module {
     viewModel { BreakActivityViewModel() }
     viewModel { TimerViewModel(get(), get(), get(), get()) }
     singleOf(::AuthViewModel)
-    singleOf(::ProjectsViewModel)
+    viewModelOf(::ProjectsViewModel)
     //UseCases
     factoryOf(::GetProjectsUseCase)
     factoryOf(::AddProjectUseCase)

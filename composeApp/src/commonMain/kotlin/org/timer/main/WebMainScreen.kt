@@ -21,48 +21,50 @@ fun WebMainScreen(
     authViewModel: AuthViewModel = koinViewModel()
 ) {
     val viewState by authViewModel.viewState.collectAsStateWithLifecycle()
-
-    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = WebRouts.Main.destanation,
-    ) {
-        composable(WebRouts.Login.destanation) {
-            LoginScreen()
-        }
-        composable(WebRouts.Main.destanation) {
-            MainScreen(viewModel)
-        }
-    }
-
-    LaunchedEffect(viewState.isLoggedIn) {
-        val currentRoute = navController.currentBackStackEntry?.destination?.route
-        if (viewState.isLoggedIn) {
-            if (currentRoute != WebRouts.Main.destanation) {
-                navController.navigate(WebRouts.Main.destanation) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                }
+    if (viewState.isLoading) {
+        FullScreenLoadingIndicator()
+    } else {
+        val navController = rememberNavController()
+        NavHost(
+            navController = navController,
+            startDestination = WebRouts.Main.destanation,
+        ) {
+            composable(WebRouts.Login.destanation) {
+                LoginScreen()
             }
-        } else {
-            if (currentRoute != WebRouts.Login.destanation) {
-                navController.navigate(WebRouts.Login.destanation) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        inclusive = true
+            composable(WebRouts.Main.destanation) {
+                MainScreen(viewModel, authViewModel)
+            }
+        }
+
+        LaunchedEffect(viewState.isLoggedIn) {
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (viewState.isLoggedIn) {
+                if (currentRoute != WebRouts.Main.destanation) {
+                    navController.navigate(WebRouts.Main.destanation) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
                     }
-                    launchSingleTop = true
+                }
+            } else {
+                if (currentRoute != WebRouts.Login.destanation) {
+                    navController.navigate(WebRouts.Login.destanation) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             }
         }
     }
 }
 
-
 @ExperimentalMaterial3Api
 @Composable
-private fun MainScreen(viewModel: TimerViewModel) {
+private fun MainScreen(viewModel: TimerViewModel, authViewModel: AuthViewModel) {
     Row {
         Card(
             modifier = Modifier
@@ -101,6 +103,16 @@ private fun MainScreen(viewModel: TimerViewModel) {
         ) {
             BreakActivityScreen()
         }
+    }
+}
+
+@Composable
+fun FullScreenLoadingIndicator() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 

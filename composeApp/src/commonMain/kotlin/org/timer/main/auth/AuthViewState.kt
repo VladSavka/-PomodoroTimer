@@ -1,5 +1,6 @@
 package org.timer.main.auth
 
 data class AuthViewState(
-    var isLoggedIn: Boolean = false
+    val isLoading: Boolean = true,
+    val isLoggedIn: Boolean = false
 )

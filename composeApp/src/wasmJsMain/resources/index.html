@@ -10,5 +10,74 @@
 </head>
 <body>
 <div id="components"></div>
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3saA7h2rLIdRaFVWQFFRb0C5qo6KawDg",
+      authDomain: "kittidoro-timer.firebaseapp.com",
+      projectId: "kittidoro-timer",
+      storageBucket: "kittidoro-timer.firebasestorage.app",
+      messagingSenderId: "653658039232",
+      appId: "1:653658039232:web:68b2f7592a783974735e25",
+      measurementId: "G-GKDJDKRKES"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Объект для взаимодействия с Kotlin/Wasm
+    window.myAppJsFirebase = {
+        signInWithGooglePopup: async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                return { success: true, email: result.user.email, uid: result.user.uid };
+            } catch (error) {
+                let msg = error.message || "Unknown error";
+                if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                    msg = 'Popup closed or cancelled.';
+                }
+                return { success: false, error: msg };
+            }
+        },
+        signOut: async () => {
+            try {
+                await firebaseSignOut(auth);
+                return { success: true };
+            } catch (error) {
+                return { success: false, error: error.message || "Unknown error" };
+            }
+        },
+        observeAuthState: (kotlinCallback) => {
+            return onAuthStateChanged(auth, (user) => {
+                kotlinCallback(!!user, user?.email, user?.uid);
+            });
+        }
+    };
+
+    window.myAppJsHelpers = {
+        getBooleanProperty: function(obj, propName) {
+            if (obj && typeof obj[propName] === 'boolean') {
+                return obj[propName];
+            }
+            return null;
+        },
+        getStringProperty: function(obj, propName) {
+            if (obj && typeof obj[propName] === 'string') {
+                return obj[propName];
+            }
+            return null;
+        },
+    };
+    console.log("JS: Firebase bridge for Kotlin initialized.");
+</script>
 </body>
 </html>

@@ -2,10 +2,10 @@ package org.timer.main.domain.auth
 
 import kotlinx.coroutines.flow.*
 
-expect class DefaultAuthGateway constructor() : AuthGateway {
+expect class DefaultAuthGateway() : AuthGateway {
 
-    override suspend fun login(): AuthResult
+    override suspend fun login()
 
-    override fun isLoggedIn(): Flow<Boolean>
+    override fun isLoggedIn(): Flow<AuthState>
     override suspend fun logout()
 }

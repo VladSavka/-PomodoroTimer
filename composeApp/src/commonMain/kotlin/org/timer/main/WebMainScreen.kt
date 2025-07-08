@@ -27,13 +27,13 @@ fun WebMainScreen(
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = WebRouts.Main.destanation,
+            startDestination = if (viewState.isLoggedIn) WebRouts.Main.destanation else  WebRouts.Login.destanation,
         ) {
             composable(WebRouts.Login.destanation) {
                 LoginScreen()
             }
             composable(WebRouts.Main.destanation) {
-                MainScreen(viewModel, authViewModel)
+                MainScreen(viewModel)
             }
         }
 
@@ -64,7 +64,7 @@ fun WebMainScreen(
 
 @ExperimentalMaterial3Api
 @Composable
-private fun MainScreen(viewModel: TimerViewModel, authViewModel: AuthViewModel) {
+private fun MainScreen(viewModel: TimerViewModel) {
     Row {
         Card(
             modifier = Modifier
@@ -112,7 +112,7 @@ fun FullScreenLoadingIndicator() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        LinearProgressIndicator()
     }
 }
 

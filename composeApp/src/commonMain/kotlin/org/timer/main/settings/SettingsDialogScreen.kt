@@ -137,18 +137,25 @@ fun Content(
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
             AlarmSoundContent(viewState, viewModel, isSmallScreen)
-            Button(
-                onClick = {
-                    isDialogVisible(false)
-                    viewModel.onSignOutClick()
-                },
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Text("Sign Out")
-            }
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
+            SignOutButton(isDialogVisible, viewModel)
         }
+    }
+}
+
+@Composable
+fun SignOutButton(
+    isDialogVisible: (Boolean) -> Unit,
+    viewModel: SettingsViewModel
+) {
+    Button(
+        onClick = {
+            isDialogVisible(false)
+            viewModel.onSignOutClick()
+        },
+        modifier = Modifier.padding(bottom = 8.dp)
+    ) {
+        Text("Sign Out")
     }
 }
 

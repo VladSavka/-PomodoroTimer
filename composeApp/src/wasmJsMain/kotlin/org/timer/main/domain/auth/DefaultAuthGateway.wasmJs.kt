@@ -1,4 +1,3 @@
-// wasmJsMain/kotlin/org/timer/main/domain/auth/DefaultAuthGateway.kt
 package org.timer.main.domain.auth
 
 import com.diamondedge.logging.*
@@ -6,20 +5,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.js.*
 
-// --- Внешние объявления для JS Interop (остаются без изменений) ---
-private external interface JsAuthResponse {
-    val success: Boolean
-    val email: String?
-    val uid: String?
-    val error: String?
-}
-
 private external interface FirebaseJsBridge {
     fun signInWithGooglePopup(): Promise<JsAny?>
     fun signOut(): Promise<JsAny?>
     fun observeAuthState(callback: (isSignedIn: Boolean, email: String?, uid: String?) -> Unit): () -> Unit
 }
-
 
 @JsName("window.myAppJsFirebase")
 private external val myAppJsFirebase: FirebaseJsBridge?
@@ -38,7 +28,7 @@ private external val myAppJsHelpers: JsHelpers?
 
 actual class DefaultAuthGateway : AuthGateway {
 
-    private val _currentAuthState = MutableStateFlow(false)
+    private val _currentAuthState = MutableStateFlow<AuthState>(AuthState.Loading)
 
     init {
         observeFirebaseAuthState()
@@ -46,55 +36,50 @@ actual class DefaultAuthGateway : AuthGateway {
 
     private fun observeFirebaseAuthState() {
         try {
-            val bridge = getFirebaseJsOrThrow()
+            val bridge = getFirebaseJs()
             bridge.observeAuthState { isSignedIn, email, uid ->
-                logging().d {"observeAuthState: isSignedIn=$isSignedIn"}
-                _currentAuthState.value = isSignedIn
+                _currentAuthState.value = if (isSignedIn) AuthState.Authenticated else AuthState.NotAuthenticated
             }
         } catch (e: Throwable) {
             val errorMessage = e.message ?: "Unknown error setting up Firebase AuthState observer"
             logging().error{"Error setting up Firebase AuthState observer: $errorMessage"}
-            _currentAuthState.value = false
+            _currentAuthState.value = AuthState.NotAuthenticated
         }
     }
 
-    private fun getFirebaseJsOrThrow(): FirebaseJsBridge {
+    private fun getFirebaseJs(): FirebaseJsBridge {
         return myAppJsFirebase
             ?: throw IllegalStateException("Firebase JS bridge (window.myAppJsFirebase) is not available.")
     }
 
-    actual override suspend fun login(): AuthResult {
+    actual override suspend fun login() {
         return try {
-            val responseJs: JsAny? = getFirebaseJsOrThrow().signInWithGooglePopup().await()
+            val responseJs: JsAny? = getFirebaseJs().signInWithGooglePopup().await()
 
             if (responseJs == null) {
-                AuthResult.Error("Received null response from JavaScript for login")
+                logging().error{"Received null response from JavaScript for login"}
             } else {
                 val helpers = getJsHelpersOrThrow()
-                // Преобразуем Kotlin String в JsString для передачи в JS функцию
                 val jsSuccess: JsBoolean = helpers.getBooleanProperty(responseJs, "success".toJsString())
-                    val uid = helpers.getStringProperty(responseJs, "uid".toJsString())?.toString() // Преобразуем JsString? в Kotlin String?
+                    val uid = helpers.getStringProperty(responseJs, "uid".toJsString())?.toString()
                 val email = helpers.getStringProperty(responseJs, "email".toJsString())?.toString()
                 val error = helpers.getStringProperty(responseJs, "error".toJsString())?.toString()
                 if (jsSuccess.toBoolean()) {
-                    AuthResult.Success(userId = uid, email = email)
+                  //  todo
                 } else {
-                    AuthResult.Error(error ?: "Unknown error during Google login")
+                    logging().error{"Error during Google login: $error"}
                 }
             }
         } catch (e: Throwable) {
             val errorMessage = e.message ?: "JavaScript error during Google login"
-            AuthResult.Error(errorMessage)
+            logging().error{errorMessage}
         }
     }
 
-    actual override fun isLoggedIn(): Flow<Boolean> {
-        return _currentAuthState
-    }
-
+    actual override fun isLoggedIn(): Flow<AuthState> = _currentAuthState
 
     actual override suspend fun logout() {
-           getFirebaseJsOrThrow().signOut()
+           getFirebaseJs().signOut()
     }
 }
 

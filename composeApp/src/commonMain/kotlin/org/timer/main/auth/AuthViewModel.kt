@@ -13,11 +13,16 @@ class AuthViewModel(
     val viewState: StateFlow<AuthViewState> = _viewState.asStateFlow()
 
     init {
-
         viewModelScope.launch {
-            isLoggedInUseCase().collect { isLoggedIn ->
-                
-                _viewState.update { it.copy(isLoggedIn = isLoggedIn, isLoading = false) }
+            isLoggedInUseCase().collect { authState ->
+                when (authState){
+                    AuthState.Authenticated ->
+                        _viewState.update { it.copy(isLoggedIn = true, isLoading = false) }
+                    AuthState.Loading ->
+                        _viewState.update{ it.copy(isLoading = true)}
+                    AuthState.NotAuthenticated ->
+                        _viewState.update { it.copy(isLoggedIn = false, isLoading = false) }
+                }
             }
         }
     }

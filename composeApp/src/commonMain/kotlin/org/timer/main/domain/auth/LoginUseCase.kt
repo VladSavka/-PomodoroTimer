@@ -10,12 +10,6 @@ interface LoginUseCase {
 class DefaultLoginUseCase(private val authGateway: AuthGateway) : LoginUseCase {
 
     override suspend fun invoke() {
-        val login = authGateway.login()
-        when (login){
-            is AuthResult.Error ->  logging().e{ "Login error" + login.message }
-            is AuthResult.Success ->  logging().d { "Login success user id = " + login.userId + " email "+login.email }
-        }
-
-
+        authGateway.login()
     }
 }

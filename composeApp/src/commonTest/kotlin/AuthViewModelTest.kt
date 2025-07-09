@@ -15,11 +15,12 @@ class AuthViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: AuthViewModel
+    private lateinit var authGateway: FakeAuthGateway
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        val authGateway = FakeAuthGateway()
+        authGateway = FakeAuthGateway()
         viewModel = AuthViewModel(
             DefaultLoginUseCase(authGateway),
             DefaultIsLoggedInUseCase(authGateway)
@@ -32,9 +33,10 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `initial state should be user is not logged in`() = runTest {
+    fun `initial state should be user is not logged in and loading shown`() = runTest {
         val initialState = viewModel.viewState.first()
         assertThat(initialState.isLoggedIn).isFalse()
+        assertThat(initialState.isLoading).isTrue()
     }
 
     @Test
@@ -43,5 +45,34 @@ class AuthViewModelTest {
         advanceUntilIdle()
         val viewState = viewModel.viewState.value
         assertThat(viewState.isLoggedIn).isTrue()
+        assertThat(viewState.isLoading).isFalse()
     }
+
+    @Test
+    fun `user auth state is  Authenticated should update screen state to logged in and not loading`() = runTest {
+            authGateway.flow.emit(AuthState.Authenticated)
+            advanceUntilIdle()
+            val viewState = viewModel.viewState.value
+            assertThat(viewState.isLoggedIn).isTrue()
+            assertThat(viewState.isLoading).isFalse()
+        }
+
+    @Test
+    fun `user auth state is Not Authenticated should update screen state to not logged in and not loading`() = runTest {
+        authGateway.flow.emit(AuthState.NotAuthenticated)
+        advanceUntilIdle()
+        val viewState = viewModel.viewState.first()
+        assertThat(viewState.isLoggedIn).isFalse()
+        assertThat(viewState.isLoading).isFalse()
+    }
+
+    @Test
+    fun `user auth state is Loading should update screen state to loading`() = runTest {
+        authGateway.flow.emit(AuthState.Loading)
+        advanceUntilIdle()
+        val viewState = viewModel.viewState.first()
+        assertThat(viewState.isLoading).isTrue()
+    }
+
+
 }

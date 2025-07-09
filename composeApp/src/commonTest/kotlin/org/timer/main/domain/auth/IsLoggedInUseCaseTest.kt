@@ -17,15 +17,23 @@ class IsLoggedInUseCaseTest {
     }
 
     @Test
-    fun `is logged in state should be false when the user hasn't logged yet`() = runTest {
+    fun `is logged in state should be loading when the user hasn't logged yet`() = runTest {
         val actualResult = isLoggedInUseCase.invoke().first()
-        assertThat(actualResult).isFalse()
+        assertThat(actualResult).isEqualTo(AuthState.Loading)
     }
 
     @Test
-    fun `is logged in state should be true when the user has successfully logged in`() = runTest {
+    fun `is logged in state should be autentificated when the user has successfully logged in`() = runTest {
         authGateway.login()
         val actualResult = isLoggedInUseCase.invoke().first()
-        assertThat(actualResult).isTrue()
+        assertThat(actualResult).isEqualTo(AuthState.Authenticated)
+    }
+
+    @Test
+    fun `is logged in state should be Not Authenticated when the user has successfully logout`() = runTest {
+        authGateway.login()
+        authGateway.logout()
+        val actualResult = isLoggedInUseCase.invoke().first()
+        assertThat(actualResult).isEqualTo(AuthState.NotAuthenticated)
     }
 }

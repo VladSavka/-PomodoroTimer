@@ -20,6 +20,6 @@ class LoginUseCaseTest {
     @Test
     fun `login should logged in user`() = runTest {
       loginUseCase.invoke()
-        assertThat(authGetway.isLoggedIn().first()).isTrue()
+        assertThat(authGetway.isLoggedIn().first()).isEqualTo(AuthState.Authenticated)
     }
 }

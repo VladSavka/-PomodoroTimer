@@ -4,15 +4,15 @@ import kotlinx.coroutines.flow.*
 import org.timer.main.domain.auth.*
 
 class FakeAuthGateway : AuthGateway {
-    private val flow = MutableStateFlow(false)
+    val flow = MutableStateFlow<AuthState>(AuthState.Loading)
 
     override suspend fun login() {
-        flow.emit(true)
+        flow.emit(AuthState.Authenticated)
     }
 
-    override fun isLoggedIn(): Flow<Boolean> = flow
+    override fun isLoggedIn(): Flow<AuthState> = flow
 
     override suspend fun logout() {
-        flow.emit(false)
+        flow.emit(AuthState.NotAuthenticated)
     }
 }

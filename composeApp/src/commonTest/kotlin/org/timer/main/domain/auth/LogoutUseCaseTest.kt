@@ -19,6 +19,6 @@ class LogoutUseCaseTest {
     @Test
     fun `logout should logout user`() = runTest {
         logoutUseCase.invoke()
-        assertThat(authGateway.isLoggedIn().first()).isFalse()
+        assertThat(authGateway.isLoggedIn().first()).isEqualTo(AuthState.NotAuthenticated)
     }
 }

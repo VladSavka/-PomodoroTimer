@@ -41,7 +41,7 @@ struct TimerWidgetsLiveActivity: Widget {
                     .clipShape(Circle())
                     VStack(alignment: .leading, spacing: 8) {
                         if context.state.isFinished {
-                            var displayText = context.attributes.isBreak ? "Meow! Time for another Kittidoro session!": "Break time! Pick a move and go!";
+                            let displayText = context.attributes.isBreak ? "Meow! Time for another Kittidoro session!": "Break time! Pick a move and go!";
                             Text(displayText)
                                 .font(.headline)
                                 .foregroundStyle(.white)

@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseMessaging
+import FirebaseAuth
 import ComposeApp
 
 @main
@@ -20,6 +21,22 @@ struct iOSApp: App {
         MobileAlarmKt.cancelLiveActivity = {
             GeneratedLiveActivityBridge.shared.endActivityByUserCancel()
         }
+        
+        DefaultAuthGateway_iosKt.signInWithGoogle = {
+            FirebaseAuthBridge.shared.signInWithGoogle()
+        }
+        
+        DefaultAuthGateway_iosKt.signOut = {
+            FirebaseAuthBridge.shared.signOut()
+        }
+        
+        DefaultAuthGateway_iosKt.observeAuthState = { callback in
+            FirebaseAuthBridge.shared.observeAuthState { isLoggedIn in
+                   let kotlinBool = KotlinBoolean(bool: isLoggedIn)
+                   _ = callback(kotlinBool)
+               }
+        }
+         
     }
         
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate

@@ -15,11 +15,13 @@ class AuthViewModel(
     init {
         viewModelScope.launch {
             isLoggedInUseCase().collect { authState ->
-                when (authState){
+                when (authState) {
                     AuthState.Authenticated ->
                         _viewState.update { it.copy(isLoggedIn = true, isLoading = false) }
+
                     AuthState.Loading ->
-                        _viewState.update{ it.copy(isLoading = true)}
+                        _viewState.update { it.copy(isLoading = true) }
+
                     AuthState.NotAuthenticated ->
                         _viewState.update { it.copy(isLoggedIn = false, isLoading = false) }
                 }

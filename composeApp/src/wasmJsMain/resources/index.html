@@ -11,7 +11,6 @@
 <body>
 <div id="components"></div>
 <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as firebaseSignOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
@@ -30,7 +29,6 @@
     const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Объект для взаимодействия с Kotlin/Wasm
     window.myAppJsFirebase = {
         signInWithGooglePopup: async () => {
             try {

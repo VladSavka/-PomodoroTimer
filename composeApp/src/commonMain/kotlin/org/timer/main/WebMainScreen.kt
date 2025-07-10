@@ -30,7 +30,7 @@ fun WebMainScreen(
             startDestination = if (viewState.isLoggedIn) WebRouts.Main.destanation else  WebRouts.Login.destanation,
         ) {
             composable(WebRouts.Login.destanation) {
-                LoginScreen()
+                LoginScreen(viewModel = authViewModel)
             }
             composable(WebRouts.Main.destanation) {
                 MainScreen(viewModel)

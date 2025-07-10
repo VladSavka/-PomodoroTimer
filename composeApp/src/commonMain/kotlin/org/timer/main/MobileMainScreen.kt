@@ -9,8 +9,10 @@ import androidx.lifecycle.compose.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
+import com.diamondedge.logging.*
 import org.jetbrains.compose.resources.*
 import org.koin.compose.viewmodel.*
+import org.timer.main.auth.*
 import org.timer.main.breakactivity.*
 import org.timer.main.settings.*
 import org.timer.main.timer.*
@@ -19,36 +21,72 @@ import pomodorotimer.composeapp.generated.resources.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MobileMainScreen(timerViewModel: TimerViewModel = koinViewModel()) {
-    val navController = rememberNavController()
-
-    val viewState by timerViewModel.viewState.collectAsStateWithLifecycle()
-    LaunchedEffect(viewState.navigateToActivitiesScreen) {
-        if (viewState.navigateToActivitiesScreen) {
-            timerViewModel.onNavigatedToActivitiesScreen()
-            navigateToScreen(navController, MobileRouts.Activities)
+fun MobileMainScreen(
+    timerViewModel: TimerViewModel = koinViewModel(),
+    authViewModel: AuthViewModel = koinViewModel()
+) {
+    val authViewState by authViewModel.viewState.collectAsStateWithLifecycle()
+    if (authViewState.isLoading) {
+        FullScreenLoadingIndicator()
+    } else {
+        val navController = rememberNavController()
+        val viewState by timerViewModel.viewState.collectAsStateWithLifecycle()
+        LaunchedEffect(viewState.navigateToActivitiesScreen) {
+            if (viewState.navigateToActivitiesScreen) {
+                timerViewModel.onNavigatedToActivitiesScreen()
+                navigateToScreen(navController, MobileRouts.Activities)
+            }
         }
-    }
 
-    Scaffold(
-        bottomBar = { BottomBar(navController = navController) }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = MobileRouts.Home.destanation,
+        Scaffold(
+            bottomBar = { BottomBar(navController = navController) }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier.padding(innerPadding)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                composable(MobileRouts.Home.destanation) {
-                    TimerScreen(viewModel = timerViewModel)
+                NavHost(
+                    navController = navController,
+                    startDestination = if (authViewState.isLoggedIn) MobileRouts.Home.destanation else MobileRouts.Login.destanation,
+                ) {
+                    composable(MobileRouts.Home.destanation) {
+                        TimerScreen(viewModel = timerViewModel)
+                    }
+                    composable(MobileRouts.Activities.destanation) {
+                        BreakActivityScreen(timerViewModel)
+                    }
+                    composable(MobileRouts.Settings.destanation) {
+                        SettingsDialogScreen(isDialogVisible = {})
+                    }
+                    composable(MobileRouts.Login.destanation) {
+                        LoginScreen(
+                            Modifier.background(MaterialTheme.colorScheme.background),
+                            authViewModel
+                        )
+                    }
                 }
-                composable(MobileRouts.Activities.destanation) {
-                    BreakActivityScreen(timerViewModel)
+            }
+        }
+
+        LaunchedEffect(authViewState.isLoggedIn) {
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (authViewState.isLoggedIn) {
+                if (currentRoute != MobileRouts.Home.destanation) {
+                    navController.navigate(MobileRouts.Home.destanation) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
-                composable(MobileRouts.Settings.destanation) {
-                    SettingsDialogScreen(isDialogVisible = {})
+            } else {
+                if (currentRoute != MobileRouts.Login.destanation) {
+                    navController.navigate(MobileRouts.Login.destanation) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             }
         }
@@ -128,4 +166,5 @@ sealed class MobileRouts(
     data object Home : MobileRouts("timer", "Timer", Res.drawable.home)
     data object Activities : MobileRouts("activities", "Activities", Res.drawable.run)
     data object Settings : MobileRouts("settings", "Settings", Res.drawable.settings)
+    data object Login : MobileRouts("Login")
 }

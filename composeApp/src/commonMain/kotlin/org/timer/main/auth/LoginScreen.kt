@@ -6,15 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
-import org.koin.compose.viewmodel.*
 
 @Composable
 fun LoginScreen(
-    viewModel: AuthViewModel = koinViewModel(),
+    modifier: Modifier = Modifier, viewModel: AuthViewModel,
 ) {
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(all = 32.dp), // Add overall padding
         verticalArrangement = Arrangement.Center,

@@ -9,7 +9,6 @@ import androidx.lifecycle.compose.*
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
-import com.diamondedge.logging.*
 import org.jetbrains.compose.resources.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.auth.*

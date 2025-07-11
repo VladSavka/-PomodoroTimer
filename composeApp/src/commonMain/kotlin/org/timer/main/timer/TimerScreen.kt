@@ -21,7 +21,7 @@ import org.timer.main.projects.*
 fun TimerScreen(
     modifier: Modifier = Modifier,
     viewModel: TimerViewModel = koinViewModel(),
-    windowInfo: WindowInfo = remeberWindowInfo()
+    windowInfo: WindowInfo = remeberWindowInfo(),
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     AskNotificationPermission()

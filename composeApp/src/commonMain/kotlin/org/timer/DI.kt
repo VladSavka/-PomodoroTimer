@@ -46,7 +46,6 @@ fun appModule() = module {
     //Gateways
     singleOf(::SettingsGateway)
     singleOf<ProjectsGateway>(::PersistentProjectsGateway)
-    singleOf<AuthGateway>(::DefaultAuthGateway)
 }
 
 expect fun platformSpecificModule(): Module

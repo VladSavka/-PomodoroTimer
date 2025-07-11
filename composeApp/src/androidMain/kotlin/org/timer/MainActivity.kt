@@ -7,15 +7,19 @@ import androidx.activity.*
 import androidx.activity.compose.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.*
+import com.google.firebase.*
+import org.timer.main.*
 import org.timer.main.timer.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             App()
         }
         createNotificationChannel()
+        FirebaseAuthBridge.init(this)
     }
 
     private fun createNotificationChannel() {

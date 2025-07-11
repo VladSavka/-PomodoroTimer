@@ -1,29 +1,40 @@
 package org.timer.main.domain.auth
 
-import com.diamondedge.logging.*
+import android.content.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.timer.main.*
+import kotlin.coroutines.*
 
-actual class DefaultAuthGateway : AuthGateway {
 
-    val flow = MutableStateFlow<AuthState>(AuthState.NotAuthenticated)
+actual class DefaultAuthGateway actual constructor(val context: Any?) : AuthGateway {
+
+    private val authStateFlow = MutableStateFlow<AuthState>(AuthState.Loading)
 
     init {
-        val launch = GlobalScope.launch {
-            delay(2000)
-            flow.emit(AuthState.NotAuthenticated)
+        FirebaseAuthBridge.observeAuthState { isSignedIn ->
+            val state = if (isSignedIn) AuthState.Authenticated else AuthState.NotAuthenticated
+            authStateFlow.tryEmit(state)
         }
     }
 
     actual override suspend fun login() {
-        flow.emit(AuthState.Authenticated)
+        suspendCancellableCoroutine { cont ->
+            FirebaseAuthBridge.signInWithGoogle(
+                context as Context,
+                onSuccess = {
+                    cont.resume(Unit)
+                },
+                onError = { error ->
+                    cont.resumeWithException(error)
+                }
+            )
+        }
     }
 
-    actual override fun isLoggedIn(): Flow<AuthState> = flow
+    actual override fun isLoggedIn(): Flow<AuthState> = authStateFlow
 
     actual override suspend fun logout() {
-        logging().d { "logout" }
-        flow.emit(AuthState.NotAuthenticated)
+        FirebaseAuthBridge.signOut()
     }
-
 }

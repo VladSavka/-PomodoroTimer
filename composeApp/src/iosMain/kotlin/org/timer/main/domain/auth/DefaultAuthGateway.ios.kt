@@ -6,7 +6,7 @@ lateinit var signInWithGoogle: () -> Unit
 lateinit var signOut: () -> Unit
 lateinit var observeAuthState: ((Boolean) -> Unit) -> Unit
 
-actual class DefaultAuthGateway : AuthGateway {
+actual class DefaultAuthGateway actual constructor(context: Any?) : AuthGateway {
 
     private val authStateFlow = MutableStateFlow<AuthState>(AuthState.Loading)
 

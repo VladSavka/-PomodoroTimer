@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     kotlin("plugin.serialization") version "2.1.20"
-
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -62,6 +62,12 @@ kotlin {
             implementation(libs.core)
             implementation(libs.permissions.compose)
             implementation(libs.permissions.notifications)
+            implementation(libs.firebase.auth)
+            implementation(libs.play.services.auth)
+            implementation(libs.androidx.credentials)
+            implementation(libs.androidx.credentials.play.services.auth)
+            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)

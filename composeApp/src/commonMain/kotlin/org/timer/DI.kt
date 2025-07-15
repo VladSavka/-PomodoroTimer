@@ -40,12 +40,14 @@ fun appModule() = module {
     factoryOf(::PlayAlarmUseCase)
     factoryOf(::CancelAlarmUseCase)
     factoryOf(::DeleteAllDoneTasksUseCase)
-    factory<IsLoggedInUseCase> { DefaultIsLoggedInUseCase(get()) }
+    factory<GetAuthStateUseCase> { DefaultGetAuthStateUseCase(get()) }
     factory<LoginUseCase> { DefaultLoginUseCase(get()) }
     factory<LogoutUseCase> { DefaultLogoutUseCase(get()) }
     //Gateways
-    singleOf(::SettingsGateway)
-    singleOf<ProjectsGateway>(::PersistentProjectsGateway)
+    singleOf(::PersistentSettingsGateway)
+    single<SettingsGateway> { FirebaseSettingsGateway() }
+    single<ProjectsGateway> { FirebaseProjectsGateway() }
+    single<AuthGateway> { DefaultAuthGateway() }
 }
 
 expect fun platformSpecificModule(): Module

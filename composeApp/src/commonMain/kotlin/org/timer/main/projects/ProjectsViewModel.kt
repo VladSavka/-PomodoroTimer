@@ -47,20 +47,20 @@ class ProjectsViewModel(
         addProjectUseCase(viewState.value.projectName)
     }
 
-    fun removeProject(id: Long) = viewModelScope.launch {
+    fun removeProject(id: String) = viewModelScope.launch {
         removeProjectUseCase(id)
     }
 
-    fun onTaskSubmitClick(projectID: Long, taskDescription: String) = viewModelScope.launch {
+    fun onTaskSubmitClick(projectID: String, taskDescription: String) = viewModelScope.launch {
         addTaskUseCase(projectID, taskDescription)
     }
 
-    fun onTaskDoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
+    fun onTaskDoneClick(projectId: String, taskId: Long) = viewModelScope.launch {
         doneTaskUseCase(projectId, taskId)
         moveTaskToTheEndOfListTaskUseCase(projectId, taskId)
     }
 
-    fun onTaskUndoneClick(projectId: Long, taskId: Long) = viewModelScope.launch {
+    fun onTaskUndoneClick(projectId: String, taskId: Long) = viewModelScope.launch {
         undoneTaskUseCase(projectId, taskId)
     }
 
@@ -68,24 +68,24 @@ class ProjectsViewModel(
         updateProjectsOrderUseCase(fromIndex, toIndex)
     }
 
-    fun onTasksDrugAndDrop(projectId: Long, fromIndex: Int, toIndex: Int) = viewModelScope.launch {
+    fun onTasksDrugAndDrop(projectId: String, fromIndex: Int, toIndex: Int) = viewModelScope.launch {
         updateTasksOrderUseCase(projectId, fromIndex, toIndex)
     }
 
-    fun onSubmitEditProjectName(id: Long, name: String) = viewModelScope.launch {
+    fun onSubmitEditProjectName(id: String, name: String) = viewModelScope.launch {
         updateProjectNameUseCase(id, name)
     }
 
-    fun onSubmitEditTaskDescription(projectId: Long, taskId: Long, desc: String) =
+    fun onSubmitEditTaskDescription(projectId: String, taskId: Long, desc: String) =
         viewModelScope.launch {
             updateTaskDescriptionUseCase(projectId, taskId, desc)
         }
 
-    fun onDeleteTaskClick(projectId: Long, taskId: Long) = viewModelScope.launch {
+    fun onDeleteTaskClick(projectId: String, taskId: Long) = viewModelScope.launch {
         deleteTaskUseCase(projectId, taskId)
     }
 
-    fun onDeleteDoneTasksClick(projectId: Long) = viewModelScope.launch {
+    fun onDeleteDoneTasksClick(projectId: String) = viewModelScope.launch {
         deleteDoneTasksUseCase(projectId)
     }
 }

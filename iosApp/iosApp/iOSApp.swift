@@ -22,8 +22,10 @@ struct iOSApp: App {
             GeneratedLiveActivityBridge.shared.endActivityByUserCancel()
         }
         
-        DefaultAuthGateway_iosKt.signInWithGoogle = {
-            FirebaseAuthBridge.shared.signInWithGoogle()
+        DefaultAuthGateway_iosKt.signInWithGoogle = {  callback in
+            FirebaseAuthBridge.shared.signInWithGoogle { isSucsess,error in
+                _ = callback(KotlinBoolean(bool: isSucsess), error)
+            }
         }
         
         DefaultAuthGateway_iosKt.signOut = {
@@ -31,9 +33,9 @@ struct iOSApp: App {
         }
         
         DefaultAuthGateway_iosKt.observeAuthState = { callback in
-            FirebaseAuthBridge.shared.observeAuthState { isLoggedIn in
+            FirebaseAuthBridge.shared.observeAuthState { isLoggedIn,id,email  in
                    let kotlinBool = KotlinBoolean(bool: isLoggedIn)
-                   _ = callback(kotlinBool)
+                   _ = callback(kotlinBool,id,email)
                }
         }
          

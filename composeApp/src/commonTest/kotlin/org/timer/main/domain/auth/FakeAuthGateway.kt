@@ -10,7 +10,7 @@ class FakeAuthGateway : AuthGateway {
         flow.emit(AuthState.Authenticated)
     }
 
-    override fun isLoggedIn(): Flow<AuthState> = flow
+    override fun getAuthState(): Flow<AuthState> = flow
 
     override suspend fun logout() {
         flow.emit(AuthState.NotAuthenticated)

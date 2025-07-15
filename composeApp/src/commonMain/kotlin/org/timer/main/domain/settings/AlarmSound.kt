@@ -3,6 +3,7 @@ package org.timer.main.domain.settings
 import org.jetbrains.compose.resources.*
 import pomodorotimer.composeapp.generated.resources.*
 
+
 enum class AlarmSound {
     CAT, BIRD, BUFFALO, DOG, WOLF, STANDARD, ;
 

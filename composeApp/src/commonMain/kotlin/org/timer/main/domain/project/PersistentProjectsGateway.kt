@@ -16,7 +16,7 @@ class PersistentProjectsGateway : ProjectsGateway {
         return flow.asStateFlow()
     }
 
-    override fun getProjectById(projectId: Long): Project {
+    override suspend fun getProjectById(projectId: String): Project {
         return getProjectListFromStorage().first { it.id == projectId }
     }
 
@@ -41,7 +41,7 @@ class PersistentProjectsGateway : ProjectsGateway {
         flow.update { projects.deepCopy() }
     }
 
-    override suspend fun removeProjectById(id: Long) {
+    override suspend fun removeProjectById(id: String) {
         val projects = getProjectListFromStorage().toMutableList()
         val projectToRemove = projects.first { it.id == id }
         projects.remove(projectToRemove)

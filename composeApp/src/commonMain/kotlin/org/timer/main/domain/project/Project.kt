@@ -3,7 +3,7 @@ package org.timer.main.domain.project
 import kotlinx.serialization.*
 
 @Serializable
-data class Project(val id: Long, var name: String, val tasks: MutableList<Task>)
+data class Project(val id: String, var name: String, val tasks: MutableList<Task>)
 
 fun List<Project>.deepCopy(): List<Project> {
     val newList = mutableListOf<Project>()

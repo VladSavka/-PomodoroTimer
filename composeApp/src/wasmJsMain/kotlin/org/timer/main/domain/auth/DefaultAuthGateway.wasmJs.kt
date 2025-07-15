@@ -3,12 +3,13 @@ package org.timer.main.domain.auth
 import com.diamondedge.logging.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlin.js.*
+import kotlin.js.Promise
 
 private external interface FirebaseJsBridge {
     fun signInWithGooglePopup(): Promise<JsAny?>
     fun signOut(): Promise<JsAny?>
-    fun observeAuthState(callback: (isSignedIn: Boolean, email: String?, uid: String?) -> Unit): () -> Unit
+    fun observeAuthState(callback: (isSignedIn: Boolean, uid: String?, email: String?) -> Unit): () -> Unit
+    fun createUser(id: String, email: String): Promise<JsAny?>
 }
 
 @JsName("window.myAppJsFirebase")
@@ -20,7 +21,8 @@ private external interface JsHelpers {
 }
 
 private fun getJsHelpersOrThrow(): JsHelpers {
-    return myAppJsHelpers ?: throw IllegalStateException("JavaScript helpers (window.myAppJsHelpers) not available.")
+    return myAppJsHelpers
+        ?: throw IllegalStateException("JavaScript helpers (window.myAppJsHelpers) not available.")
 }
 
 @JsName("window.myAppJsHelpers")
@@ -37,12 +39,16 @@ actual class DefaultAuthGateway : AuthGateway {
     private fun observeFirebaseAuthState() {
         try {
             val bridge = getFirebaseJs()
-            bridge.observeAuthState { isSignedIn, email, uid ->
-                _currentAuthState.value = if (isSignedIn) AuthState.Authenticated else AuthState.NotAuthenticated
+            bridge.observeAuthState { isSignedIn, uid, email ->
+                _currentAuthState.value =
+                    if (isSignedIn) AuthState.Authenticated(
+                        uid!!,
+                        email!!
+                    ) else AuthState.NotAuthenticated
             }
         } catch (e: Throwable) {
             val errorMessage = e.message ?: "Unknown error setting up Firebase AuthState observer"
-            logging().error{"Error setting up Firebase AuthState observer: $errorMessage"}
+            logging().error { "Error setting up Firebase AuthState observer: $errorMessage" }
             _currentAuthState.value = AuthState.NotAuthenticated
         }
     }
@@ -57,29 +63,35 @@ actual class DefaultAuthGateway : AuthGateway {
             val responseJs: JsAny? = getFirebaseJs().signInWithGooglePopup().await()
 
             if (responseJs == null) {
-                logging().error{"Received null response from JavaScript for login"}
+                logging().error { "Received null response from JavaScript for login" }
             } else {
                 val helpers = getJsHelpersOrThrow()
-                val jsSuccess: JsBoolean = helpers.getBooleanProperty(responseJs, "success".toJsString())
-                    val uid = helpers.getStringProperty(responseJs, "uid".toJsString())?.toString()
+                val jsSuccess: JsBoolean =
+                    helpers.getBooleanProperty(responseJs, "success".toJsString())
+                val uid = helpers.getStringProperty(responseJs, "uid".toJsString())?.toString()
                 val email = helpers.getStringProperty(responseJs, "email".toJsString())?.toString()
                 val error = helpers.getStringProperty(responseJs, "error".toJsString())?.toString()
                 if (jsSuccess.toBoolean()) {
-                  //  todo
+                    //  todo
                 } else {
-                    logging().error{"Error during Google login: $error"}
+                    logging().error { "Error during Google login: $error" }
                 }
             }
         } catch (e: Throwable) {
             val errorMessage = e.message ?: "JavaScript error during Google login"
-            logging().error{errorMessage}
+            logging().error { errorMessage }
         }
     }
 
-    actual override fun isLoggedIn(): Flow<AuthState> = _currentAuthState
+    actual override fun getAuthState(): Flow<AuthState> = _currentAuthState
 
     actual override suspend fun logout() {
-           getFirebaseJs().signOut()
+        getFirebaseJs().signOut()
+    }
+
+    override suspend fun createUser(id: String, email: String) {
+        logging().info { "createUser: $id, $email" }
+        getFirebaseJs().createUser(id, email).await<JsAny?>()
     }
 }
 

@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.*
 
 class UpdateTasksOrderUseCase(private val projectsGateway: ProjectsGateway) {
 
-    suspend operator fun invoke(projectId: Long, fromIndex: Int, toIndex: Int) {
+    suspend operator fun invoke(projectId: String, fromIndex: Int, toIndex: Int) {
         val projects = projectsGateway.getProjects().first()
         val projectsWithReorderedTasks = projects.map {
             if (it.id == projectId) {

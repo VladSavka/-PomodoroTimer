@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.*
 interface ProjectsGateway {
     fun getProjects(): Flow<List<Project>>
 
-    fun getProjectById(projectId: Long): Project
+    suspend fun getProjectById(projectId: String): Project
 
     suspend fun saveProject(project: Project)
 
@@ -13,6 +13,6 @@ interface ProjectsGateway {
 
     suspend fun updateProjects(projects: List<Project>)
 
-    suspend fun removeProjectById(id: Long)
+    suspend fun removeProjectById(id: String)
 
 }

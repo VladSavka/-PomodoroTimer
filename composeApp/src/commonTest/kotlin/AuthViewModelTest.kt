@@ -23,7 +23,7 @@ class AuthViewModelTest {
         authGateway = FakeAuthGateway()
         viewModel = AuthViewModel(
             DefaultLoginUseCase(authGateway),
-            DefaultIsLoggedInUseCase(authGateway)
+            DefaultGetAuthStateUseCase(authGateway)
         )
     }
 

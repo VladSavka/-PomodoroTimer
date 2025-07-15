@@ -93,6 +93,8 @@
         "moduleDependency": [
           "com.diamondedge:logging",
           "org.jetbrains.kotlin:kotlin-stdlib",
+          "dev.gitlive:firebase-firestore",
+          "dev.gitlive:firebase-auth",
           "org.jetbrains.compose.runtime:runtime",
           "org.jetbrains.compose.foundation:foundation",
           "org.jetbrains.compose.material3:material3",

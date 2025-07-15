@@ -7,16 +7,16 @@ import org.timer.main.domain.auth.*
 
 class AuthViewModel(
     private val loginUseCase: LoginUseCase,
-    private val isLoggedInUseCase: IsLoggedInUseCase
+    private val getAuthStateUseCase: GetAuthStateUseCase
 ) : ViewModel() {
     private val _viewState = MutableStateFlow(AuthViewState())
     val viewState: StateFlow<AuthViewState> = _viewState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            isLoggedInUseCase().collect { authState ->
+            getAuthStateUseCase().collect { authState ->
                 when (authState) {
-                    AuthState.Authenticated ->
+                    is AuthState.Authenticated ->
                         _viewState.update { it.copy(isLoggedIn = true, isLoading = false) }
 
                     AuthState.Loading ->
@@ -24,6 +24,7 @@ class AuthViewModel(
 
                     AuthState.NotAuthenticated ->
                         _viewState.update { it.copy(isLoggedIn = false, isLoading = false) }
+
                 }
             }
         }

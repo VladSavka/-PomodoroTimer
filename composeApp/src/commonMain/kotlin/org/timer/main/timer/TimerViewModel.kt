@@ -177,7 +177,7 @@ class TimerViewModel(
                 "Tomato " + (viewState.value.kittyDoroNumber + 1),
                 false,
                 pomodoroTimer.getCurrentTimeMillis(),
-                settings.getAlarmSound().value
+                settings.getAlarmSound().first()
             )
 
             scheduleAlarm(
@@ -200,10 +200,10 @@ class TimerViewModel(
         }
     }
 
-    private fun scheduleAlarm(currentTimerMillis: Long, title: String, body: String) {
+    private suspend fun scheduleAlarm(currentTimerMillis: Long, title: String, body: String) {
         mobileAlarm.cancel()
         val scheduleDate = Clock.System.now().toEpochMilliseconds() + currentTimerMillis
-        val alarmSound = settings.getAlarmSound().value
+        val alarmSound = settings.getAlarmSound().first()
         mobileAlarm.schedule(scheduleDate, alarmSound, title, body)
     }
 
@@ -215,7 +215,7 @@ class TimerViewModel(
                 "Short break",
                 true,
                 shortBreakTimer.getCurrentTimeMillis(),
-                settings.getAlarmSound().value
+                settings.getAlarmSound().first()
             )
             scheduleAlarm(
                 shortBreakTimer.getCurrentTimeMillis(),
@@ -245,7 +245,7 @@ class TimerViewModel(
                 "Long break",
                 true,
                 longBreakTimer.getCurrentTimeMillis(),
-                settings.getAlarmSound().value
+                settings.getAlarmSound().first()
             )
 
             scheduleAlarm(

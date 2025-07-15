@@ -15,7 +15,7 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
@@ -54,6 +54,9 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.permissions.compose)
             implementation(libs.permissions.notifications)
+            api(libs.firebase.firestore)
+            api(libs.gitlive.firebase.auth)
+
         }
         androidMain.dependencies {
             implementation(compose.preview)
@@ -66,8 +69,9 @@ kotlin {
             implementation(libs.play.services.auth)
             implementation(libs.androidx.credentials)
             implementation(libs.androidx.credentials.play.services.auth)
-            implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-
+            implementation(libs.googleid)
+            api(libs.firebase.firestore)
+            api(libs.gitlive.firebase.auth)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -89,7 +93,6 @@ kotlin {
             implementation(libs.multiplatform.settings.no.arg)
             implementation(libs.multiplatform.settings.serialization)
             implementation(libs.emoji.compose.m3)
-
             api(libs.logging)
         }
         val commonTest by getting {
@@ -126,9 +129,10 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
 }
 
 dependencies {

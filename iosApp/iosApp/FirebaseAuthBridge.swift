@@ -10,7 +10,7 @@ class FirebaseAuthBridge: NSObject {
     
     private var authStateDidChangeHandle: AuthStateDidChangeListenerHandle?
 
-    @objc func signInWithGoogle() {
+    @objc func signInWithGoogle(callback: @escaping (Bool, String?) -> Void) {
         guard
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
             let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController
@@ -48,9 +48,11 @@ class FirebaseAuthBridge: NSObject {
 
             Auth.auth().signIn(with: credential) { authResult, error in
                 if let error = error {
-                    print("❌ Firebase sign-in failed: \(error.localizedDescription)")
+                    print("❌ Google Sign-In canceled by user. \(error.localizedDescription)")
+                    callback(false, error.localizedDescription)
                 } else {
                     print("✅ Signed in to Firebase successfully")
+                    callback(true, nil)
                 }
             }
         }
@@ -67,11 +69,9 @@ class FirebaseAuthBridge: NSObject {
         }
     }
     
-    func observeAuthState(_ callback: @escaping (Bool) -> Void) {
+    func observeAuthState(_ callback: @escaping (Bool, String, String) -> Void) {
           Auth.auth().addStateDidChangeListener { _, user in
-              callback(user != nil)
+              callback(user != nil,user?.uid ?? "", user?.email ?? "")
           }
       }
 }
-
-

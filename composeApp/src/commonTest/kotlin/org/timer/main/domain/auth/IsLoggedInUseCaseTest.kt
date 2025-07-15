@@ -7,13 +7,13 @@ import org.timer.main.domain.auth.*
 
 class IsLoggedInUseCaseTest {
 
-    private lateinit var isLoggedInUseCase: DefaultIsLoggedInUseCase
+    private lateinit var isLoggedInUseCase: DefaultGetAuthStateUseCase
     private lateinit var authGateway: FakeAuthGateway
 
     @BeforeTest
     fun setUp() {
         authGateway = FakeAuthGateway()
-        isLoggedInUseCase = DefaultIsLoggedInUseCase(authGateway)
+        isLoggedInUseCase = DefaultGetAuthStateUseCase(authGateway)
     }
 
     @Test

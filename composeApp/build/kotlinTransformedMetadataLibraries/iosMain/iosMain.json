@@ -1,5 +1,25 @@
 [
   {
+    "moduleId": "module dev.gitlive:firebase-firestore:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-firestore-2.1.0-iosMain-Cap0TQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-firestore:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-firestore-2.1.0-commonMain-Fdh7rw.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-auth:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-auth-2.1.0-iosMain-GIv_gQ.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-auth:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-auth-2.1.0-commonMain-GSr3Yw.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
     "moduleId": "module dev.icerock.moko:permissions-compose:0.19.1",
     "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-compose-0.19.1-iosMain-YdL94Q.klib",
     "sourceSetName": "iosMain"
@@ -17,6 +37,31 @@
   {
     "moduleId": "module dev.icerock.moko:permissions-notifications:0.19.1",
     "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.icerock.moko-permissions-notifications-0.19.1-commonMain-hPoFrg.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-app:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-app-2.1.0-iosMain-YwAkWA.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-app:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-app-2.1.0-commonMain-PWJ-hQ.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-common:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-common-2.1.0-commonMain-7Aqy4Q.klib",
+    "sourceSetName": "commonMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-common-internal:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-common-internal-2.1.0-iosMain-nmVAZA.klib",
+    "sourceSetName": "iosMain"
+  },
+  {
+    "moduleId": "module dev.gitlive:firebase-common-internal:2.1.0",
+    "file": "/Users/vlad/-PomodoroTimer/composeApp/build/kotlinTransformedMetadataLibraries/iosMain/dev.gitlive-firebase-common-internal-2.1.0-commonMain-_a7JYQ.klib",
     "sourceSetName": "commonMain"
   },
   {

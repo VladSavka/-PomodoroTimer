@@ -1,3 +1,6 @@
 package org.timer.main.domain.settings
 
-data class TimeSettings(val pomodoroTime: Long, val shortBreakTime: Long, val longBreakTime: Long)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TimeSettings(val selectedPosition:Int, val pomodoroTime: Long, val shortBreakTime: Long, val longBreakTime: Long)

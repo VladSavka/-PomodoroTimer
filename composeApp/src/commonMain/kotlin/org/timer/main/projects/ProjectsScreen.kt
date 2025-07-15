@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.compose.*
+import kotlinx.coroutines.*
 import org.koin.compose.viewmodel.*
 import org.timer.main.*
 import org.timer.main.WindowInfo
@@ -338,15 +339,15 @@ fun ProjectItem(
     modifier: Modifier,
     project: PresentableProject,
     isDrugging: Boolean,
-    onDeleteClick: (Long) -> Unit,
+    onDeleteClick: (String) -> Unit,
     onSubmitTaskClick: (PresentableProject, String) -> Unit,
     onTaskDoneClick: (PresentableProject, Task) -> Unit,
     onTaskUndoneClick: (PresentableProject, Task) -> Unit,
     onTasksReorder: (PresentableProject, Int, Int) -> Unit,
-    onSubmitEditProjectName: (Long, String) -> Unit,
-    onSubmitEditTaskDescription: (Long, Long, String) -> Unit,
-    onDeleteTaskClick: (Long, Long) -> Unit,
-    onDeleteDoneTasksClick: (Long) -> Unit,
+    onSubmitEditProjectName: (String, String) -> Unit,
+    onSubmitEditTaskDescription: (String, Long, String) -> Unit,
+    onDeleteTaskClick: (String, Long) -> Unit,
+    onDeleteDoneTasksClick: (String) -> Unit,
 ) {
     var showAddTaskFooter by remember { mutableStateOf(project.tasks.isEmpty()) }
     var hasRequestedFocus by remember { mutableStateOf(true) } // New state variable
@@ -414,23 +415,32 @@ fun ProjectItem(
                     }
                 }
             }
-            if (showAddTaskFooter) {
-                HorizontalDivider()
-                AddTaskFooter(
-                    focusRequester = focusRequester,
-                    onSubmitTaskClick = {
-                        onSubmitTaskClick(project, it)
-                        showAddTaskFooter = false
-                    },
-                    onLostFocus = {
-                        showAddTaskFooter = false
-                    }
-                )
-                LaunchedEffect(showAddTaskFooter) {
-                    if (showAddTaskFooter && !hasRequestedFocus) {
-                        focusRequester.requestFocus()
-                        hasRequestedFocus = true // Set the flag after requesting focus
-                    }
+            // Используем AnimatedVisibility для AddTaskFooter
+            AnimatedVisibility(
+                visible = showAddTaskFooter,
+                enter = fadeIn(animationSpec = tween(durationMillis = 300)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 300, delayMillis = 200))
+            ) {
+                Column {
+                    HorizontalDivider()
+                    AddTaskFooter(
+                        focusRequester = focusRequester,
+                        onSubmitTaskClick = { taskName ->
+                            onSubmitTaskClick(project, taskName)
+                            showAddTaskFooter = false
+                        },
+                        onLostFocus = {
+                            showAddTaskFooter = false
+                        }
+                    )
+                }
+            }
+
+            LaunchedEffect(showAddTaskFooter, hasRequestedFocus) {
+                if (showAddTaskFooter && !hasRequestedFocus) {
+                    delay(50)
+                    focusRequester.requestFocus()
+                    hasRequestedFocus = true
                 }
             }
         }
@@ -636,7 +646,7 @@ private fun Header(
     project: PresentableProject,
     onDeleteProjectClick: () -> Unit,
     onAddTaskClick: () -> Unit,
-    onSubmitEditProjectName: (Long, String) -> Unit,
+    onSubmitEditProjectName: (String, String) -> Unit,
     onDeleteDoneTasksClick: () -> Unit,
 ) {
     var textFieldValue by remember {

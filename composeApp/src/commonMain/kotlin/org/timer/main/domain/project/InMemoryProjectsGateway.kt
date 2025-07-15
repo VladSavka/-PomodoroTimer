@@ -31,13 +31,13 @@ class InMemoryProjectsGateway : ProjectsGateway {
     }
 
 
-    override suspend fun removeProjectById(id: Long) {
+    override suspend fun removeProjectById(id: String) {
         val project = projects.first { it.id == id }
         projects.remove(project)
         flow.emit(projects.deepCopy())
     }
 
-    override fun getProjectById(projectId: Long) = projects.first { it.id == projectId }
+    override suspend fun getProjectById(projectId: String) = projects.first { it.id == projectId }
 
 
 }

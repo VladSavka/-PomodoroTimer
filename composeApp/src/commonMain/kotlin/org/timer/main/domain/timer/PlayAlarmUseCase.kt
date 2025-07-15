@@ -5,7 +5,7 @@ import org.timer.main.timer.*
 
 class PlayAlarmUseCase(
     private val alarmPlayer: AlarmPlayer,
-    private val settingsGateway: SettingsGateway
+    private val settingsGateway: PersistentSettingsGateway
 ) {
 
     fun invoke(onEnded: () -> Unit = {}) {

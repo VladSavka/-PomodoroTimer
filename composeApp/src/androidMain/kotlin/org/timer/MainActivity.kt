@@ -14,13 +14,13 @@ import org.timer.main.timer.*
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FirebaseApp.initializeApp(this)
+        FirebaseAuthBridge.init(this)
         setContent {
             App()
         }
         createNotificationChannel()
-        FirebaseAuthBridge.init(this)
     }
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

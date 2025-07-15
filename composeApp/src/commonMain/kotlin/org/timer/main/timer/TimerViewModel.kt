@@ -272,9 +272,9 @@ class TimerViewModel(
     private fun resetTimers() = viewModelScope.launch {
         timerJob?.cancel()
         cancelAlarmUseCase.invoke()
-        pomodoroTimer.pauseTimer()
-        shortBreakTimer.pauseTimer()
-        longBreakTimer.pauseTimer()
+        if (::pomodoroTimer.isInitialized) pomodoroTimer.pauseTimer()
+        if (::shortBreakTimer.isInitialized) shortBreakTimer.pauseTimer()
+        if (::longBreakTimer.isInitialized) longBreakTimer.pauseTimer()
         mobileAlarm.cancel()
         mobileAlarm.stopLiveNotification()
         initTimers()
@@ -315,8 +315,6 @@ class TimerViewModel(
         longBreakTimer.pauseTimer()
         mobileAlarm.stopLiveNotification()
     }
-
-
 
 
     fun onPageChanged(currentPage: Int) {

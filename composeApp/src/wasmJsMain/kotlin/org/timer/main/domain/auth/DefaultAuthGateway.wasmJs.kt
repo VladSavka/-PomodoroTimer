@@ -15,19 +15,6 @@ private external interface FirebaseJsBridge {
 @JsName("window.myAppJsFirebase")
 private external val myAppJsFirebase: FirebaseJsBridge?
 
-private external interface JsHelpers {
-    fun getBooleanProperty(obj: JsAny?, propName: JsString): JsBoolean // JsBoolean может быть null
-    fun getStringProperty(obj: JsAny?, propName: JsString): JsString?   // JsString может быть null
-}
-
-private fun getJsHelpersOrThrow(): JsHelpers {
-    return myAppJsHelpers
-        ?: throw IllegalStateException("JavaScript helpers (window.myAppJsHelpers) not available.")
-}
-
-@JsName("window.myAppJsHelpers")
-private external val myAppJsHelpers: JsHelpers?
-
 actual class DefaultAuthGateway : AuthGateway {
 
     private val _currentAuthState = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -61,22 +48,6 @@ actual class DefaultAuthGateway : AuthGateway {
     actual override suspend fun login() {
         return try {
             val responseJs: JsAny? = getFirebaseJs().signInWithGooglePopup().await()
-
-            if (responseJs == null) {
-                logging().error { "Received null response from JavaScript for login" }
-            } else {
-                val helpers = getJsHelpersOrThrow()
-                val jsSuccess: JsBoolean =
-                    helpers.getBooleanProperty(responseJs, "success".toJsString())
-                val uid = helpers.getStringProperty(responseJs, "uid".toJsString())?.toString()
-                val email = helpers.getStringProperty(responseJs, "email".toJsString())?.toString()
-                val error = helpers.getStringProperty(responseJs, "error".toJsString())?.toString()
-                if (jsSuccess.toBoolean()) {
-                    //  todo
-                } else {
-                    logging().error { "Error during Google login: $error" }
-                }
-            }
         } catch (e: Throwable) {
             val errorMessage = e.message ?: "JavaScript error during Google login"
             logging().error { errorMessage }

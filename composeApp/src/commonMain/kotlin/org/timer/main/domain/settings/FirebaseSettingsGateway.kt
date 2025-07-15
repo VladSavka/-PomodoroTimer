@@ -2,7 +2,7 @@ package org.timer.main.domain.settings
 
 import kotlinx.coroutines.flow.*
 
-expect class FirebaseSettingsGateway() : SettingsGateway {
+expect class FirebaseSettingsGateway()  : SettingsGateway {
     override fun getTimeSettings(): Flow<TimeSettings>
 
     override suspend fun setTimeSettings(timeSettings: TimeSettings)

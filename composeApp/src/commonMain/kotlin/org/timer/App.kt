@@ -30,7 +30,7 @@ fun App() {
 @Composable
 private fun MainContent() {
     MaterialTheme(lightScheme) {
-        MainScreen()
+        CommonMainScreen()
     }
 }
 

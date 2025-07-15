@@ -17,7 +17,6 @@ import org.timer.main.timer.*
 @ExperimentalMaterial3Api
 @Composable
 fun WebMainScreen(
-    viewModel: TimerViewModel = koinViewModel(),
     authViewModel: AuthViewModel = koinViewModel()
 ) {
     val viewState by authViewModel.viewState.collectAsStateWithLifecycle()
@@ -33,7 +32,7 @@ fun WebMainScreen(
                 LoginScreen(viewModel = authViewModel)
             }
             composable(WebRouts.Main.destanation) {
-                MainScreen(viewModel)
+              MainScreen()
             }
         }
 
@@ -64,7 +63,7 @@ fun WebMainScreen(
 
 @ExperimentalMaterial3Api
 @Composable
-private fun MainScreen(viewModel: TimerViewModel) {
+private fun MainScreen(viewModel: TimerViewModel = koinViewModel()) {
     Row {
         Card(
             modifier = Modifier

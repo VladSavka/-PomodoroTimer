@@ -32,7 +32,7 @@ fun WebMainScreen(
                 LoginScreen(viewModel = authViewModel)
             }
             composable(WebRouts.Main.destanation) {
-              MainScreen()
+                MainScreen()
             }
         }
 

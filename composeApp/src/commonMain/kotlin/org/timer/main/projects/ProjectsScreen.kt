@@ -488,7 +488,7 @@ fun AddTaskFooter(
 @Composable
 fun TaskItem(
     task: Task,
-    isDrugging: Boolean, // Предполагаю, это isDragging
+    isDrugging: Boolean,
     onTaskDoneClick: (Task) -> Unit,
     onTaskUndoneClick: (Task) -> Unit,
     onSubmitEditTaskDescription: (Long, String) -> Unit,
@@ -497,23 +497,41 @@ fun TaskItem(
     var isEditing by remember { mutableStateOf(false) }
     var isMenuExpanded by remember { mutableStateOf(false) }
 
-    var textFieldValue by remember(task.description, isEditing) {
+    var displayedText by remember { mutableStateOf(task.description) }
+    var currentEditValue by remember(task.description) { // Keyed to task.description
         mutableStateOf(TextFieldValue(task.description, TextRange(task.description.length)))
     }
+
+    LaunchedEffect(task.description) {
+        if (!isEditing) {
+            if (displayedText != task.description) {
+                displayedText = task.description
+            }
+            if (currentEditValue.text != task.description) {
+                currentEditValue = TextFieldValue(task.description, TextRange(task.description.length))
+            }
+        }
+    }
+
+    LaunchedEffect(isEditing) {
+        if (isEditing) {
+            // When entering edit mode, sync currentEditValue with the latest displayedText
+            // This ensures that if displayedText was optimistically updated, we edit that.
+            // Or if task.description changed, displayedText would have caught it.
+            if (currentEditValue.text != displayedText || currentEditValue.selection.end != displayedText.length) {
+                currentEditValue = TextFieldValue(displayedText, TextRange(displayedText.length))
+            }
+        }
+    }
+
     val focusRequester = remember { FocusRequester() }
     var isFocusLostByDoneAction by remember { mutableStateOf(false) }
-
     val keyboardController = LocalSoftwareKeyboardController.current
     val elevation by animateDpAsState(if (isDrugging) 2.dp else 0.dp)
 
     LaunchedEffect(isEditing) {
         if (isEditing) {
             isFocusLostByDoneAction = false
-            val currentText = task.description
-            if (textFieldValue.text != currentText || textFieldValue.selection.end != currentText.length) {
-                textFieldValue = TextFieldValue(currentText, TextRange(currentText.length))
-            }
-            logging().d { "[TaskItem ${task.id}] LaunchedEffect: Requesting focus."}
             focusRequester.requestFocus()
             keyboardController?.show()
         }
@@ -543,20 +561,23 @@ fun TaskItem(
                 if (isEditing) {
                     var localHasFocus by remember { mutableStateOf(false) }
                     BasicTextField(
-                        value = textFieldValue,
-                        onValueChange = { textFieldValue = it },
+                        value = currentEditValue,
+                        onValueChange = { currentEditValue = it },
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Transparent)
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState ->
-                                logging().d { "[TaskItem ${task.id}] BasicTextField focusState: isFocused = ${focusState.isFocused}, isFocusLostByDoneAction = $isFocusLostByDoneAction" }
                                 if (focusState.isFocused) {
                                     localHasFocus = true
                                 } else {
                                     if (localHasFocus && !isFocusLostByDoneAction) {
-                                        if (textFieldValue.text.isNotBlank() && textFieldValue.text != task.description) {
-                                            onSubmitEditTaskDescription(task.id, textFieldValue.text)
+                                        val newText = currentEditValue.text
+                                        if (newText != task.description) {
+                                            displayedText = newText
+                                            onSubmitEditTaskDescription(task.id, newText)
+                                        } else {
+                                            displayedText = task.description
                                         }
                                         isEditing = false
                                     }
@@ -568,15 +589,19 @@ fun TaskItem(
                                 MaterialTheme.colorScheme.primary,
                                 RoundedCornerShape(4.dp)
                             )
-                            .padding(horizontal = 4.dp, vertical = 4.dp),
+                            .padding(horizontal = 4.dp, vertical = 3.dp),
                         textStyle = if (task.isDone) LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) else LocalTextStyle.current,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(
                             onDone = {
+                                val newText = currentEditValue.text
                                 isFocusLostByDoneAction = true
-                                if (textFieldValue.text.isNotBlank() && textFieldValue.text != task.description) {
-                                    onSubmitEditTaskDescription(task.id, textFieldValue.text)
+                                if (newText != task.description) {
+                                    displayedText = newText
+                                    onSubmitEditTaskDescription(task.id, newText)
+                                } else {
+                                    displayedText = task.description
                                 }
                                 isEditing = false
                                 keyboardController?.hide()
@@ -586,13 +611,13 @@ fun TaskItem(
                     )
                 } else {
                     Text(
-                        text = task.description,
+                        text = displayedText,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 4.dp)
                             .clickable {
                                 isEditing = true
-                            },
+                            }
+                            .padding(start = 4.dp),
                         style = if (task.isDone) LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough) else LocalTextStyle.current,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -604,9 +629,7 @@ fun TaskItem(
             Box {
                 IconButton(
                     modifier = Modifier.size(20.dp),
-                    onClick = {
-                        isMenuExpanded = true
-                    }
+                    onClick = { isMenuExpanded = true }
                 ) {
                     Icon(Icons.Rounded.MoreVert, contentDescription = "More")
                 }

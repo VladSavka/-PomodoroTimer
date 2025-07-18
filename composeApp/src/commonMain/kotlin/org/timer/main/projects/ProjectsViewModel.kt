@@ -32,11 +32,12 @@ class ProjectsViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun Project.toPresentableProject(): PresentableProject =
+    private fun Project.toPresentableProject() =
         PresentableProject(
             this.id,
             this.name,
-            this.tasks
+            this.tasks,
+            this.tasks.isEmpty()
         )
 
     fun onProjectTitleUpdate(title: String) {

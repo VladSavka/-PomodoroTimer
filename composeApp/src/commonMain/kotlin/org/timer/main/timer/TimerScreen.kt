@@ -1,5 +1,6 @@
 package org.timer.main.timer
 
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.pager.*
@@ -49,7 +50,7 @@ fun TimerTitle() {
         fontSize = 28.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.primary
     )
 }
 

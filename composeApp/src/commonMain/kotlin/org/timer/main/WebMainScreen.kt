@@ -1,5 +1,6 @@
 package org.timer.main
 
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,7 +27,7 @@ fun WebMainScreen(
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = if (viewState.isLoggedIn) WebRouts.Main.destanation else  WebRouts.Login.destanation,
+            startDestination = if (viewState.isLoggedIn) WebRouts.Main.destanation else WebRouts.Login.destanation,
         ) {
             composable(WebRouts.Login.destanation) {
                 LoginScreen(viewModel = authViewModel)
@@ -64,14 +65,18 @@ fun WebMainScreen(
 @ExperimentalMaterial3Api
 @Composable
 private fun MainScreen(viewModel: TimerViewModel = koinViewModel()) {
-    Row {
+    Row(
+        modifier = Modifier.background(
+            MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+        )
+    ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight()
                 .padding(start = 8.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                containerColor = MaterialTheme.colorScheme.background,
             ),
 
             ) {
@@ -97,7 +102,7 @@ private fun MainScreen(viewModel: TimerViewModel = koinViewModel()) {
                 .fillMaxHeight()
                 .padding(start = 4.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                containerColor = MaterialTheme.colorScheme.background,
             ),
         ) {
             BreakActivityScreen()

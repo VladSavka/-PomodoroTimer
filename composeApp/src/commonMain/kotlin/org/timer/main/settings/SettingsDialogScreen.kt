@@ -26,21 +26,14 @@ import pomodorotimer.composeapp.generated.resources.*
 
 @Composable
 fun SettingsDialogScreen(
-    viewModel: SettingsViewModel = koinViewModel(),
-    isDialogVisible: (Boolean) -> Unit
+    viewModel: SettingsViewModel = koinViewModel(), isDialogVisible: (Boolean) -> Unit
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     SingleChoiceDialog(
-        title = "Settings",
-        radioOptions = listOf(
-            "25min/5min/15min",
-            "50min/10min/30min",
-            "Custom time (minutes)"
-        ),
-        isDialogVisible = { isDialogVisible(it) },
-        viewModel,
-        viewState
+        title = "Settings", radioOptions = listOf(
+            "25min/5min/15min", "50min/10min/30min", "Custom time (minutes)"
+        ), isDialogVisible = { isDialogVisible(it) }, viewModel, viewState
     )
 }
 
@@ -55,14 +48,14 @@ fun SingleChoiceDialog(
 
     val isSmallScreen = remeberWindowInfo().isSmallScreen()
     if (isSmallScreen) {
-        Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer)) {
+        Column() {
             Text(
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
                 text = title,
                 textAlign = TextAlign.Center,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.primary
             )
             Content(
                 radioOptions,
@@ -75,28 +68,19 @@ fun SingleChoiceDialog(
         }
 
     } else {
-        AlertDialog(
-            title = { Text(text = title) },
-            text = {
-                Content(
-                    radioOptions,
-                    viewModel,
-                    viewState,
-                    isSmallScreen,
-                    isDialogVisible
-                )
-            },
-            onDismissRequest = {
+        AlertDialog(title = { Text(text = title) }, text = {
+            Content(
+                radioOptions, viewModel, viewState, isSmallScreen, isDialogVisible
+            )
+        }, onDismissRequest = {
+            isDialogVisible(false)
+        }, confirmButton = {
+            TextButton(onClick = {
                 isDialogVisible(false)
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    isDialogVisible(false)
-                }) {
-                    Text(text = "Confirm")
-                }
+            }) {
+                Text(text = "Confirm")
             }
-        )
+        })
     }
 
 }
@@ -113,31 +97,23 @@ fun Content(
     val keyboard = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
-    // Use a Box as the clickable container
-    Box(
-        modifier = Modifier
-            .wrapContentSize() // Fill the available space
-            // Add a clickable modifier to dismiss the keyboard
-            .clickable(
-                // Use an empty interactionSource to prevent ripple effect
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null // No visual indication on click
-            ) {
-                // Clear focus and hide the keyboard when clicked outside text fields
-                focusManager.clearFocus()
-                keyboard?.hide()
-            }
-    ) {
+    Box(modifier = Modifier.wrapContentSize() // Fill the available space
+        .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null // No visual indication on click
+        ) {
+            focusManager.clearFocus()
+            keyboard?.hide()
+        }) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState) // Use the created scrollState
+            modifier = Modifier.fillMaxWidth()
+                .verticalScroll(scrollState)
                 .padding(end = 8.dp),
         ) {
             TimerSettingsContent(items, viewModel, viewState, isSmallScreen)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             AlarmSoundContent(viewState, viewModel, isSmallScreen)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) // Adjust padding as needed
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SignOutButton(isDialogVisible, viewModel)
         }
     }
@@ -145,15 +121,13 @@ fun Content(
 
 @Composable
 fun SignOutButton(
-    isDialogVisible: (Boolean) -> Unit,
-    viewModel: SettingsViewModel
+    isDialogVisible: (Boolean) -> Unit, viewModel: SettingsViewModel
 ) {
     Button(
         onClick = {
             isDialogVisible(false)
             viewModel.onSignOutClick()
-        },
-        modifier = Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
+        }, modifier = Modifier.padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
     ) {
         Text("Sign Out")
     }
@@ -180,56 +154,49 @@ private fun TimerSettingsContent(
     items.forEachIndexed { index, text ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(36.dp)
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth()
+            modifier = Modifier.height(36.dp).padding(horizontal = 8.dp).fillMaxWidth()
         ) {
-            RadioButtonWithText(
-                index = index,
+            RadioButtonWithText(index = index,
                 selectedItemIndex = viewState.selectedPresetPosition,
                 text = text,
                 isSmallScreen = isSmallScreen,
-                onClick = { viewModel.onPresetClick(index) }
-            )
+                onClick = { viewModel.onPresetClick(index) })
         }
 
         if (index == items.size - 1) {
-            MaterialTheme(if (isSmallScreen) darkScheme else lightScheme) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 0.dp),
-                    verticalArrangement = Arrangement.spacedBy(rowSpacing) // This should be 0.dp
-                ) {
-                    SettingRow(
-                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
-                        textFieldValue = viewState.pomodoroMinutes,
-                        onTextFieldValueChange = { viewModel.updatePomodoroMinutes(it) },
-                        label = "Focus time",
-                        showError = viewState.showPomodoroError,
-                        textFieldScale = textFieldScale,
-                        isEnabled = viewState.selectedPresetPosition == items.size - 1
-                    )
+            Column(
+                modifier = Modifier.padding(horizontal = 0.dp),
+                verticalArrangement = Arrangement.spacedBy(rowSpacing) // This should be 0.dp
+            ) {
+                SettingRow(
+                    modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                    textFieldValue = viewState.pomodoroMinutes,
+                    onTextFieldValueChange = { viewModel.updatePomodoroMinutes(it) },
+                    label = "Focus time",
+                    showError = viewState.showPomodoroError,
+                    textFieldScale = textFieldScale,
+                    isEnabled = viewState.selectedPresetPosition == items.size - 1
+                )
 
-                    SettingRow(
-                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
-                        textFieldValue = viewState.shortBreakMinutes,
-                        onTextFieldValueChange = { viewModel.updateShortBreakMinutes(it) },
-                        label = "Short break",
-                        showError = viewState.showShortBreakError,
-                        textFieldScale = textFieldScale,
-                        isEnabled = viewState.selectedPresetPosition == items.size - 1
-                    )
+                SettingRow(
+                    modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                    textFieldValue = viewState.shortBreakMinutes,
+                    onTextFieldValueChange = { viewModel.updateShortBreakMinutes(it) },
+                    label = "Short break",
+                    showError = viewState.showShortBreakError,
+                    textFieldScale = textFieldScale,
+                    isEnabled = viewState.selectedPresetPosition == items.size - 1
+                )
 
-                    SettingRow(
-                        modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
-                        textFieldValue = viewState.longBreakMinutes,
-                        onTextFieldValueChange = { viewModel.updateLongBreakMinutes(it) },
-                        label = "Long break",
-                        showError = viewState.showLongBreakError,
-                        textFieldScale = textFieldScale,
-                        isEnabled = viewState.selectedPresetPosition == items.size - 1
-                    )
-                }
+                SettingRow(
+                    modifier = Modifier.heightIn(min = minRowHeight, max = maxRowHeight),
+                    textFieldValue = viewState.longBreakMinutes,
+                    onTextFieldValueChange = { viewModel.updateLongBreakMinutes(it) },
+                    label = "Long break",
+                    showError = viewState.showLongBreakError,
+                    textFieldScale = textFieldScale,
+                    isEnabled = viewState.selectedPresetPosition == items.size - 1
+                )
             }
         }
     }
@@ -247,13 +214,10 @@ private fun SettingRow(
     isEnabled: Boolean
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        verticalAlignment = Alignment.CenterVertically, modifier = modifier
     ) {
         OutlinedTextField(
-            modifier = Modifier
-                .scale(textFieldScale)
-                .width(150.dp),
+            modifier = Modifier.scale(textFieldScale).width(150.dp),
             value = textFieldValue,
             onValueChange = {
                 if (it.length <= 3 && (it.isEmpty() || it.isDigits())) {
@@ -282,23 +246,15 @@ private fun String.isDigits() = matches(Regex("^\\d+\$"))
 
 @Composable
 private fun RadioButtonWithText(
-    index: Int,
-    selectedItemIndex: Int,
-    text: String,
-    isSmallScreen: Boolean,
-    onClick: () -> Unit
+    index: Int, selectedItemIndex: Int, text: String, isSmallScreen: Boolean, onClick: () -> Unit
 ) {
     Row(Modifier.clickable(onClick = onClick)) {
-        MaterialTheme(colorScheme = if (isSmallScreen) darkScheme else lightScheme) {
-            RadioButton(
-                selected = (index == selectedItemIndex),
-                onClick = null
-            )
-        }
+        RadioButton(
+            selected = (index == selectedItemIndex), onClick = null
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
         )
     }
 }
@@ -315,42 +271,31 @@ private fun ErrorText(modifier: Modifier = Modifier, text: String = "Please ente
 
 @Composable
 private fun AlarmSoundContent(
-    viewState: SettingsViewState,
-    viewModel: SettingsViewModel,
-    isSmallScreen: Boolean
+    viewState: SettingsViewState, viewModel: SettingsViewModel, isSmallScreen: Boolean
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
     ) {
         Text(
             text = "Alarm sound: ",
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-            color = if (isSmallScreen) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
-
+            modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
         )
         // Add the clickable sound icon here
         Icon(
             imageVector = vectorResource(Res.drawable.sound), // Use a sound-related icon
             contentDescription = "Play alarm sound preview",
-            modifier = Modifier
-                .size(24.dp) // Adjust size as needed
+            modifier = Modifier.size(24.dp) // Adjust size as needed
                 .clip(CircleShape) // Clip the icon to a circle
                 .border(
-                    1.dp,
-                    if (isSmallScreen) Color.White else Color.Black,
-                    CircleShape
+                    1.dp, if (isSmallScreen) Color.White else Color.Black, CircleShape
                 ) // Add a round border
                 .clickable {
                     viewModel.onPlayAlarmSoundPreviewClick()
-                }
-                .align(Alignment.CenterVertically) // Align icon vertically
+                }.align(Alignment.CenterVertically) // Align icon vertically
                 .padding(2.dp) // Add padding inside the circle,
-            , tint = if (isSmallScreen) Color.White else Color.Black
+            ,
+            tint = if (isSmallScreen) Color.White else Color.Black
         )
         Spacer(modifier = Modifier.width(8.dp)) // Add space between icon and TextButton
 
@@ -364,50 +309,39 @@ private fun AlarmSoundContent(
             MaterialTheme(colorScheme = darkScheme) {
 
                 TextButton(
-                    onClick = { expanded = true },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface // Adjust color as needed
+                    onClick = { expanded = true }, colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ), contentPadding = PaddingValues(
+                        horizontal = 16.dp, vertical = 8.dp
                     ),
-                    contentPadding = PaddingValues(
-                        horizontal = 16.dp,
-                        vertical = 8.dp
-                    ), // Add padding
-                    shape = MaterialTheme.shapes.small, // Apply a shape
+                    shape = MaterialTheme.shapes.small,
                     border = BorderStroke(
                         1.dp,
-                        if (isSmallScreen) Color.White else Color.Black
-                    ) // Add a border
+                        MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    MaterialTheme(colorScheme = if (isSmallScreen) lightScheme else darkScheme) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            selectedAlarmSound, color = MaterialTheme.colorScheme.onPrimary
+                        )
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                selectedAlarmSound, color = MaterialTheme.colorScheme.onPrimary
-                            ) // Display the selected sound
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Expand alarm sound options",
+                            tint = MaterialTheme.colorScheme.onPrimary
 
-                            Spacer(Modifier.width(4.dp)) // Space between text and icon
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown, // Dropdown arrow icon
-                                contentDescription = "Expand alarm sound options",
-                                tint = if (isSmallScreen) Color.White else Color.Black
-                            )
-                        }
+                        )
                     }
                 }
             }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 alarmSoundOptions.forEachIndexed { position, sound ->
-                    DropdownMenuItem(
-                        text = { Text(sound) },
-                        onClick = {
-                            // No need to update selectedAlarmSound here, it's derived from viewState
-                            expanded = false
-                            viewModel.onAlarmSoundClick(position)
-                        }
-                    )
+                    DropdownMenuItem(text = { Text(sound) }, onClick = {
+                        // No need to update selectedAlarmSound here, it's derived from viewState
+                        expanded = false
+                        viewModel.onAlarmSoundClick(position)
+                    })
                 }
             }
         }

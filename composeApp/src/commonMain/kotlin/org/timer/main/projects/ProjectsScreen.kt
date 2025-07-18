@@ -87,7 +87,6 @@ fun ProjectsScreen(
 
     Scaffold(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.primaryContainer, // Explicitly set screen background
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -268,7 +267,6 @@ private fun CollapsedTopBar(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = shadowElevation),
-        color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Box(
             modifier = Modifier
@@ -300,7 +298,7 @@ private fun CollapsedTopBar(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
@@ -331,7 +329,6 @@ private fun EmptyState() {
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.Center),
             text = "Your project list is empty.\n Add your first project using button below.",
-            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -807,7 +804,7 @@ fun ProjectsTitle() {
         fontSize = 28.sp,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onPrimary
+        color = MaterialTheme.colorScheme.primary
     )
 }
 

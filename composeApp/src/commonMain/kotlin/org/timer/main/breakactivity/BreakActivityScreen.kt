@@ -52,7 +52,6 @@ fun BreakActivityScreen(
                 Icon(
                     Icons.Filled.Settings,
                     contentDescription = "Settings",
-                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -174,7 +173,6 @@ fun Title(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -188,14 +186,14 @@ fun Title(
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.primary
             )
             if (windowInfo.isSmallScreen()) {
                 Text(
-                    text = currentTime, // Display the current time
-                    fontSize = 18.sp, // Adjust font size as needed
+                    text = currentTime,
+                    fontSize = 18.sp,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) // Slightly less prominent
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) // Slightly less prominent
                 )
             }
 
@@ -234,10 +232,6 @@ fun ToggleBreakTypeButton(
             start = 12.dp,
             end = 12.dp,
         ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-            contentColor = MaterialTheme.colorScheme.primary
-        ),
     ) {
         Text(
             text = buttonText,
@@ -257,7 +251,6 @@ fun Audio(video: Video, showDialog: Boolean) {
             text = "Show those moves! Dance like nobody watching",
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onPrimary
         )
 
         if (!showDialog) {
@@ -301,7 +294,6 @@ fun GoForIt() {
         fontWeight = FontWeight.SemiBold,
         style = MaterialTheme.typography.headlineMedium,
         text = "Go for it!",
-        color = MaterialTheme.colorScheme.onPrimary
     )
 }
 
@@ -313,7 +305,6 @@ fun ToDo() {
         fontWeight = FontWeight.SemiBold,
         style = MaterialTheme.typography.headlineMedium,
         text = "To do. Work in progress...",
-        color = MaterialTheme.colorScheme.onPrimary
     )
 }
 
@@ -326,7 +317,6 @@ fun LongBreakContent(modifier: Modifier, viewState: TimerViewState) {
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.headlineMedium,
             text = "Have some food, check direct and stretch a bit, buddy, you deserve it!",
-            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
